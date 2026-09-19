@@ -9,7 +9,7 @@ permissions:
 
 engine:
   id: pi
-  model: anthropic/claude-haiku-4-5
+  model: anthropic/claude-haiku-4-5-20251001
 
 tools:
   cli-proxy: true
@@ -27,7 +27,7 @@ safe-outputs:
   threat-detection:
     engine:
       id: claude
-      model: claude-haiku-4-5
+      model: claude-haiku-4-5-20251001
 
 timeout-minutes: 15
 ---
