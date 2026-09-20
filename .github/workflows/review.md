@@ -2,6 +2,9 @@
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  # The implementer App is not a repository collaborator, so without this the
+  # role check in pre_activation denies its pull requests.
+  bots: [gh-aw-spike-implementer]
 
 permissions:
   contents: read
@@ -18,6 +21,9 @@ tools:
     toolsets: [repos, pull_requests]
 
 safe-outputs:
+  github-app:
+    client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+    private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
   create-pull-request-review-comment:
     max: 5
   submit-pull-request-review:
