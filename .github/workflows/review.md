@@ -32,7 +32,7 @@ safe-outputs:
 timeout-minutes: 15
 ---
 
-# Pull request reviewer
+# Review
 
 Review pull request #${{ github.event.pull_request.number }} in
 ${{ github.repository }}.
