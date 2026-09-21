@@ -92,6 +92,15 @@ safe-outputs:
   create-check-run:
     name: "Agent review"
     max: 1
+  # The one door back to the implementer. rework.md fires on this label.
+  add-labels:
+    allowed: [needs-rework]
+    max: 1
+  # Strikes are CONSECUTIVE: a passing review clears the counters, so three
+  # unrelated failures months apart never escalate (ADR 0009).
+  remove-labels:
+    allowed: ["strike:*", "conflict:*", "needs-rework"]
+    max: 5
   noop:
   threat-detection:
     engine:
@@ -192,7 +201,17 @@ then the blocking themes. Use `###` or lower for any heading.
 You cannot APPROVE — the review App is not configured for it, and an APPROVE will
 fail at runtime.
 
-## Step 5: Publish the verdict as a status check
+## Step 5: Send it back, or clear the slate
+
+If you submitted **REQUEST_CHANGES**, call `add_labels` with `needs-rework`.
+That label is what starts the rework agent; without it your findings sit
+unanswered.
+
+If you submitted **COMMENT**, call `remove_labels` for every `strike:*` and
+`conflict:*` label the pull request carries. Those are the consecutive-failure
+counters, and work you have accepted resets them.
+
+## Step 6: Publish the verdict as a status check
 
 Call `create_check_run` once, so the verdict is a check a ruleset can require
 rather than a comment someone has to read:
@@ -204,7 +223,7 @@ rather than a comment someone has to read:
 The check must agree with the review you submitted in Step 4. If they disagree,
 the check is the one that gates merge, so get it right.
 
-## Step 6: Record what you concluded
+## Step 7: Record what you concluded
 
 Write `/tmp/gh-aw/comment-memory/review.md` with `reviewed_at`, `review_event`,
 `top_themes`, `files_reviewed` and `comment_count`, so the next review of this
