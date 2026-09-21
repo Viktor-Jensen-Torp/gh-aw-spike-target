@@ -51,7 +51,10 @@ safe-outputs:
     allowed-files:
       - "src/**"
       - "test/**"
-    github-token-for-extra-empty-commit: app
+    # No github-token-for-extra-empty-commit: safe-outputs.github-app already
+    # makes the branch push and the PR come from the implementer App, so CI
+    # fires on `opened` by itself. The extra commit only added a second
+    # `synchronize` event, doubling CI and reviewer runs. See FINDINGS.md.
   threat-detection:
     engine:
       id: claude
