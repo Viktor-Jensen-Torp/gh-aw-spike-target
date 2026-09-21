@@ -106,6 +106,44 @@ safe-outputs:
     # terminal. Two retries absorb a flaky detector without weakening the gate.
     retries: 2
 
+# The rework loop is driven from the review that was actually posted, not from
+# the agent remembering to label. On run 35555162071 the agent submitted
+# REQUEST_CHANGES and simply skipped the add_labels step, so the loop never
+# started. Anything the pipeline depends on must not live in a prompt step.
+#
+# conclusion runs after safe_outputs, so by here the review exists.
+jobs:
+  conclusion:
+    pre-steps:
+      - uses: actions/create-github-app-token@v3
+        id: label_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+      - name: Route on the posted verdict
+        env:
+          GH_TOKEN: ${{ steps.label_token.outputs.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          STATE=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
+            --jq '[.[] | select(.user.login == "gh-aw-spike-reviewer[bot]")] | last | .state // ""')
+          echo "latest review by this App: ${STATE:-none}"
+          case "$STATE" in
+            CHANGES_REQUESTED)
+              gh pr edit "$PR" --repo "$REPO" --add-label needs-rework
+              echo "-> needs-rework" ;;
+            COMMENTED|APPROVED)
+              # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
+              DROP=$(gh pr view "$PR" --repo "$REPO" --json labels \
+                --jq '[.labels[].name | select(startswith("strike:") or startswith("conflict:"))] | join(",")')
+              [ -n "$DROP" ] && gh pr edit "$PR" --repo "$REPO" --remove-label "$DROP" || true
+              echo "-> cleared: ${DROP:-nothing}" ;;
+            *)
+              echo "-> no verdict to route" ;;
+          esac
+
 timeout-minutes: 15
 
 evals:
