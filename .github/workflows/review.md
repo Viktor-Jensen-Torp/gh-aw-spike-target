@@ -1,4 +1,8 @@
 ---
+emoji: "🔎"
+description: Critical line-level review of a pull request's diff, ending in one COMMENT or REQUEST_CHANGES review.
+intent: Give an agent-authored pull request a review a maintainer would trust, without a person reading the diff first.
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -14,11 +18,61 @@ engine:
   id: pi
   model: anthropic/claude-haiku-4-5-20251001
 
+# Warm the pre-fetch across re-reviews of the same head commit.
+cache:
+  key: pr-prefetch-${{ github.event.pull_request.head.sha }}
+  path: /tmp/gh-aw/agent
+  restore-keys:
+    - pr-prefetch-${{ github.event.pull_request.number }}-
+
+# Fetch the diff, metadata and existing comments on the runner instead of
+# spending agent turns on it. Adapted from gh-aw's own shared/pr-diff-data-fetch.md;
+# we cannot import that file because it lives in the gh-aw repository.
+pre-agent-steps:
+  - name: Pre-fetch PR diff, metadata and existing review comments
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      EXPR_GITHUB_REPOSITORY: ${{ github.repository }}
+      PR_DIFF_MAX_LINES: "2000"
+    run: |
+      set -euo pipefail
+      mkdir -p /tmp/gh-aw/agent
+      CACHE_HEAD_SHA=""
+      if [ -f /tmp/gh-aw/agent/pr-data-head-sha.txt ]; then
+        CACHE_HEAD_SHA="$(tr -d '\n' < /tmp/gh-aw/agent/pr-data-head-sha.txt)"
+      fi
+      if [ "$PR_HEAD_SHA" = "$CACHE_HEAD_SHA" ] \
+        && [ -f /tmp/gh-aw/agent/pr-diff.patch ] \
+        && [ -f /tmp/gh-aw/agent/pr-meta.json ] \
+        && [ -f /tmp/gh-aw/agent/pr-review-comments.json ]; then
+        echo "Cache hit for head ${PR_HEAD_SHA}"
+      else
+        { gh pr diff "$PR_NUMBER" --repo "$EXPR_GITHUB_REPOSITORY" \
+            --exclude '**/*.lock.yml' || true; } \
+          | head -n "${PR_DIFF_MAX_LINES}" > /tmp/gh-aw/agent/pr-diff.patch
+        gh pr view "$PR_NUMBER" --repo "$EXPR_GITHUB_REPOSITORY" \
+          --json number,title,body,headRefName,headRefOid,additions,deletions,changedFiles,files \
+          > /tmp/gh-aw/agent/pr-meta.json
+        gh api "repos/$EXPR_GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments" --paginate \
+          --jq '.[] | {id, path, line: (.line // .original_line), body: .body[:200], user: .user.login}' \
+          2>/dev/null | jq -s '.' > /tmp/gh-aw/agent/pr-review-comments.json \
+          || echo '[]' > /tmp/gh-aw/agent/pr-review-comments.json
+        printf '%s\n' "$PR_HEAD_SHA" > /tmp/gh-aw/agent/pr-data-head-sha.txt
+        echo "Pre-fetched $(wc -l < /tmp/gh-aw/agent/pr-diff.patch) diff lines for head ${PR_HEAD_SHA}"
+      fi
+
 tools:
   cli-proxy: true
   github:
     mode: gh-proxy
-    toolsets: [repos, pull_requests]
+    # Only act on trusted content. Our own PRs are non-fork on a public repo,
+    # which is `approved`; this is also the runtime default for public repos.
+    min-integrity: approved
+    toolsets: [pull_requests, repos]
+  comment-memory:
+    memory-id: review
 
 safe-outputs:
   github-app:
@@ -26,10 +80,13 @@ safe-outputs:
     private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
   create-pull-request-review-comment:
     max: 5
+    side: "RIGHT"
   submit-pull-request-review:
     max: 1
+    # GITHUB_TOKEN cannot APPROVE; see gh-aw's pr-reviewer guide.
     allowed-events: [COMMENT, REQUEST_CHANGES]
     supersede-older-reviews: true
+  noop:
   threat-detection:
     engine:
       id: claude
@@ -44,21 +101,98 @@ safe-outputs:
     retries: 2
 
 timeout-minutes: 15
+
+evals:
+  - id: review_submitted
+    question: Did the agent submit exactly one pull request review, with the event set to COMMENT or REQUEST_CHANGES?
+  - id: findings_scoped
+    question: Are all of the agent's review comments about lines that appear in the pull request diff, rather than unrelated code?
+  - id: criteria_followed
+    question: If the agent chose REQUEST_CHANGES, did it name at least one concrete defect? If it chose COMMENT, are all of its findings non-blocking?
 ---
 
 # Review
 
-Review pull request #${{ github.event.pull_request.number }} in
-${{ github.repository }}.
+You are a sceptical reviewer for pull request
+#${{ github.event.pull_request.number }} in ${{ github.repository }}. This pull
+request was written by an agent, so assume it is plausible-looking and unverified
+until you have checked it.
 
-1. Read the pull request's title, description and full diff.
-2. For each concrete problem you find (a bug, a missing check, unclear code),
-   leave a line comment on the exact changed line with
-   `create_pull_request_review_comment`. Leave at least one line comment: if
-   you find no problem, comment on the most important changed line saying what
-   it does and why it looks right.
-3. Submit one review with `submit_pull_request_review`. Use `REQUEST_CHANGES`
-   if any comment points out a real problem, otherwise `COMMENT`. The review
-   body is a short summary of what the change does and what you found.
+Note: gh-aw supports an inline sub-agent for first-pass issue mining, but only on
+the Copilot, Claude, Codex and Gemini engines. This workflow runs on Pi, so the
+analysis below is single-pass.
 
-Do not try to change any files.
+## Step 1: Read the pre-fetched data
+
+The diff and metadata are already on disk. Read all three in one turn:
+
+- `/tmp/gh-aw/agent/pr-diff.patch` — the diff, capped at 2000 lines
+- `/tmp/gh-aw/agent/pr-meta.json` — number, title, body, changed files, counts
+- `/tmp/gh-aw/agent/pr-review-comments.json` — existing inline comments, each with
+  `id`, `path`, `line`, `body`, `user`. Read these so you do not repeat a point
+  someone has already made.
+
+Do **not** call `get_diff` or `get_review_comments`; the files above are already
+capped and fetching again wastes the budget.
+
+If this pull request has been reviewed before, also read
+`/tmp/gh-aw/comment-memory/review.md` for what the last review concluded, so a
+re-review builds on it instead of restating it.
+
+## Step 2: Analyse the changed lines
+
+Review only lines that appear in the diff. Look for:
+
+- Logic errors, unhandled edge cases, missing error handling
+- Behaviour that does not match what the linked issue or the PR body claims
+- Tests that assert the implementation rather than the requirement, and missing
+  cases for the boundaries the change introduces
+- Unsafe input handling, hardcoded credentials, unsafe string interpolation
+- Performance traps: unnecessary passes over data, N+1 patterns
+- Unclear names, magic numbers, comments that no longer match the code
+- Dead or commented-out code, duplicated logic, needless complexity
+
+## Step 3: Write line comments
+
+Use `create_pull_request_review_comment` for each finding, with the exact file
+path and line from the diff. At most 5, spent in this order:
+
+1. Correctness and security defects (up to 3)
+2. Missing or weak test coverage for the change (up to 1)
+3. Maintainability, and only where it materially raises risk (up to 1)
+
+Each comment: one sentence naming the defect and its consequence, then a
+`<details><summary>💡 Why</summary>` block with the reasoning and a concrete fix.
+
+Do not comment on: anything a linter already catches, style preference without a
+consequence, unchanged lines, or praise.
+
+## Step 4: Submit one review
+
+Call `submit_pull_request_review` once.
+
+Use **REQUEST_CHANGES** when any of these is true:
+
+- A change can cause wrong output, data loss, a crash, or a security problem
+- The change does not do what the issue asked
+- The change is untested and its behaviour is not obvious from reading it
+- Three or more separate maintainability findings point at the same weakness
+
+Use **COMMENT** when every finding is non-blocking, and when you found nothing.
+
+The review body is: a verdict line, then one sentence on what the change does,
+then the blocking themes. Use `###` or lower for any heading.
+
+You cannot APPROVE — the review App is not configured for it, and an APPROVE will
+fail at runtime.
+
+## Step 5: Record what you concluded
+
+Write `/tmp/gh-aw/comment-memory/review.md` with `reviewed_at`, `review_event`,
+`top_themes`, `files_reviewed` and `comment_count`, so the next review of this
+pull request can pick up where you left off.
+
+If after all of this there is genuinely nothing to post, call the `noop` tool with
+a one-line reason. Never finish without calling a safe-output tool.
+
+Do not modify any files.
