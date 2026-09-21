@@ -37,17 +37,19 @@ on:
   # agent keeps is a counter the agent can lose. Labels are the only state that
   # survives a run, and unlike the run log they are visible on the pull request.
   # Design follows ../pi-github-test docs/adr/0009-the-rework-loop.md.
+  #
+  # The label writes below use GITHUB_TOKEN, deliberately, NOT an App token.
+  # An App-applied label fires `pull_request labeled` again, and gh-aw's PR
+  # concurrency group cancels the run in flight: on run 35556564292 the gate
+  # added strike:1, that event started run 35556639139, and the second killed
+  # the first before the agent did anything. github-actions[bot] labels do not
+  # trigger workflows, which is exactly what a counter wants. Only the reviewer's
+  # needs-rework label is meant to chain, and that one is applied by its App.
   steps:
-    - uses: actions/create-github-app-token@v3
-      id: token
-      with:
-        client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
-        private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
-
     - name: Decide whether to rework, and what for
       id: gate
       env:
-        GH_TOKEN: ${{ steps.token.outputs.token }}
+        GH_TOKEN: ${{ github.token }}
         REPO: ${{ github.repository }}
         PR: ${{ github.event.pull_request.number }}
         LABELLED_SHA: ${{ github.event.pull_request.head.sha }}

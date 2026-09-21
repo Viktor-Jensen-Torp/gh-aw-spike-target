@@ -79,7 +79,9 @@ safe-outputs:
     client-id: ${{ vars.REVIEWER_CLIENT_ID }}
     private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
   create-pull-request-review-comment:
-    max: 5
+    # Matches gh-aw's own reviewer. Comments beyond max are silently skipped
+    # (create_pr_review_comment.cjs), so a low cap can drop a real finding.
+    max: 10
     side: "RIGHT"
   submit-pull-request-review:
     max: 1
@@ -199,10 +201,10 @@ Review only lines that appear in the diff. Look for:
 ## Step 3: Write line comments
 
 Use `create_pull_request_review_comment` for each finding, with the exact file
-path and line from the diff. At most 5, spent in this order:
+path and line from the diff. At most 10, spent in this order:
 
-1. Correctness and security defects (up to 3)
-2. Missing or weak test coverage for the change (up to 1)
+1. Correctness and security defects (up to 6)
+2. Missing or weak test coverage for the change (up to 3)
 3. Maintainability, and only where it materially raises risk (up to 1)
 
 Each comment: one sentence naming the defect and its consequence, then a
