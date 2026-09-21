@@ -86,6 +86,12 @@ safe-outputs:
     # GITHUB_TOKEN cannot APPROVE; see gh-aw's pr-reviewer guide.
     allowed-events: [COMMENT, REQUEST_CHANGES]
     supersede-older-reviews: true
+  # The verdict as a status check, so a ruleset can require it before merge.
+  # Needs checks:write on the reviewer App. Keep `name` stable: rulesets match
+  # required checks by name (.github/aw/pr-reviewer.md).
+  create-check-run:
+    name: "Agent review"
+    max: 1
   noop:
   threat-detection:
     engine:
@@ -186,7 +192,19 @@ then the blocking themes. Use `###` or lower for any heading.
 You cannot APPROVE — the review App is not configured for it, and an APPROVE will
 fail at runtime.
 
-## Step 5: Record what you concluded
+## Step 5: Publish the verdict as a status check
+
+Call `create_check_run` once, so the verdict is a check a ruleset can require
+rather than a comment someone has to read:
+
+- `conclusion`: `failure` if you submitted REQUEST_CHANGES, `success` if COMMENT
+- `title`: the verdict and the count, e.g. `REQUEST_CHANGES — 2 blocking issues`
+- `summary`: the same blocking themes as the review body, in markdown
+
+The check must agree with the review you submitted in Step 4. If they disagree,
+the check is the one that gates merge, so get it right.
+
+## Step 6: Record what you concluded
 
 Write `/tmp/gh-aw/comment-memory/review.md` with `reviewed_at`, `review_event`,
 `top_themes`, `files_reviewed` and `comment_count`, so the next review of this
