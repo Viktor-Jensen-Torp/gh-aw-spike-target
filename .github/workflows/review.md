@@ -92,15 +92,6 @@ safe-outputs:
   create-check-run:
     name: "Agent review"
     max: 1
-  # The one door back to the implementer. rework.md fires on this label.
-  add-labels:
-    allowed: [needs-rework]
-    max: 1
-  # Strikes are CONSECUTIVE: a passing review clears the counters, so three
-  # unrelated failures months apart never escalate (ADR 0009).
-  remove-labels:
-    allowed: ["strike:*", "conflict:*", "needs-rework"]
-    max: 5
   noop:
   threat-detection:
     engine:
@@ -114,6 +105,44 @@ safe-outputs:
     # threat-detect's own default is 0, so one clean exit without a verdict is
     # terminal. Two retries absorb a flaky detector without weakening the gate.
     retries: 2
+
+# The rework loop is driven from the review that was actually posted, not from
+# the agent remembering to label. On run 35555162071 the agent submitted
+# REQUEST_CHANGES and simply skipped the add_labels step, so the loop never
+# started. Anything the pipeline depends on must not live in a prompt step.
+#
+# conclusion runs after safe_outputs, so by here the review exists.
+jobs:
+  conclusion:
+    pre-steps:
+      - uses: actions/create-github-app-token@v3
+        id: label_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+      - name: Route on the posted verdict
+        env:
+          GH_TOKEN: ${{ steps.label_token.outputs.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          STATE=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
+            --jq '[.[] | select(.user.login == "gh-aw-spike-reviewer[bot]")] | last | .state // ""')
+          echo "latest review by this App: ${STATE:-none}"
+          case "$STATE" in
+            CHANGES_REQUESTED)
+              gh pr edit "$PR" --repo "$REPO" --add-label needs-rework
+              echo "-> needs-rework" ;;
+            COMMENTED|APPROVED)
+              # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
+              DROP=$(gh pr view "$PR" --repo "$REPO" --json labels \
+                --jq '[.labels[].name | select(startswith("strike:") or startswith("conflict:"))] | join(",")')
+              [ -n "$DROP" ] && gh pr edit "$PR" --repo "$REPO" --remove-label "$DROP" || true
+              echo "-> cleared: ${DROP:-nothing}" ;;
+            *)
+              echo "-> no verdict to route" ;;
+          esac
 
 timeout-minutes: 15
 
@@ -201,17 +230,7 @@ then the blocking themes. Use `###` or lower for any heading.
 You cannot APPROVE — the review App is not configured for it, and an APPROVE will
 fail at runtime.
 
-## Step 5: Send it back, or clear the slate
-
-If you submitted **REQUEST_CHANGES**, call `add_labels` with `needs-rework`.
-That label is what starts the rework agent; without it your findings sit
-unanswered.
-
-If you submitted **COMMENT**, call `remove_labels` for every `strike:*` and
-`conflict:*` label the pull request carries. Those are the consecutive-failure
-counters, and work you have accepted resets them.
-
-## Step 6: Publish the verdict as a status check
+## Step 5: Publish the verdict as a status check
 
 Call `create_check_run` once, so the verdict is a check a ruleset can require
 rather than a comment someone has to read:
@@ -223,7 +242,7 @@ rather than a comment someone has to read:
 The check must agree with the review you submitted in Step 4. If they disagree,
 the check is the one that gates merge, so get it right.
 
-## Step 7: Record what you concluded
+## Step 6: Record what you concluded
 
 Write `/tmp/gh-aw/comment-memory/review.md` with `reviewed_at`, `review_event`,
 `top_themes`, `files_reviewed` and `comment_count`, so the next review of this
