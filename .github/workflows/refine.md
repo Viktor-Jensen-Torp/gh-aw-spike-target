@@ -160,7 +160,13 @@ safe-outputs:
     issue_number: integer
     outcome: string
     reason: string
+  # A quiet night must write nothing. gh-aw's default opens an "[aw] No-Op Runs"
+  # issue every time a run no-ops, which for a nightly role that legitimately
+  # has nothing to do most nights is a new issue most nights — and each one then
+  # shows up in the backlog this role reads. Run 35777771038 created #23 that
+  # way. The run's own summary is the record.
   noop:
+    report-as-issue: false
   threat-detection:
     engine:
       id: claude
@@ -204,7 +210,11 @@ ask for something that is already there or describe it in the wrong terms.
 
 **Make it ready.** If the issue is nearly there and you can close the gap from
 what is already in the repository, rewrite it into the template's shape with
-`update_issue` and add `refined` with `add_labels`. Keep the author's intent and their words where you
+`update_issue` and add `refined` with `add_labels`. **Replace the body — do not
+append to it.** The new body is the whole issue, in the template's headings,
+with the author's own words carried into them. Leaving the original text above
+your version doubles the issue and makes an implementer read two specifications
+and guess which one counts. The edit history keeps what was there before. Keep the author's intent and their words where you
 can; you are filling in what an implementer would otherwise have to ask, not
 rewriting their request into your own. State the behaviour wanted, what happens
 at the boundaries, and how anyone would know it works. Do not invent a
