@@ -1,0 +1,73 @@
+name: Config drift
+
+# Fails loudly when `.github/` differs between `main` and `develop`.
+#
+# Why this can happen at all: GitHub decides which copy of a workflow to run by
+# how the workflow was triggered. An issue-triggered workflow (implement) runs
+# the DEFAULT branch's copy — `main`. A pull-request-triggered one (review,
+# rework, release-review) runs the copy on the branch under review, which is cut
+# from `develop`. Scheduled and dispatched workflows also follow the default
+# branch.
+#
+# So if the two branches' `.github/` ever differ, half the pipeline runs one
+# version of the rules and half runs another, and nothing says so. That is the
+# release-skew trap in ../pi-github-test ADR 0019, and it is invisible by
+# nature: the only symptom is an agent behaving like last week.
+#
+# The rule this enforces: `.github/` is infrastructure, kept identical on both
+# branches and pushed to both, never carried through the daily release. This
+# does not prevent drift — it makes it loud, which is the next best thing and
+# the only honest one, since nothing can merge to `develop` unattended.
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['.github/**']
+  schedule:
+    - cron: "15 6 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Compare .github on main and develop
+        run: |
+          set -euo pipefail
+          git fetch -q origin main develop
+
+          # A plain tree diff, not `git compare`: a three-dot comparison is
+          # relative to the merge base and would hide changes made on one side
+          # only, which is exactly the case we are looking for.
+          DIFF=$(git diff --name-only origin/main origin/develop -- .github/ || true)
+
+          if [ -z "$DIFF" ]; then
+            echo "✅ .github/ is identical on main and develop" >> "$GITHUB_STEP_SUMMARY"
+            echo "no drift"
+            exit 0
+          fi
+
+          {
+            echo "### ⚠️ \`.github/\` differs between \`main\` and \`develop\`"
+            echo
+            echo "Half the pipeline is running a different version of the rules from the other half:"
+            echo "issue-triggered workflows use \`main\`'s copy, pull-request-triggered ones use \`develop\`'s."
+            echo
+            echo '```'
+            echo "$DIFF"
+            echo '```'
+            echo
+            echo "Fix: push the change to whichever branch is behind. \`.github/\` is infrastructure —"
+            echo "it belongs on both branches and never travels through the daily release."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::error::.github/ differs between main and develop: $(echo "$DIFF" | tr '\n' ' ')"
+          exit 1
