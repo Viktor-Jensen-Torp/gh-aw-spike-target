@@ -12,7 +12,7 @@ on:
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
-  skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent -label:agentic-workflows"
+  skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent -label:agentic-workflows -label:draft"
 
   stop-after: +30d
 
@@ -56,12 +56,20 @@ pre-agent-steps:
       # Skip anything a person or an agent is already working from, anything a
       # previous night judged ready, anything parked on a human decision, and
       # gh-aw's own bookkeeping issues — a failure report is not backlog.
+      #
+      # `draft` is the author's own opt-out: a half-written reminder they intend
+      # to finish later. It is opt-OUT rather than an opt-IN "ready to refine"
+      # label on purpose — with opt-in, an issue nobody remembers to mark is an
+      # issue that is never refined, and silent starvation is this pipeline's
+      # recurring failure shape. The settling period below covers the author who
+      # is still typing; `draft` covers the one who has deliberately stopped.
       gh issue list --repo "$REPO" --state open --limit 100 \
         --json number,title,body,labels,createdAt,updatedAt,comments \
         --jq "[ .[]
                 | select([.labels[].name] | any(. == \"refined\" or . == \"implement\"
                     or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
-                    or . == \"needs-shape\" or . == \"agentic-workflows\") | not)
+                    or . == \"needs-shape\" or . == \"agentic-workflows\"
+                    or . == \"draft\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],
