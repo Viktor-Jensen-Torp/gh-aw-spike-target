@@ -208,6 +208,12 @@ safe-outputs:
     required-labels: [agent]
     if-no-changes: error
     commit-title-suffix: " [rework]"
+    # Skip the pre-push branch-protection lookup. It needs administration: read,
+    # and with safe-outputs.github-app gh-aw REQUESTS that permission when minting
+    # the token, so an App without it fails the whole job (run 35681365661) —
+    # not the "warning and continue" the docs describe. GitHub still enforces
+    # protection when the push lands, and rework only pushes to agent PR branches.
+    check-branch-protection: false
   add-comment:
     max: 1
   noop:
