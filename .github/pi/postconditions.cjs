@@ -66,7 +66,7 @@ const ROLES = {
   // finishing with no output at all does not, because that is indistinguishable
   // from a run that decided something and forgot to write it.
   refine: {
-    required: [["update_issue", "add_labels", "add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    required: [["update_issue", "add_labels", "add_comment", "set_issue_type", "assign_milestone", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
   },
   // The release read is advice to a person, never a gate: `main` is merged by a

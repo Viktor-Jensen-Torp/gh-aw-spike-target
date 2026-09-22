@@ -1,5 +1,5 @@
-# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"d1d09cac18be16a45aaf292bda9a5fb14026eb20089e8f7b4131cf5b08969d73","body_hash":"83e8262c48cf31c3fd869f1d46070837901efb88fe143558680cd7613f5f68ba","stop_time":"2026-10-22 19:05:59","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
-# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","add_labels","missing_data","missing_tool","noop","update_issue"]}]}
+# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"58c1679fd4f24f05dbf517e4f58a8a15f94d3c11d26bba1979ba18b1b6c4ff10","body_hash":"614ad4c8412f5b922f61a44a8c467a6ab0dd5c3fa3dbb2f4f72e711ab2adf610","stop_time":"2026-10-22 19:05:59","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
+# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","add_labels","assign_milestone","missing_data","missing_tool","noop","set_issue_type","update_issue"]}]}
 # This file was automatically generated by gh-aw (v0.88.7). DO NOT EDIT. To debug this workflow, load the skill at https://github.com/github/gh-aw/blob/main/debug.md
 #
 #    ___                   _   _
@@ -285,7 +285,7 @@ jobs:
           GH_AW_GITHUB_RUN_ID: ${{ github.run_id }}
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
           GH_AW_PROMPT_CONTENT_0000: "<system>\n"
-          GH_AW_PROMPT_CONTENT_0001: "<safe-output-tools>\nTools: add_comment(max:15), update_issue(max:15), add_labels(max:15), missing_tool, missing_data, noop\n"
+          GH_AW_PROMPT_CONTENT_0001: "<safe-output-tools>\nTools: add_comment(max:15), update_issue(max:15), add_labels(max:15), assign_milestone(max:15), set_issue_type(max:15), missing_tool, missing_data, noop\n"
           GH_AW_PROMPT_CONTENT_0002: "</safe-output-tools>\n"
           GH_AW_PROMPT_CONTENT_0003: "<github-context>\nThe following GitHub context information is available for this workflow:\n{{#if github.actor}}\n- **actor**: __GH_AW_GITHUB_ACTOR__\n{{/if}}\n{{#if github.repository}}\n- **repository**: __GH_AW_GITHUB_REPOSITORY__\n{{/if}}\n{{#if github.workspace}}\n- **workspace**: __GH_AW_GITHUB_WORKSPACE__\n{{/if}}\n{{#if github.event.issue.number || (github.aw.context.item_type == 'issue' && github.aw.context.item_number)}}\n- **issue-number**: #__GH_AW_EXPR_802A9F6A__\n{{/if}}\n{{#if github.event.discussion.number || (github.aw.context.item_type == 'discussion' && github.aw.context.item_number)}}\n- **discussion-number**: #__GH_AW_EXPR_1A3A194A__\n{{/if}}\n{{#if github.event.pull_request.number || (github.aw.context.item_type == 'pull_request' && github.aw.context.item_number)}}\n- **pull-request-number**: #__GH_AW_EXPR_463A214A__\n{{/if}}\n{{#if github.event.comment.id || github.aw.context.comment_id}}\n- **comment-id**: __GH_AW_EXPR_FF1D34CE__\n{{/if}}\n{{#if github.run_id}}\n- **workflow-run-id**: __GH_AW_GITHUB_RUN_ID__\n{{/if}}\n</github-context>\n\n"
           GH_AW_PROMPT_CONTENT_0004: "</system>\n"
@@ -557,7 +557,7 @@ jobs:
         env:
           GH_AW_FILE_ROOT: "${{ runner.temp }}/gh-aw"
           GH_AW_FILE_CONFIG: "{\"files\":[{\"path\":\"safeoutputs/config.json\",\"content_env\":\"GH_AW_SAFE_OUTPUTS_CONFIG\"}]}"
-          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"add_comment\":{\"max\":15,\"target\":\"*\"},\"add_labels\":{\"allowed\":[\"refined\",\"needs-shape\",\"needs-split\"],\"max\":15,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"true\"},\"report_incomplete\":{},\"update_issue\":{\"allow_body\":true,\"allow_title\":true,\"max\":15,\"target\":\"*\"}}"
+          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"add_comment\":{\"data_enabled\":true,\"data_schema\":{\"additionalProperties\":false,\"properties\":{\"issue_number\":{\"type\":\"integer\"},\"outcome\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"}},\"required\":[\"issue_number\",\"outcome\",\"reason\"],\"type\":\"object\"},\"max\":15,\"target\":\"*\"},\"add_labels\":{\"allowed\":[\"refined\",\"needs-shape\",\"needs-split\",\"bug\",\"enhancement\",\"documentation\"],\"max\":15,\"target\":\"*\"},\"assign_milestone\":{\"max\":15,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"true\"},\"report_incomplete\":{},\"set_issue_type\":{\"allowed\":[\"Task\",\"Bug\",\"Feature\"],\"max\":15,\"target\":\"*\"},\"update_issue\":{\"allow_body\":true,\"allow_title\":true,\"max\":15,\"target\":\"*\"}}"
         with:
           script: |
             const path = require('path');
@@ -572,11 +572,146 @@ jobs:
             {
               "description_suffixes": {
                 "add_comment": " CONSTRAINTS: Maximum 15 comment(s) can be added. Target: *. Supports reply_to_id for discussion threading.",
-                "add_labels": " CONSTRAINTS: Maximum 15 label(s) can be added. Only these labels are allowed: [\"refined\" \"needs-shape\" \"needs-split\"]. Target: *.",
+                "add_labels": " CONSTRAINTS: Maximum 15 label(s) can be added. Only these labels are allowed: [\"refined\" \"needs-shape\" \"needs-split\" \"bug\" \"enhancement\" \"documentation\"]. Target: *.",
+                "assign_milestone": " CONSTRAINTS: Maximum 15 milestone assignment(s) can be made.",
                 "update_issue": " CONSTRAINTS: Maximum 15 issue(s) can be updated. Target: *. Body updates are allowed."
               },
               "repo_params": {},
-              "dynamic_tools": []
+              "dynamic_tools": [],
+              "property_injections": {
+                "add_comment": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "create_issue": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "create_pull_request": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "create_pull_request_review_comment": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "reply_to_pull_request_review_comment": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "submit_pull_request_review": {
+                  "data": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "issue_number": {
+                        "type": "integer"
+                      },
+                      "outcome": {
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "issue_number",
+                      "outcome",
+                      "reason"
+                    ],
+                    "type": "object"
+                  }
+                }
+              }
             }
           GH_AW_VALIDATION_JSON: |
             {
@@ -619,6 +754,27 @@ jobs:
                     "type": "string",
                     "pattern": "^#?aw_[A-Za-z0-9_]{3,12}$"
                   }
+                },
+                "dataEnabled": true,
+                "dataSchema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "issue_number": {
+                      "type": "integer"
+                    },
+                    "outcome": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "issue_number",
+                    "outcome",
+                    "reason"
+                  ],
+                  "type": "object"
                 }
               },
               "add_labels": {
@@ -636,6 +792,27 @@ jobs:
                     "maxLength": 256
                   }
                 }
+              },
+              "assign_milestone": {
+                "defaultMax": 1,
+                "fields": {
+                  "issue_number": {
+                    "issueNumberOrTemporaryId": true
+                  },
+                  "milestone_number": {
+                    "optionalPositiveInteger": true
+                  },
+                  "milestone_title": {
+                    "type": "string",
+                    "sanitize": true,
+                    "maxLength": 128
+                  },
+                  "repo": {
+                    "type": "string",
+                    "maxLength": 256
+                  }
+                },
+                "customValidation": "requiresOneOf:milestone_number,milestone_title"
               },
               "missing_data": {
                 "defaultMax": 20,
@@ -707,6 +884,42 @@ jobs:
                     "type": "string",
                     "sanitize": true,
                     "maxLength": 1024
+                  }
+                }
+              },
+              "set_issue_type": {
+                "defaultMax": 5,
+                "fields": {
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "LOW",
+                      "MEDIUM",
+                      "HIGH"
+                    ],
+                    "x-strip-on-error": true
+                  },
+                  "issue_number": {
+                    "issueOrPRNumber": true
+                  },
+                  "issue_type": {
+                    "required": true,
+                    "type": "string",
+                    "sanitize": true,
+                    "maxLength": 128
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "sanitize": true,
+                    "maxLength": 280,
+                    "x-strip-on-error": true
+                  },
+                  "repo": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "suggest": {
+                    "type": "boolean"
                   }
                 }
               },
@@ -1770,6 +1983,7 @@ jobs:
       GH_AW_WORKFLOW_NAME: "Refine"
       GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/refine.md"
     outputs:
+      assign_milestone_milestone_assigned: ${{ steps.process_safe_outputs.outputs.milestone_assigned }}
       code_push_failure_count: ${{ steps.process_safe_outputs.outputs.code_push_failure_count }}
       code_push_failure_errors: ${{ steps.process_safe_outputs.outputs.code_push_failure_errors }}
       comment_id: ${{ steps.process_safe_outputs.outputs.comment_id }}
@@ -1838,7 +2052,7 @@ jobs:
           GH_AW_ALLOWED_DOMAINS: "api.snapcraft.io,archive.ubuntu.com,azure.archive.ubuntu.com,crl.geotrust.com,crl.globalsign.com,crl.identrust.com,crl.sectigo.com,crl.thawte.com,crl.usertrust.com,crl.verisign.com,crl3.digicert.com,crl4.digicert.com,crls.ssl.com,json-schema.org,json.schemastore.org,keyserver.ubuntu.com,ocsp.digicert.com,ocsp.geotrust.com,ocsp.globalsign.com,ocsp.identrust.com,ocsp.sectigo.com,ocsp.ssl.com,ocsp.thawte.com,ocsp.usertrust.com,ocsp.verisign.com,packagecloud.io,packages.cloud.google.com,packages.microsoft.com,ppa.launchpad.net,s.symcb.com,s.symcd.com,security.ubuntu.com,ts-crl.ws.symantec.com,ts-ocsp.ws.symantec.com,www.googleapis.com"
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_API_URL: ${{ github.api_url }}
-          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":15,\"target\":\"*\"},\"add_labels\":{\"allowed\":[\"refined\",\"needs-shape\",\"needs-split\"],\"max\":15,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"true\"},\"report_incomplete\":{},\"update_issue\":{\"allow_body\":true,\"allow_title\":true,\"max\":15,\"target\":\"*\"}}"
+          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":15,\"target\":\"*\"},\"add_labels\":{\"allowed\":[\"refined\",\"needs-shape\",\"needs-split\",\"bug\",\"enhancement\",\"documentation\"],\"max\":15,\"target\":\"*\"},\"assign_milestone\":{\"max\":15,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"true\"},\"report_incomplete\":{},\"set_issue_type\":{\"allowed\":[\"Task\",\"Bug\",\"Feature\"],\"max\":15,\"target\":\"*\"},\"update_issue\":{\"allow_body\":true,\"allow_title\":true,\"max\":15,\"target\":\"*\"}}"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |

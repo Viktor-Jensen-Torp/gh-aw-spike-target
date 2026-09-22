@@ -117,7 +117,29 @@ safe-outputs:
     # A scheduled run has no triggering issue, so the default `triggering`
     # target would have nothing to act on.
     target: "*"
-    allowed: [refined, needs-shape, needs-split]
+    allowed: [refined, needs-shape, needs-split, bug, enhancement, documentation]
+  # What kind of work this is. The org defines Task, Bug and Feature; an issue
+  # type is a typed field, unlike a label, so it is the better home for a
+  # classification the pipeline may later read.
+  set-issue-type:
+    max: 15
+    target: "*"
+    allowed: [Task, Bug, Feature]
+  # Existing milestones only — no `auto_create`. Deciding that a release exists
+  # and what goes in it is planning, and planning stays with people for the same
+  # reason decomposition does (../pi-github-test ADR 0015). With no milestones
+  # defined, this output simply never fires.
+  assign-milestone:
+    max: 15
+    target: "*"
+  # A typed record of what the role decided about each issue, alongside the
+  # writes. Modelled on gh-aw's own issue-triage-agent. The point is ADR 0018's:
+  # a decision derived from named fields cannot be quietly inconsistent with
+  # itself the way a decision buried in prose can.
+  data:
+    issue_number: integer
+    outcome: string
+    reason: string
   noop:
   threat-detection:
     engine:
@@ -143,6 +165,12 @@ start on an issue tomorrow without asking anyone a question.
   anyone would know it works.
 - **Small** — one pull request's worth, reviewable in one sitting.
 
+**The shape of a ready issue is defined in `.github/ISSUE_TEMPLATE/work-item.md`
+— read that file first and use exactly its headings.** It is the single
+definition of ready; do not invent your own structure, and if it changes, follow
+it. Keep a heading the author left empty only if you genuinely cannot fill it,
+and say why under it.
+
 ## Step 1: Read the candidates
 
 `/tmp/gh-aw/agent/refine-candidates.json` holds the issues to consider this run,
@@ -155,8 +183,8 @@ ask for something that is already there or describe it in the wrong terms.
 ## Step 2: For each candidate, do exactly one of these
 
 **Make it ready.** If the issue is nearly there and you can close the gap from
-what is already in the repository, rewrite it with `update_issue` and add
-`refined` with `add_labels`. Keep the author's intent and their words where you
+what is already in the repository, rewrite it into the template's shape with
+`update_issue` and add `refined` with `add_labels`. Keep the author's intent and their words where you
 can; you are filling in what an implementer would otherwise have to ask, not
 rewriting their request into your own. State the behaviour wanted, what happens
 at the boundaries, and how anyone would know it works. Do not invent a
@@ -176,7 +204,27 @@ up.
 Noticing that an issue is too big is much easier than dividing it well, and
 dividing it is the author's call.
 
-## Step 3: A quiet night writes nothing
+## Step 3: Classify what you touched
+
+For every issue you mark `refined`, also:
+
+- **Set its type** with `set_issue_type`: `Bug` for something behaving wrongly,
+  `Feature` for new behaviour, `Task` for everything else. One of the three
+  always applies; this is not a judgement call to agonise over.
+- **Add at most one topic label** — `bug`, `enhancement` or `documentation` —
+  and only when it is obvious. A label nobody filters on is noise.
+- **Assign a milestone** with `assign_milestone` only if an existing milestone
+  clearly covers this work. Never invent one: deciding that a release exists,
+  and what goes in it, is a person's call. If no milestone fits, assign none.
+
+## Step 4: Record what you decided
+
+Emit one `data` record per issue you considered, with `issue_number`, `outcome`
+— exactly one of `ready`, `rewritten`, `question`, `too-big` — and a one-line
+`reason`. Name the outcome you actually took; a record that disagrees with what
+you did is worse than no record.
+
+## Step 5: A quiet night writes nothing
 
 If every candidate is already ready and correctly labelled, or there are no
 candidates, call `noop` with a one-line reason. An agent asked to improve a
