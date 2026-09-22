@@ -4,6 +4,12 @@ description: Moves open issues toward ready — clear enough to start without as
 intent: Let a person write an issue the way they think, and have it be implementable by morning, without a person rewriting it.
 
 on:
+  # Refine one issue now, without waiting for tonight. gh-aw removes the label
+  # again after the run, so it reads as a verb rather than a state.
+  label_command:
+    name: refine
+    events: [issues]
+
   # Fuzzy `daily` rather than a fixed cron: the compiler warns that a fixed
   # time contributes to load spikes, and scheduled runs are dropped — not
   # merely delayed — when GitHub is busy, which is worst on the hour.
@@ -17,7 +23,11 @@ on:
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
-  skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent -label:agentic-workflows -label:draft"
+  # Deliberately broad. A narrower query would also gate the `refine` label, so
+  # labelling an already-refined issue would silently do nothing — and "I asked
+  # and nothing happened" is worse than one cheap no-op run on a settled
+  # backlog. The deterministic step below does the real filtering.
+  skip-if-no-match: "is:issue is:open"
 
   stop-after: +30d
 
@@ -64,9 +74,24 @@ pre-agent-steps:
       # settling period buys that without asking anyone to remember a label —
       # an issue nobody remembers to mark would simply never be refined.
       SETTLE_HOURS: ${{ inputs.settle_hours || '4' }}
+      TRIGGERING_ISSUE: ${{ github.event.issue.number }}
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
+
+      # Asked for by name: refine exactly that issue, and skip every filter.
+      # The settling period, `draft` and `refined` all exist to decide what to
+      # touch UNASKED. A person applying the label has already decided.
+      if [ -n "${TRIGGERING_ISSUE:-}" ] && [ "$TRIGGERING_ISSUE" != "0" ]; then
+        gh issue view "$TRIGGERING_ISSUE" --repo "$REPO" \
+          --json number,title,body,labels,createdAt,comments \
+          --jq "[ {number, title, body: (.body // \"\")[0:4000],
+                   labels: [.labels[].name], createdAt, comments} ]" \
+          > /tmp/gh-aw/agent/refine-candidates.json
+        echo "asked by label: #$TRIGGERING_ISSUE"
+        exit 0
+      fi
+
       CUTOFF=$(date -u -d "-${SETTLE_HOURS} hours" +%Y-%m-%dT%H:%M:%SZ)
       # Skip anything a person or an agent is already working from, anything a
       # previous night judged ready, anything parked on a human decision, and
@@ -76,8 +101,8 @@ pre-agent-steps:
       # to finish later. It is opt-OUT rather than an opt-IN "ready to refine"
       # label on purpose — with opt-in, an issue nobody remembers to mark is an
       # issue that is never refined, and silent starvation is this pipeline's
-      # recurring failure shape. The settling period below covers the author who
-      # is still typing; `draft` covers the one who has deliberately stopped.
+      # recurring failure shape. The settling period covers the author who is
+      # still typing; `draft` covers the one who has deliberately stopped.
       gh issue list --repo "$REPO" --state open --limit 100 \
         --json number,title,body,labels,createdAt,updatedAt,comments \
         --jq "[ .[]
