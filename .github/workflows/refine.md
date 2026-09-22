@@ -43,7 +43,11 @@ pre-agent-steps:
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
-      MAX_ISSUES: "5"
+      # Must stay equal to the safe-output `max` values below. gh-aw drops
+      # output beyond `max` silently (established for review comments in
+      # FINDINGS), so a candidate the agent works on but cannot write is work
+      # thrown away with no error anywhere.
+      MAX_ISSUES: "15"
       # Leave an issue alone until its author has stopped typing. Rewriting a
       # body someone is still working on is worse than leaving it rough, and a
       # settling period buys that without asking anyone to remember a label —
@@ -95,8 +99,10 @@ safe-outputs:
   # putting work into the pipeline, which is the one thing this role must never
   # do. Every other role here needs an App precisely because its writes must
   # cascade.
+  # These three caps and MAX_ISSUES above are one number in three places. Raise
+  # or lower them together.
   update-issue:
-    max: 5
+    max: 15
     # Not the triggering issue: a scheduled run has none.
     target: "*"
     # `title:` with no value is how gh-aw enables a field — the key's presence
@@ -104,10 +110,10 @@ safe-outputs:
     title:
     body: true
   add-comment:
-    max: 5
+    max: 15
     target: "*"
   add-labels:
-    max: 5
+    max: 15
     # A scheduled run has no triggering issue, so the default `triggering`
     # target would have nothing to act on.
     target: "*"
@@ -120,7 +126,9 @@ safe-outputs:
     continue-on-error: false
     retries: 2
 
-timeout-minutes: 15
+# Fifteen candidates read properly against the codebase needs more than the
+# 15 minutes the other roles get.
+timeout-minutes: 25
 ---
 
 # Refine
