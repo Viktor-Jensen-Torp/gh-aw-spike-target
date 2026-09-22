@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage } = require('../src/index.js');
+const { sum, movingAverage, clamp } = require('../src/index.js');
 
 test('sum adds the numbers', () => {
   assert.strictEqual(sum([1, 2, 3]), 6);
@@ -49,4 +49,32 @@ test('movingAverage does not modify the input array', () => {
   const copy = [...original];
   movingAverage(original, 2);
   assert.deepStrictEqual(original, copy);
+});
+
+test('clamp returns value unchanged if it falls within range', () => {
+  assert.strictEqual(clamp(5, 0, 10), 5);
+});
+
+test('clamp returns min if value is below min', () => {
+  assert.strictEqual(clamp(-3, 0, 10), 0);
+});
+
+test('clamp returns max if value is above max', () => {
+  assert.strictEqual(clamp(15, 0, 10), 10);
+});
+
+test('clamp returns min when value equals min', () => {
+  assert.strictEqual(clamp(0, 0, 10), 0);
+});
+
+test('clamp returns max when value equals max', () => {
+  assert.strictEqual(clamp(10, 0, 10), 10);
+});
+
+test('clamp works with floating-point values in range', () => {
+  assert.strictEqual(clamp(5.5, 0, 10), 5.5);
+});
+
+test('clamp works with negative ranges', () => {
+  assert.strictEqual(clamp(-2.3, -5, -1), -2.3);
 });

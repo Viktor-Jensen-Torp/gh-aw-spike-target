@@ -26,4 +26,11 @@ function movingAverage(numbers, windowSize) {
   return result;
 }
 
-module.exports = { sum, movingAverage };
+/** Constrains a value within a minimum and maximum range. */
+function clamp(value, min, max) {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+
+module.exports = { sum, movingAverage, clamp };
