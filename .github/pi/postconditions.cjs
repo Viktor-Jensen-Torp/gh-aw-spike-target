@@ -31,7 +31,7 @@
  *    for follow-ups queued in agent_end (agent-session.js _handlePostAgentRun).
  *    Capped, so a confused agent cannot loop.
  *
- * Configuration: PI_ROLE (review | implement | rework | release), set via engine.env.
+ * Configuration: PI_ROLE (review | implement | rework | release | refine | relate), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
 
@@ -60,6 +60,19 @@ const ROLES = {
   },
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    checks: {},
+  },
+  // A quiet night is a correct outcome for the refiner, so `noop` counts — but
+  // finishing with no output at all does not, because that is indistinguishable
+  // from a run that decided something and forgot to write it.
+  refine: {
+    required: [["update_issue", "add_labels", "add_comment", "set_issue_type", "assign_milestone", "set_issue_field", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    checks: {},
+  },
+  // Finding nothing to link is the usual answer over a settled backlog, so
+  // `noop` counts; finishing with nothing at all does not.
+  relate: {
+    required: [["link_blocked_by", "add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
   },
   // The release read is advice to a person, never a gate: `main` is merged by a
