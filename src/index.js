@@ -6,3 +6,5 @@ function sum(numbers) {
 }
 
 module.exports = { sum };
+
+// Experiment: does a red required check cancel a pending auto-merge, or pause it?
