@@ -95,6 +95,18 @@ jobs:
             _() { base64 -d <<<"$row" | jq -r "$1"; }
             PR=$(_ '.number'); SHA=$(_ '.headRefOid'); DRAFT=$(_ '.isDraft')
             MERGEABLE=$(_ '.mergeable'); AM=$(_ '.autoMergeRequest // "null"')
+            # `mergeable` is computed lazily and reads UNKNOWN until a
+            # background job finishes. A single read therefore misses exactly
+            # the pull requests this job exists for — run 35796245303 saw
+            # UNKNOWN on two genuinely conflicted ones and swept nothing.
+            if [ "$MERGEABLE" = "UNKNOWN" ]; then
+              for _ in 1 2 3 4 5; do
+                sleep 4
+                MERGEABLE=$(gh api "repos/$REPO/pulls/$PR" --jq '.mergeable // "UNKNOWN"' \
+                  | sed 's/^true$/MERGEABLE/; s/^false$/CONFLICTING/; s/^null$/UNKNOWN/')
+                [ "$MERGEABLE" = "UNKNOWN" ] || break
+              done
+            fi
             LABELS=$(_ '[.labels[].name] | join(",")')
             echo "--- PR #$PR sha=${SHA:0:8} mergeable=$MERGEABLE labels=$LABELS"
 
