@@ -24,7 +24,7 @@ on:
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
   # Deliberately broad. A narrower query would also gate the `refine` label, so
-  # labelling an already-refined issue would silently do nothing — and "I asked
+  # labelling an issue already marked `ready` would silently do nothing — and "I asked
   # and nothing happened" is worse than one cheap no-op run on a settled
   # backlog. The deterministic step below does the real filtering.
   skip-if-no-match: "is:issue is:open"
@@ -80,7 +80,7 @@ pre-agent-steps:
       mkdir -p /tmp/gh-aw/agent
 
       # Asked for by name: refine exactly that issue, and skip every filter.
-      # The settling period, `draft` and `refined` all exist to decide what to
+      # The settling period, `draft` and `ready` all exist to decide what to
       # touch UNASKED. A person applying the label has already decided.
       if [ -n "${TRIGGERING_ISSUE:-}" ] && [ "$TRIGGERING_ISSUE" != "0" ]; then
         gh issue view "$TRIGGERING_ISSUE" --repo "$REPO" \
@@ -106,7 +106,7 @@ pre-agent-steps:
       gh issue list --repo "$REPO" --state open --limit 100 \
         --json number,title,body,labels,createdAt,updatedAt,comments \
         --jq "[ .[]
-                | select([.labels[].name] | any(. == \"refined\" or . == \"implement\"
+                | select([.labels[].name] | any(. == \"ready\" or . == \"implement\"
                     or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
                     or . == \"needs-shape\" or . == \"agentic-workflows\"
                     or . == \"draft\") | not)
@@ -153,7 +153,7 @@ safe-outputs:
     # A scheduled run has no triggering issue, so the default `triggering`
     # target would have nothing to act on.
     target: "*"
-    allowed: [refined, needs-shape, needs-split, bug, enhancement, documentation]
+    allowed: [ready, needs-shape, needs-split, bug, enhancement, documentation]
   # What kind of work this is. The org defines Task, Bug and Feature; an issue
   # type is a typed field, unlike a label, so it is the better home for a
   # classification the pipeline may later read.
@@ -246,7 +246,7 @@ ask for something that is already there or describe it in the wrong terms.
 
 **Make it ready.** If the issue is nearly there and you can close the gap from
 what is already in the repository, rewrite it into the template's shape with
-`update_issue` and add `refined` with `add_labels`. **Replace the body — do not
+`update_issue` and add `ready` with `add_labels`. **Replace the body — do not
 append to it.** The new body is the whole issue, in the template's headings,
 with the author's own words carried into them. Leaving the original text above
 your version doubles the issue and makes an implementer read two specifications
@@ -257,7 +257,7 @@ at the boundaries, and how anyone would know it works. Do not invent a
 requirement the author did not ask for — if a decision is genuinely the
 author's, that is the next case, not a guess.
 
-**It is already ready.** Add `refined` and change nothing. This is a common and
+**It is already ready.** Add `ready` and change nothing. This is a common and
 correct outcome.
 
 **It needs a person to decide something.** Add `needs-shape` and one comment
@@ -272,7 +272,7 @@ dividing it is the author's call.
 
 ## Step 3: Classify what you touched
 
-For every issue you mark `refined`, also:
+For every issue you mark `ready`, also:
 
 - **Set its type** with `set_issue_type`: `Bug` for something behaving wrongly,
   `Feature` for new behaviour, `Task` for everything else. One of the three
