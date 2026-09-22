@@ -129,6 +129,13 @@ tools:
   timeout: 300
 
 safe-outputs:
+  # No run-status comments. On a label-triggered run gh-aw posts "✅ Refine
+  # completed successfully!" onto the triggering issue, and on #24 the agent's
+  # own text was folded into it — so the author got a report about a question
+  # instead of the question. This role's only visible output should be the
+  # question itself; the run's own page is the place for run status.
+  activation-comments: false
+
   # No github-app, deliberately, and this is a safety property rather than a
   # shortcut. Writes made with GITHUB_TOKEN trigger no workflows, so nothing the
   # refiner does can start an implementation — it is mechanically incapable of
@@ -261,9 +268,18 @@ author's, that is the next case, not a guess.
 correct outcome.
 
 **It needs a person to decide something.** Add `needs-shape` and one comment
-naming the question, in one or two sentences. Use this when the gap is a
-decision only the author can make, not when it is detail you could have looked
-up.
+**addressed to the author, whose body is the question itself**. Use this when
+the gap is a decision only the author can make, not when it is detail you could
+have looked up.
+
+Write what you would say to them: what you need to know, why it matters, and —
+where it helps — the two or three answers you can see, so they can reply with
+one word. Never write a report about what you did. "Marked needs-shape:
+requires author decision on rounding" tells the author nothing they can answer;
+"Should rounding change the existing functions, live in a new helper, or happen
+at display time?" does. Pass the issue number as `item_number`, and never use
+`target: status` — that edits the run's own status comment instead of speaking
+to the author.
 
 **It is too large.** Add `needs-split` and one comment proposing how it divides
 — the pieces, in the order they would be built. **Do not split it yourself.**
