@@ -15,6 +15,21 @@ permissions:
   contents: read
   issues: read
 
+# Agent work happens on `develop`, the untrusted integration branch, while
+# `main` stays the default branch and the release target. GitHub loads an
+# issue-triggered workflow's DEFINITION from the default branch and cannot be
+# told otherwise, but the code the agent reads and edits is this checkout.
+# Without it the implementer would write against `main` and open pull requests
+# into `develop`, never seeing work it had already merged.
+#
+# Consequence (../pi-github-test ADR 0019, release skew): a pull_request
+# workflow loads its definition from the branch under review, which comes off
+# `develop`, while this one loads from `main`. Keep `.github/` identical on both
+# branches and push workflow changes to both; never carry them through the
+# develop -> main release.
+checkout:
+  ref: develop
+
 engine:
   id: pi
   # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
@@ -66,6 +81,19 @@ safe-outputs:
     draft: false
     title-prefix: "[implementer] "
     labels: [agent, needs-review]
+    # Agent work targets `develop`, not `main`. Without this the base is
+    # `github.ref_name`, which on an `issues` event is the default branch.
+    base-branch: develop
+    # Arm the merge at creation; the `develop gate` ruleset decides when it
+    # happens (required checks: test, hold, Agent review). Established on
+    # PR #14: arming is allowed while a required check is RED, and a check
+    # going red pauses the pending merge rather than cancelling it, so the
+    # reviewer's REQUEST_CHANGES → rework → green cycle needs nothing re-armed.
+    # Squash because the ruleset allows only squash, and one issue per commit
+    # on `develop` is what makes a revert cheap (../pi-github-test ADR 0011).
+    # Note: arming is best-effort in gh-aw — a failure is only a warning and the
+    # PR is still created, so a PR that never merges is a sweeper case.
+    auto-merge: squash
     # gh-aw's glob compiles `src/**/*.js` to ^src/.*/[^/]*\.js$, which does NOT
     # match a file directly in src/. Use `src/**` for "everything under src/".
     allowed-files:
