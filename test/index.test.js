@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage } = require('../src/index.js');
+const { sum, last, movingAverage } = require('../src/index.js');
 
 test('sum adds the numbers', () => {
   assert.strictEqual(sum([1, 2, 3]), 6);
@@ -9,6 +9,30 @@ test('sum adds the numbers', () => {
 test('sum of an empty list is zero', () => {
   assert.strictEqual(sum([]), 0);
 });
+
+test('last returns the final element of a list', () => {
+  assert.strictEqual(last([1, 2, 3]), 3);
+});
+
+test('last returns the only element when array has one element', () => {
+  assert.strictEqual(last([1]), 1);
+});
+
+test('last returns the final element with multiple elements', () => {
+  assert.strictEqual(last([5, 10, 15, 20]), 20);
+});
+
+test('last throws RangeError for empty array', () => {
+  assert.throws(() => last([]), RangeError);
+});
+
+test('last does not modify the input array', () => {
+  const original = [1, 2, 3, 4, 5];
+  const copy = [...original];
+  last(original);
+  assert.deepStrictEqual(original, copy);
+});
+
 
 test('movingAverage with window size 3 on 7 elements gives 5 results', () => {
   const result = movingAverage([1, 2, 3, 4, 5, 6, 7], 3);

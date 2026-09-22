@@ -5,6 +5,14 @@ function sum(numbers) {
   return numbers.reduce((total, n) => total + n, 0);
 }
 
+/** Returns the last element of a list. */
+function last(array) {
+  if (!Array.isArray(array) || array.length === 0) {
+    throw new RangeError('array must be a non-empty array');
+  }
+  return array[array.length - 1];
+}
+
 /** Returns a list of averages of consecutive runs of windowSize values. */
 function movingAverage(numbers, windowSize) {
   // Validate inputs
@@ -26,4 +34,4 @@ function movingAverage(numbers, windowSize) {
   return result;
 }
 
-module.exports = { sum, movingAverage };
+module.exports = { sum, last, movingAverage };
