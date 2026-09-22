@@ -31,7 +31,7 @@
  *    for follow-ups queued in agent_end (agent-session.js _handlePostAgentRun).
  *    Capped, so a confused agent cannot loop.
  *
- * Configuration: PI_ROLE (review | implement | rework), set via engine.env.
+ * Configuration: PI_ROLE (review | implement | rework | release), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
 
@@ -61,6 +61,15 @@ const ROLES = {
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
+  },
+  // The release read is advice to a person, never a gate: `main` is merged by a
+  // human who has the verdict in front of them. REQUEST_CHANGES would claim an
+  // authority this role does not have, so COMMENT is the only allowed event.
+  release: {
+    required: [["submit_pull_request_review", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    checks: {
+      submit_pull_request_review: { field: "event", allowed: ["COMMENT"], upper: true },
+    },
   },
 };
 

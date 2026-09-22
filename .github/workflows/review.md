@@ -6,6 +6,12 @@ intent: Give an agent-authored pull request a review a maintainer would trust, w
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    # Agent pull requests only. The release pull request (`develop -> main`) is a
+    # different job — a day's work rather than one change — and is read by
+    # release-review.md. Without this filter that reviewer and this one would
+    # both run on it, and this one's 2000-line diff cap and 10-comment budget
+    # are shaped for a single small change.
+    branches: [develop]
   # The implementer App is not a repository collaborator, so without this the
   # role check in pre_activation denies its pull requests.
   bots: [gh-aw-spike-implementer]

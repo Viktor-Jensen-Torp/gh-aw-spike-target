@@ -1,0 +1,85 @@
+name: Release
+
+# Opens the daily release pull request, develop -> main, and nothing else.
+#
+# Deterministic on purpose: which commits are ahead of `main` is a fact. The
+# judgement — what this release does as a whole, and where its parts meet — is
+# release-review.md, and the decision to ship is a person's.
+#
+# The pull request is opened with the reviewer App, not GITHUB_TOKEN. A pull
+# request opened by GITHUB_TOKEN triggers no workflows, so release-review.md
+# would never run on it and the developer would arrive to an unread release.
+
+on:
+  schedule:
+    # 06:00 UTC on weekdays, so the release is waiting when people start.
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  open-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+
+      - name: Open or refresh the release pull request
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          AHEAD=$(gh api "repos/$REPO/compare/main...develop" --jq '.ahead_by')
+          echo "develop is $AHEAD commit(s) ahead of main"
+
+          if [ "$AHEAD" -eq 0 ]; then
+            echo "Nothing to release." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          EXISTING=$(gh pr list --repo "$REPO" --base main --head develop --state open \
+            --json number,url --jq '.[0] // empty')
+          if [ -n "$EXISTING" ]; then
+            URL=$(jq -r '.url' <<<"$EXISTING")
+            # An open release pull request follows `develop` on its own; every
+            # push re-fires release-review.md on the new head.
+            echo "Release pull request already open: $URL ($AHEAD commit(s))" \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "$AHEAD change(s) from \`develop\`, each already reviewed and merged on its own."
+            echo
+            echo "## Shipping"
+            echo
+            gh api "repos/$REPO/compare/main...develop" \
+              --jq '.commits[] | "- \(.commit.message | split("\n")[0])"'
+            echo
+            echo "## How to handle this"
+            echo
+            echo "- **Ship it** — merge with a *merge commit*, not a squash, so each change keeps its \`(#n)\` and \`main\`'s history says what it shipped."
+            echo "- **Ship it and file a follow-up** — merge, then open an issue."
+            echo "- **Revert one change and ship the rest** — each change is a single squashed commit on \`develop\`, so GitHub's Revert button on that pull request is one click. Merge the revert into \`develop\` with your admin override; the agent reviewer cannot usefully judge a change whose purpose is removal. Then this pull request updates itself."
+            echo
+            echo "Do not cherry-pick a change out of this release: that ships a combination nothing has tested."
+            echo
+            echo "A release read from the reviewer will appear below shortly."
+          } > /tmp/release-body.md
+
+          URL=$(gh pr create --repo "$REPO" --base main --head develop \
+            --title "Release $(date -u +%Y-%m-%d)" \
+            --body-file /tmp/release-body.md)
+          echo "Opened $URL ($AHEAD commit(s))" >> "$GITHUB_STEP_SUMMARY"
+          echo "opened $URL"
