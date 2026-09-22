@@ -17,6 +17,9 @@ permissions:
 
 engine:
   id: pi
+  # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
+  env:
+    PI_ROLE: implement
 model: anthropic/claude-haiku-4-5-20251001
 
 network:
@@ -27,6 +30,23 @@ network:
 runtimes:
   node:
     version: "24"
+
+pre-agent-steps:
+  # Install the role-postconditions Pi extension for the agent run only.
+  # Not via engine.args: those also reach the evals job, which has no checkout,
+  # and Pi exits 1 on a missing --extension file (dist/main.js). Pi auto-loads
+  # *.js from $PI_CODING_AGENT_DIR/extensions, which gh-aw sets to
+  # /tmp/gh-aw/pi-agent-dir and never clears (pi_models_json.cjs only mkdirs).
+  # The source is the base branch's copy: .github/ is restored from base before
+  # these steps run (restore_base_github_folders.sh).
+  - name: Install role postconditions extension
+    run: |
+      set -euo pipefail
+      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
+      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
+      echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE"
+    env:
+      PI_ROLE: implement
 
 tools:
   cli-proxy: true
