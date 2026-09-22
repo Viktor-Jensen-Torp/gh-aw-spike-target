@@ -17,6 +17,9 @@ permissions:
 engine:
   id: pi
   model: anthropic/claude-haiku-4-5-20251001
+  # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
+  env:
+    PI_ROLE: review
 
 # Warm the pre-fetch across re-reviews of the same head commit.
 cache:
@@ -29,6 +32,21 @@ cache:
 # spending agent turns on it. Adapted from gh-aw's own shared/pr-diff-data-fetch.md;
 # we cannot import that file because it lives in the gh-aw repository.
 pre-agent-steps:
+  # Install the role-postconditions Pi extension for the agent run only.
+  # Not via engine.args: those also reach the evals job, which has no checkout,
+  # and Pi exits 1 on a missing --extension file (dist/main.js). Pi auto-loads
+  # *.js from $PI_CODING_AGENT_DIR/extensions, which gh-aw sets to
+  # /tmp/gh-aw/pi-agent-dir and never clears (pi_models_json.cjs only mkdirs).
+  # The source is the base branch's copy: .github/ is restored from base before
+  # these steps run (restore_base_github_folders.sh).
+  - name: Install role postconditions extension
+    run: |
+      set -euo pipefail
+      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
+      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
+      echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE"
+    env:
+      PI_ROLE: review
   - name: Pre-fetch PR diff, metadata and existing review comments
     env:
       GH_TOKEN: ${{ github.token }}
@@ -122,28 +140,59 @@ jobs:
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
           private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+      # Route on the CHECK RUN, not the review state. On run 35598277469 the
+      # agent wrote "REQUEST_CHANGES" in the review text and posted a red
+      # check, but called submit_pull_request_review without an `event`
+      # field; gh-aw silently defaulted it to COMMENT (pr_review_buffer.cjs),
+      # the review posted as COMMENTED, and rework never fired. The check run
+      # is also what a ruleset gates merge on, so one signal drives both.
+      #
+      # Fail safe: if the check and the review disagree, treat it as blocking.
+      # Only a green check AND a non-blocking review clear the strike counters.
       - name: Route on the posted verdict
         env:
           GH_TOKEN: ${{ steps.label_token.outputs.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          APP: gh-aw-spike-reviewer
         run: |
           set -euo pipefail
+          # Both verdicts must be about THIS commit, not an older review.
+          CHECK=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
+            --jq "[.check_runs[] | select(.name == \"Agent review\" and .app.slug == \"$APP\")]
+                  | sort_by(.completed_at) | last | .conclusion // \"\"")
           STATE=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
-            --jq '[.[] | select(.user.login == "gh-aw-spike-reviewer[bot]")] | last | .state // ""')
-          echo "latest review by this App: ${STATE:-none}"
-          case "$STATE" in
-            CHANGES_REQUESTED)
-              gh pr edit "$PR" --repo "$REPO" --add-label needs-rework
+            --jq "[.[] | select(.user.login == \"${APP}[bot]\" and .commit_id == \"$SHA\")]
+                  | last | .state // \"\"")
+          echo "head $SHA: check=${CHECK:-none} review=${STATE:-none}"
+
+          if [ "$CHECK" = "failure" ] || [ "$STATE" = "CHANGES_REQUESTED" ]; then
+            VERDICT=block
+            if [ "$CHECK" != "failure" ] || [ "$STATE" != "CHANGES_REQUESTED" ]; then
+              echo "::warning::verdicts disagree (check=${CHECK:-none}, review=${STATE:-none}); treating as blocking"
+            fi
+          elif [ "$CHECK" = "success" ]; then
+            VERDICT=pass
+          else
+            VERDICT=none
+          fi
+
+          # REST, not `gh pr edit`: the latter goes through GraphQL and fails
+          # on the Projects (classic) deprecation in this repo.
+          case "$VERDICT" in
+            block)
+              gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
               echo "-> needs-rework" ;;
-            COMMENTED|APPROVED)
+            pass)
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
-              DROP=$(gh pr view "$PR" --repo "$REPO" --json labels \
-                --jq '[.labels[].name | select(startswith("strike:") or startswith("conflict:"))] | join(",")')
-              [ -n "$DROP" ] && gh pr edit "$PR" --repo "$REPO" --remove-label "$DROP" || true
-              echo "-> cleared: ${DROP:-nothing}" ;;
-            *)
-              echo "-> no verdict to route" ;;
+              for L in $(gh api "repos/$REPO/issues/$PR/labels" \
+                           --jq '.[].name | select(startswith("strike:") or startswith("conflict:"))'); do
+                gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent || true
+                echo "-> cleared $L"
+              done ;;
+            none)
+              echo "-> no verdict on this commit; nothing to route" ;;
           esac
 
 timeout-minutes: 15
