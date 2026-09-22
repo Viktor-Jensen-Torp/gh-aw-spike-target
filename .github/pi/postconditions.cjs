@@ -135,7 +135,8 @@ ${cases}
   __rc=$?
   if [ $__rc -eq 0 ]; then
     [ -n "$__rec" ] && printf '%s' "$__val" > "$__rec"
-    echo "$1" >> "${CALLED_LOG}"
+    # Record tool names only, not flags such as --help.
+    case "$1" in -*|"") ;; *) echo "$1" >> "${CALLED_LOG}" ;; esac
   fi
   return $__rc
 }

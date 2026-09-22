@@ -1,0 +1,3 @@
+safeoutputs create_check_run . <<'PAYLOAD'
+{"conclusion": "failure", "title": "REQUEST_CHANGES — 3 blocking issues", "summary": "### Critical Issues Remain Unfixed\n\n1. **Data mutation bug (line 18)**: `median()` mutates caller's array via `Array.sort()`\n2. **Wrong sort semantics (line 18)**: Lexicographic sort instead of numeric; multi-digit numbers sort incorrectly\n3. **Insufficient test coverage**: Only single-digit test cases; multi-digit tests needed to expose sort bug\n\nAll three issues identified and documented in prior review comments remain unaddressed. See PR comments for detailed explanation and fixes."}
+PAYLOAD
