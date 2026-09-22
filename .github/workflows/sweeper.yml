@@ -22,6 +22,7 @@ permissions:
   contents: write        # delete the branches of merged agent pull requests
   pull-requests: write   # arm auto-merge, comment
   issues: write          # labels live on the issue side of a pull request
+  actions: write         # dispatch the unblocker at a conflicted pull request
 
 concurrency:
   group: sweeper
@@ -100,15 +101,29 @@ jobs:
             # A pull request a person is already holding is not ours to touch.
             case ",$LABELS," in *,needs-human,*) n_skipped=$((n_skipped+1)); continue;; esac
 
-            # 1. Conflicted. rework's resolve-conflict door is unreachable:
-            #    `pull_request` workflows do not run on a conflicted pull
-            #    request, so no label can start anything. A person resolves it.
+            # 1. Conflicted. A conflict's first responder is unblock.md, sent
+            #    by unblock-detect.yml on the push that caused it. This is the
+            #    backstop for a conflict that arrived some other way — a push
+            #    that predates the detector, a dispatch that failed, a branch
+            #    that drifted.
+            #
+            #    It DISPATCHES rather than labelling `needs-human`. Escalating
+            #    here would pre-empt the automatic fix: the sweeper runs every
+            #    30 minutes, and whichever ran first would decide the outcome.
+            #    `needs-human` on a conflict now means one thing only — the
+            #    unblocker tried and could not.
             if [ "$MERGEABLE" = "CONFLICTING" ]; then
               if budget_left; then
-                label_as_app "$PR" needs-human
-                say "$PR" "<!-- sweeper:conflict:$SHA -->" \
-                  "**Swept:** this pull request conflicts with \`$BASE\`, and no event can reach it — \`pull_request\` workflows do not run on a conflicted pull request, so rework cannot be triggered by a label. Labelled \`needs-human\`; resolve the conflict, then remove the label to release the merge."
-                spend; n_conflict=$((n_conflict+1))
+                if gh workflow run unblock.lock.yml -f pr="$PR" 2>/dev/null; then
+                  echo "-> dispatched the unblocker at #$PR"
+                  spend; n_conflict=$((n_conflict+1))
+                else
+                  # If even the dispatch fails, a person is the only option left.
+                  label_as_app "$PR" needs-human
+                  say "$PR" "<!-- sweeper:conflict:$SHA -->" \
+                    "**Swept:** this pull request conflicts with \`$BASE\` and the unblocker could not be dispatched. No event can reach a conflicted pull request, so nothing else will retry. Resolve the conflict, then remove \`needs-human\` to release the merge."
+                  spend
+                fi
               fi
               continue
             fi
@@ -188,7 +203,7 @@ jobs:
           {
             echo "| case | acted |"
             echo "|---|---|"
-            echo "| conflicted → needs-human | $n_conflict |"
+            echo "| conflicted → unblocker dispatched | $n_conflict |"
             echo "| no review verdict → needs-human | $n_noverdict |"
             echo "| dropped rework → needs-rework | $n_stuck |"
             echo "| auto-merge armed | $n_armed |"
