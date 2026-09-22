@@ -59,6 +59,29 @@ jobs:
             exit 0
           fi
 
+          # Carry the closing keywords up to the release.
+          #
+          # An agent pull request says "Fixes #n" in its body, but it targets
+          # `develop`, and GitHub only creates the issue link — and only closes
+          # the issue — for a pull request merged into the DEFAULT branch. So
+          # that keyword never fires: after release 2026-09-22 (#21) shipped
+          # PR #18, issue #17 was still open and GraphQL reported
+          # `closingIssuesReferences: []` — the link had never existed at all.
+          # Re-stating the keywords here is what closes those issues when a
+          # person merges this pull request into `main`, which is the intended
+          # model: an issue is resolved when it ships, not when it merges.
+          CLOSES=""
+          for P in $(gh api "repos/$REPO/compare/main...develop" \
+                       --jq '.commits[].commit.message' \
+                     | grep -oE '\(#[0-9]+\)' | tr -d '(#)' | sort -u); do
+            for I in $(gh pr view "$P" --repo "$REPO" --json body --jq '.body' 2>/dev/null \
+                       | grep -oiE '(fixes|closes|resolves) #[0-9]+' \
+                       | grep -oE '[0-9]+'); do
+              CLOSES="$CLOSES$I\n"
+            done
+          done
+          CLOSES=$(printf "$CLOSES" | sort -un)
+
           {
             echo "$AHEAD change(s) from \`develop\`, each already reviewed and merged on its own."
             echo
@@ -67,6 +90,12 @@ jobs:
             gh api "repos/$REPO/compare/main...develop" \
               --jq '.commits[] | "- \(.commit.message | split("\n")[0])"'
             echo
+            if [ -n "$CLOSES" ]; then
+              echo "## Resolves"
+              echo
+              for I in $CLOSES; do echo "Closes #$I"; done
+              echo
+            fi
             echo "## How to handle this"
             echo
             echo "- **Ship it** — merge with a *merge commit*, not a squash, so each change keeps its \`(#n)\` and \`main\`'s history says what it shipped."
