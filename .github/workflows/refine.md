@@ -197,6 +197,17 @@ definition of ready; do not invent your own structure, and if it changes, follow
 it. Keep a heading the author left empty only if you genuinely cannot fill it,
 and say why under it.
 
+**Under "Done when", choose the shape the template describes**: a table of
+inputs and expectations for a function, scenarios for a journey through a
+screen. Never both, and never a scenario for a pure function — it is longer and
+says less.
+
+**Write only cases you can derive from the issue or from the code.** An
+acceptance case you invented reads exactly like one the author asked for, and an
+implementer will build to it. If the issue does not say what should happen at a
+boundary and the code does not settle it, that is a question for the author
+(`needs-shape`), not a case for you to make up.
+
 ## Step 1: Read the candidates
 
 `/tmp/gh-aw/agent/refine-candidates.json` holds the issues to consider this run,

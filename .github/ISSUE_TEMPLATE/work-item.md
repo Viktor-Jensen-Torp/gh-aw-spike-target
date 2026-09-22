@@ -31,8 +31,38 @@ list. Anything you already know the answer to and would otherwise be asked.
 
 ## Done when
 
-How anyone can tell it works. A behaviour someone could check, not "it is
-finished".
+The cases that have to hold. Each one becomes a named test, so write them as
+things a test could check, not as a feeling of completeness.
+
+Pick the shape that fits the work — do not use both:
+
+**A table, for anything with inputs and outputs.** A function, a calculation, a
+transform. Most work here is this shape.
+
+| Given | Expect |
+|---|---|
+| `truncate("hello world", 8)` | `"hello w…"` — 8 characters, ellipsis included |
+| `truncate("hello", 5)` | `"hello"` — exactly the limit already fits |
+| `truncate("x", 0)` | throws `RangeError` |
+
+**Scenarios, for anything with steps and state.** A journey through a screen, a
+flow with a before and after. These map onto browser tests directly, so write
+them the way a test would read.
+
+```gherkin
+Given I am signed out
+When I open the dashboard
+Then I am sent to the sign-in page
+And the dashboard is not rendered
+```
+
+Use a table for a function and scenarios for a journey. A pure function has no
+"given I am…" state to set up, and a scenario written for one is longer and
+says less. A journey written as a table loses the ordering that is the whole
+point.
+
+Cover the boundaries you named in **Details**: the empty case, the maximum, the
+bad input. A case nobody could check is not a case.
 
 ## Out of scope
 
