@@ -33,3 +33,7 @@ test('median of an even-length list', () => {
 test('median of an empty list is zero', () => {
   assert.strictEqual(median([]), 0);
 });
+
+test('median with multi-digit numbers', () => {
+  assert.strictEqual(median([100, 5, 50]), 50);
+});

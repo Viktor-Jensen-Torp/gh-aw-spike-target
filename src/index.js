@@ -20,7 +20,7 @@ function median(numbers) {
   if (numbers.length === 0) {
     return 0;
   }
-  const sorted = numbers.sort();
+  const sorted = [...numbers].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   if (sorted.length % 2 === 0) {
     return mean([sorted[middle - 1], sorted[middle]]);
