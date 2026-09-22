@@ -1,4 +1,4 @@
-// Small helpers. The spike's implementer agent adds to this file.
+// Small helpers for the dashboard. The implementer agent adds to this file.
 
 /** Returns the sum of a list of numbers. */
 function sum(numbers) {
