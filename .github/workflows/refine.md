@@ -136,6 +136,15 @@ safe-outputs:
     max: 15
     target: "*"
     allowed: [Task, Bug, Feature]
+  # Priority and Effort are org-level issue FIELDS — typed, and set on the issue
+  # itself rather than on a board. That is the whole reason no part of this
+  # pipeline needs Projects access: a Project is a view over issues, so a field
+  # set here shows up on any board that displays it, and GITHUB_TOKEN cannot
+  # touch Projects at all (../pi-github-test ADR 0016).
+  set-issue-field:
+    max: 15
+    target: "*"
+    allowed-fields: [Priority, Effort]
   # Existing milestones only — no `auto_create`. Deciding that a release exists
   # and what goes in it is planning, and planning stays with people for the same
   # reason decomposition does (../pi-github-test ADR 0015). With no milestones
@@ -227,6 +236,15 @@ For every issue you mark `refined`, also:
 - **Assign a milestone** with `assign_milestone` only if an existing milestone
   clearly covers this work. Never invent one: deciding that a release exists,
   and what goes in it, is a person's call. If no milestone fits, assign none.
+- **Set `Effort`** with `set_issue_field` — `Low` for a change of a few lines in
+  one file, `Medium` for one file's worth of real work, `High` for anything you
+  would have called `needs-split` if it were any bigger. This is a size
+  estimate, not a promise.
+- **Set `Priority`** only when the issue itself says so — it calls something
+  broken, or names a deadline, or the author said it is urgent. **If the issue
+  gives you no evidence, leave Priority unset.** Priority is the author's
+  judgement about what matters, and a backlog where an agent guessed every
+  priority is a backlog where the field means nothing.
 
 ## Step 4: Record what you decided
 
