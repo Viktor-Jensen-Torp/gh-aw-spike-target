@@ -88,6 +88,7 @@ pre-agent-steps:
         echo "conflicted" > /tmp/gh-aw/agent/merge-state.txt
         git diff --name-only --diff-filter=U > /tmp/gh-aw/agent/conflicts.txt || true
         echo "conflicted files:"; cat /tmp/gh-aw/agent/conflicts.txt
+        echo "--- git said ---"; cat /tmp/gh-aw/agent/merge.log
       fi
       printf '%s\n' "$BASE" > /tmp/gh-aw/agent/base.txt
 
@@ -120,6 +121,11 @@ safe-outputs:
       - "test/**"
     if-no-changes: error
     commit-title-suffix: " [unblock]"
+    # Without this gh-aw REQUESTS `administration: read` when minting the App
+    # token, and an App that lacks it fails the whole safe_outputs job — which
+    # is exactly how run 35796425852 died. Already recorded in FINDINGS and
+    # already fixed in rework.md; repeated here anyway.
+    check-branch-protection: false
   add-labels:
     max: 1
     target: "*"
