@@ -15,6 +15,21 @@ permissions:
   contents: read
   issues: read
 
+# Agent work happens on `develop`, the untrusted integration branch, while
+# `main` stays the default branch and the release target. GitHub loads an
+# issue-triggered workflow's DEFINITION from the default branch and cannot be
+# told otherwise, but the code the agent reads and edits is this checkout.
+# Without it the implementer would write against `main` and open pull requests
+# into `develop`, never seeing work it had already merged.
+#
+# Consequence (../pi-github-test ADR 0019, release skew): a pull_request
+# workflow loads its definition from the branch under review, which comes off
+# `develop`, while this one loads from `main`. Keep `.github/` identical on both
+# branches and push workflow changes to both; never carry them through the
+# develop -> main release.
+checkout:
+  ref: develop
+
 engine:
   id: pi
   # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
