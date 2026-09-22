@@ -1,0 +1,91 @@
+name: Unblock detect
+
+# The trigger for "this pull request now conflicts" — because GitHub does not
+# have one.
+#
+# There is no event for a pull request becoming unmergeable: none of the 21
+# `pull_request` activity types is a mergeability transition, there is no
+# webhook for it, and mergeability is computed lazily on read, so even the
+# event that would have told you carries `mergeable: null`. Worse, a conflicted
+# pull request goes dark: GitHub documents that "workflows will not run on
+# `pull_request` activity if the pull request has a merge conflict".
+#
+# But a pull request conflicts because something landed on its base. That push
+# is an ordinary, reliable, base-context event, and it happens at the exact
+# moment the conflicts are created. So: watch the cause, not the symptom.
+#
+# This half is deterministic — which pull requests are now dirty is a fact. The
+# judgement (what the conflicting lines should say) is unblock.md, which this
+# hands the number to, because it cannot be triggered by the pull request it
+# is fixing.
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write        # dispatch the resolver
+
+concurrency:
+  group: unblock-detect
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find pull requests this push has broken, and send the fixer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          # A push that breaks more than this is a systemic fault, and firing a
+          # fixer at each one turns it into a systemic write.
+          MAX_DISPATCH: "5"
+        run: |
+          set -euo pipefail
+
+          PRS=$(gh pr list --repo "$REPO" --base develop --state open --limit 50 \
+            --json number,labels \
+            --jq '[.[] | select([.labels[].name] | index("agent"))
+                       | select([.labels[].name] | index("needs-human") | not)
+                       | .number]')
+          echo "open agent pull requests: $(jq -r 'join(", ") // "none"' <<<"$PRS")"
+
+          SENT=0
+          for PR in $(jq -r '.[]' <<<"$PRS"); do
+            # `mergeable` is computed lazily: the first read after a change
+            # returns UNKNOWN while a background job runs. Treating UNKNOWN as
+            # "fine" would miss exactly the pull requests this job exists for,
+            # so poll until it settles.
+            STATE=UNKNOWN
+            for _ in 1 2 3 4 5 6; do
+              STATE=$(gh pr view "$PR" --repo "$REPO" --json mergeable --jq .mergeable)
+              [ "$STATE" = "UNKNOWN" ] || break
+              sleep 5
+            done
+
+            if [ "$STATE" != "CONFLICTING" ]; then
+              echo "#$PR: $STATE"
+              continue
+            fi
+
+            if [ "$SENT" -ge "$MAX_DISPATCH" ]; then
+              echo "#$PR: CONFLICTING, but the dispatch budget is spent"
+              continue
+            fi
+
+            echo "#$PR: CONFLICTING -> dispatching the fixer"
+            gh workflow run unblock.lock.yml --repo "$REPO" --ref "${GITHUB_REF_NAME}" -f pr="$PR" \
+              || gh workflow run unblock.lock.yml --repo "$REPO" -f pr="$PR"
+            SENT=$((SENT + 1))
+          done
+
+          {
+            echo "### Unblock detect"
+            echo ""
+            echo "Dispatched the fixer at $SENT conflicted pull request(s)."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "dispatched: $SENT"

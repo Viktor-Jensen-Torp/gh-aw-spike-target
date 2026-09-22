@@ -31,7 +31,7 @@
  *    for follow-ups queued in agent_end (agent-session.js _handlePostAgentRun).
  *    Capped, so a confused agent cannot loop.
  *
- * Configuration: PI_ROLE (review | implement | rework | release | refine | relate), set via engine.env.
+ * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
 
@@ -73,6 +73,12 @@ const ROLES = {
   // `noop` counts; finishing with nothing at all does not.
   relate: {
     required: [["link_blocked_by", "add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    checks: {},
+  },
+  // Either it pushed a resolution, or it handed the disagreement to a person.
+  // Finishing with neither leaves a pull request stuck with no trace of why.
+  unblock: {
+    required: [["push_to_pull_request_branch", "add_labels", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
   },
   // The release read is advice to a person, never a gate: `main` is merged by a
