@@ -12,7 +12,7 @@ on:
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
-  skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent"
+  skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent -label:agentic-workflows"
 
   stop-after: +30d
 
@@ -44,24 +44,31 @@ pre-agent-steps:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       MAX_ISSUES: "5"
+      # Leave an issue alone until its author has stopped typing. Rewriting a
+      # body someone is still working on is worse than leaving it rough, and a
+      # settling period buys that without asking anyone to remember a label —
+      # an issue nobody remembers to mark would simply never be refined.
+      SETTLE_HOURS: "4"
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
-      # Skip anything a person or an agent is already working from: rewriting a
-      # body someone is working to is worse than leaving it rough. `refined`
-      # excludes what a previous night judged ready; the human-decision labels
-      # exclude what is waiting on a person.
-      gh issue list --repo "$REPO" --state open --limit 50 \
-        --json number,title,body,labels,createdAt,comments \
+      CUTOFF=$(date -u -d "-${SETTLE_HOURS} hours" +%Y-%m-%dT%H:%M:%SZ)
+      # Skip anything a person or an agent is already working from, anything a
+      # previous night judged ready, anything parked on a human decision, and
+      # gh-aw's own bookkeeping issues — a failure report is not backlog.
+      gh issue list --repo "$REPO" --state open --limit 100 \
+        --json number,title,body,labels,createdAt,updatedAt,comments \
         --jq "[ .[]
                 | select([.labels[].name] | any(. == \"refined\" or . == \"implement\"
                     or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
-                    or . == \"needs-shape\") | not)
+                    or . == \"needs-shape\" or . == \"agentic-workflows\") | not)
+                | select(.title | startswith(\"[aw]\") | not)
+                | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],
                    labels: [.labels[].name], createdAt, comments} ]
-              | sort_by(.createdAt) | .[0:${MAX_ISSUES}]" \
+              | sort_by(.createdAt) | reverse | .[0:${MAX_ISSUES}]" \
         > /tmp/gh-aw/agent/refine-candidates.json
-      echo "candidates: $(jq 'length' /tmp/gh-aw/agent/refine-candidates.json)"
+      echo "candidates (settled before $CUTOFF): $(jq 'length' /tmp/gh-aw/agent/refine-candidates.json)"
       jq -r '.[] | "  #\(.number) \(.title)"' /tmp/gh-aw/agent/refine-candidates.json
 
 tools:
@@ -93,6 +100,9 @@ safe-outputs:
     target: "*"
   add-labels:
     max: 5
+    # A scheduled run has no triggering issue, so the default `triggering`
+    # target would have nothing to act on.
+    target: "*"
     allowed: [refined, needs-shape, needs-split]
   noop:
   threat-detection:
