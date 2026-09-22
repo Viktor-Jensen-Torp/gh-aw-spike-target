@@ -1,0 +1,207 @@
+name: Sweeper
+
+# Catches agent pull requests that no event will ever revisit.
+#
+# Deliberately NOT an agentic workflow, unlike gh-aw's own pr-sous-chef. Its
+# whole purpose is to catch work the chain dropped, and a catcher that can
+# itself drop things is worth little: "obligations never live in a prompt".
+# gh-aw's sweeper is agentic because its actuator is a comment addressed to
+# Copilot, which needs judgement to write; ours is a label, which does not. Its
+# detection half is a deterministic shell prefilter too — that half is what this
+# copies. See FINDINGS.md.
+#
+# Every case here is one FINDINGS names as unreachable from events.
+
+on:
+  schedule:
+    # Every 30 minutes. Free on a public repository; one short job per tick.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write        # delete the branches of merged agent pull requests
+  pull-requests: write   # arm auto-merge, comment
+  issues: write          # labels live on the issue side of a pull request
+
+concurrency:
+  group: sweeper
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      # Escalation labels must be written with an App token, not GITHUB_TOKEN.
+      # `needs-human` is only a stop button because hold.yml re-runs on the
+      # `labeled` event and turns its required check red; GITHUB_TOKEN-authored
+      # events do not trigger workflows, so a label written with it would leave
+      # the gate green and the pull request merging. Same for `needs-rework`,
+      # which rework.md listens for from this App.
+      - uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+
+      - name: Sweep
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_TOKEN: ${{ steps.app_token.outputs.token }}
+          REPO: ${{ github.repository }}
+          BASE: develop
+          # Bound every run. A sweeper that acts on everything it finds turns a
+          # systemic fault into a systemic write.
+          MAX_ACTIONS: "10"
+          # How long a head commit may sit with no review verdict before that
+          # counts as "the review will never run" rather than "it is running".
+          VERDICT_GRACE_MINUTES: "20"
+        run: |
+          set -euo pipefail
+
+          acted=0
+          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0
+
+          budget_left() { [ "$acted" -lt "$MAX_ACTIONS" ]; }
+          spend() { acted=$((acted + 1)); }
+
+          # One comment per case per head commit. Without a marker the sweeper
+          # repeats itself every 30 minutes forever.
+          already_said() { # <pr> <marker>
+            gh api "repos/$REPO/issues/$1/comments" --paginate --jq '.[].body' \
+              | grep -qF "$2"
+          }
+          say() { # <pr> <marker> <body>
+            already_said "$1" "$2" && return 0
+            printf '%s\n\n%s\n' "$3" "$2" \
+              | gh api -X POST "repos/$REPO/issues/$1/comments" -F body=@- --silent
+          }
+          label_as_app() { # <pr> <label>
+            GH_TOKEN="$APP_TOKEN" gh api -X POST "repos/$REPO/issues/$1/labels" \
+              -f "labels[]=$2" --silent
+          }
+
+          echo "## Sweeper" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # ---- open agent pull requests -------------------------------------
+          PRS=$(gh pr list --repo "$REPO" --state open --base "$BASE" --limit 100 \
+            --json number,headRefOid,isDraft,labels,mergeable,mergeStateStatus,autoMergeRequest,author \
+            --jq '[.[] | select([.labels[].name] | index("agent"))]')
+
+          echo "open agent pull requests on $BASE: $(jq 'length' <<<"$PRS")"
+
+          for row in $(jq -r '.[] | @base64' <<<"$PRS"); do
+            _() { base64 -d <<<"$row" | jq -r "$1"; }
+            PR=$(_ '.number'); SHA=$(_ '.headRefOid'); DRAFT=$(_ '.isDraft')
+            MERGEABLE=$(_ '.mergeable'); AM=$(_ '.autoMergeRequest // "null"')
+            LABELS=$(_ '[.labels[].name] | join(",")')
+            echo "--- PR #$PR sha=${SHA:0:8} mergeable=$MERGEABLE labels=$LABELS"
+
+            # A pull request a person is already holding is not ours to touch.
+            case ",$LABELS," in *,needs-human,*) n_skipped=$((n_skipped+1)); continue;; esac
+
+            # 1. Conflicted. rework's resolve-conflict door is unreachable:
+            #    `pull_request` workflows do not run on a conflicted pull
+            #    request, so no label can start anything. A person resolves it.
+            if [ "$MERGEABLE" = "CONFLICTING" ]; then
+              if budget_left; then
+                label_as_app "$PR" needs-human
+                say "$PR" "<!-- sweeper:conflict:$SHA -->" \
+                  "**Swept:** this pull request conflicts with \`$BASE\`, and no event can reach it — \`pull_request\` workflows do not run on a conflicted pull request, so rework cannot be triggered by a label. Labelled \`needs-human\`; resolve the conflict, then remove the label to release the merge."
+                spend; n_conflict=$((n_conflict+1))
+              fi
+              continue
+            fi
+
+            # 2. No verdict on this head commit. The review was skipped or
+            #    errored (confused deputy, E009 lock drift). Nothing re-runs a
+            #    review on its own, so the pull request would wait forever on a
+            #    required check that will never report.
+            VERDICT=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
+              --jq '[.check_runs[] | select(.name == "Agent review")] | sort_by(.completed_at) | last | .conclusion // ""')
+            if [ -z "$VERDICT" ]; then
+              PUSHED=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.committer.date')
+              AGE=$(( ( $(date -u +%s) - $(date -u -d "$PUSHED" +%s) ) / 60 ))
+              if [ "$AGE" -ge "$VERDICT_GRACE_MINUTES" ] && budget_left; then
+                label_as_app "$PR" needs-human
+                say "$PR" "<!-- sweeper:noverdict:$SHA -->" \
+                  "**Swept:** no \`Agent review\` verdict on \`${SHA:0:8}\` after ${AGE} minutes, so the review was skipped rather than delayed. The required check will never report and this pull request cannot merge. Closing and reopening it re-fires the review; labelled \`needs-human\` so the merge stays held until someone does."
+                spend; n_noverdict=$((n_noverdict+1))
+              fi
+              continue
+            fi
+
+            # 3. Changes were requested and nothing is listening. A strike was
+            #    spent on a rework round that never landed (FINDINGS: PRs #12,
+            #    #16). Re-applying the label as the reviewer App starts another
+            #    round; rework's own three-strike gate still bounds it.
+            case ",$LABELS," in
+              *,needs-rework,*) : ;;
+              *)
+                if [ "$VERDICT" = "failure" ] && budget_left; then
+                  label_as_app "$PR" needs-rework
+                  say "$PR" "<!-- sweeper:stuck:$SHA -->" \
+                    "**Swept:** \`Agent review\` is red on \`${SHA:0:8}\` but nothing was queued to act on it, so the rework round was dropped. Re-applied \`needs-rework\`. Rework's three-strike gate still applies."
+                  spend; n_stuck=$((n_stuck+1))
+                  continue
+                fi ;;
+            esac
+
+            # 4. Auto-merge was never armed. gh-aw arms it best-effort at
+            #    creation: a failure is only a core.warning and the pull request
+            #    is still created, so one that will never merge looks exactly
+            #    like one that is waiting.
+            if [ "$AM" = "null" ] && [ "$DRAFT" = "false" ] && budget_left; then
+              NODE=$(gh api "repos/$REPO/pulls/$PR" --jq '.node_id')
+              if gh api graphql -f query='
+                    mutation($id: ID!) {
+                      enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: SQUASH}) {
+                        pullRequest { number }
+                      }
+                    }' -f id="$NODE" --silent 2>/dev/null; then
+                say "$PR" "<!-- sweeper:armed:$PR -->" \
+                  "**Swept:** auto-merge was not armed on this pull request, so it would have waited for a merge nobody had asked for. Armed it (squash). The \`develop gate\` still decides when it happens."
+                spend; n_armed=$((n_armed+1))
+              fi
+            fi
+          done
+
+          # ---- branches of merged agent pull requests ------------------------
+          # delete_branch_on_merge is off, so every merged agent branch survives.
+          # Only branches whose pull request was opened by the implementer App
+          # and is already merged are touched.
+          MERGED=$(gh pr list --repo "$REPO" --state merged --base "$BASE" --limit 50 \
+            --json number,headRefName,author,mergedAt \
+            --jq '[.[] | select(.author.login == "app/gh-aw-spike-implementer")]')
+          for row in $(jq -r '.[] | @base64' <<<"$MERGED"); do
+            budget_left || break
+            BR=$(base64 -d <<<"$row" | jq -r '.headRefName')
+            N=$(base64 -d <<<"$row" | jq -r '.number')
+            gh api "repos/$REPO/branches/$BR" --silent 2>/dev/null || continue
+            OPEN=$(gh pr list --repo "$REPO" --state open --head "$BR" --json number --jq 'length')
+            [ "$OPEN" = "0" ] || continue
+            gh api -X DELETE "repos/$REPO/git/refs/heads/$BR" --silent
+            echo "deleted $BR (merged in #$N)"
+            spend; n_branch=$((n_branch+1))
+          done
+
+          {
+            echo "| case | acted |"
+            echo "|---|---|"
+            echo "| conflicted → needs-human | $n_conflict |"
+            echo "| no review verdict → needs-human | $n_noverdict |"
+            echo "| dropped rework → needs-rework | $n_stuck |"
+            echo "| auto-merge armed | $n_armed |"
+            echo "| merged branches deleted | $n_branch |"
+            echo "| skipped (already held by a person) | $n_skipped |"
+            echo ""
+            echo "Budget $acted/$MAX_ACTIONS."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Never finish silently: a do-nothing run still says so, and says why.
+          # Written as an `if`, not `[ ... ] && echo`: under `set -e` a false
+          # test as the last command would fail the job on a successful sweep.
+          if [ "$acted" -eq 0 ]; then
+            echo "nothing to sweep" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "swept: $acted action(s)"
