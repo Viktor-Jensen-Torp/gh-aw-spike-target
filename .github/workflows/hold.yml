@@ -1,0 +1,31 @@
+name: Hold
+
+# A stop button a person can press, expressed as a required check.
+#
+# The merge gate on `develop` is "every required check is green". This workflow
+# turns the `needs-human` label into one of those checks, so a person (or an
+# agent escalating after three strikes) can halt a pending auto-merge by adding
+# the label, and release it by removing it. Nothing has to re-arm the merge:
+# the check simply goes green again and GitHub proceeds.
+#
+# It must run on every pull request, not only labelled ones. A required check
+# that never reports leaves the pull request pending forever.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  hold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hold while needs-human is set
+        if: contains(github.event.pull_request.labels.*.name, 'needs-human')
+        run: |
+          echo "::error::needs-human is on this pull request; a person is looking at it. Holding the merge."
+          exit 1
+      - name: Nothing holding this pull request
+        run: echo "No needs-human label; this gate is clear."
