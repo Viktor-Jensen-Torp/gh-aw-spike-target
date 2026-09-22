@@ -9,12 +9,23 @@ on:
   # merely delayed — when GitHub is busy, which is worst on the hour.
   schedule: daily
   workflow_dispatch:
+    inputs:
+      settle_hours:
+        description: "Override the settling period, in hours. 0 considers every issue, however recently edited. For testing the role without waiting a night."
+        required: false
+        default: ""
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
   skip-if-no-match: "is:issue is:open -label:refined -label:implement -label:agent -label:agentic-workflows -label:draft"
 
   stop-after: +30d
+
+# Without a discriminator every dispatch shares one conclusion concurrency slot,
+# so a second dispatch cancels the first — the shape that once killed a rework
+# run mid-flight (FINDINGS).
+concurrency:
+  job-discriminator: ${{ github.run_id }}
 
 permissions:
   contents: read
@@ -52,7 +63,7 @@ pre-agent-steps:
       # body someone is still working on is worse than leaving it rough, and a
       # settling period buys that without asking anyone to remember a label —
       # an issue nobody remembers to mark would simply never be refined.
-      SETTLE_HOURS: "4"
+      SETTLE_HOURS: ${{ inputs.settle_hours || '4' }}
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
