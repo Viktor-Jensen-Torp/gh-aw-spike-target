@@ -85,10 +85,8 @@ const ROLES = {
   // human who has the verdict in front of them. REQUEST_CHANGES would claim an
   // authority this role does not have, so COMMENT is the only allowed event.
   release: {
-    required: [["submit_pull_request_review", "noop", "report_incomplete", "missing_tool", "missing_data"]],
-    checks: {
-      submit_pull_request_review: { field: "event", allowed: ["COMMENT"], upper: true },
-    },
+    required: [["add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    checks: {},
   },
 };
 
