@@ -157,6 +157,13 @@ Work in this order:
    **Do not set a base branch.** This workflow already targets `develop`, the
    branch agent work merges into; `main` is the release branch and a pull
    request against it will be refused.
+7. **Then stop.** Do not inspect the result — no `git log`, no `git status`, no
+   `ls` to confirm the commit, no reading the pull request back. gh-aw pushes
+   the branch and opens the pull request after your run ends, so the working
+   directory you would be looking at cannot show you the outcome either way:
+   a clean check and a broken one look identical from in here. On run
+   35874352977 the implementer spent four calls doing exactly this and learned
+   nothing. If the write fails, the run fails and the sweeper picks it up.
 
 Stop and call `noop` with a short reason, without opening a pull request, when:
 
