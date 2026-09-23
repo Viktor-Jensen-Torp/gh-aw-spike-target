@@ -21,10 +21,13 @@ name: Merge group gate
 # and a `needs-human` applied AFTER the pull request was queued, which the
 # pull-request-side check can no longer see.
 #
-# Which pull requests are in the group is derived from git ancestry, not from
-# the temporary branch's name: GitHub documents only the
-# `gh-readonly-queue/{base_branch}` prefix and does not specify how the rest of
-# the name represents one pull request or several.
+# Which pull requests are in the group comes from the queue branch's name, which
+# carries them: `gh-readonly-queue/develop/pr-36-<sha>`. GitHub documents only
+# the prefix, so that format is established by observation (run 35807427496),
+# and git ancestry is kept as a fallback. Ancestry alone does NOT work, which is
+# how the first version of this file ejected a perfectly good pull request: the
+# queue squashes, so the group's commit is a squash and the pull request's own
+# commits are not ancestors of it.
 #
 # Both jobs FAIL CLOSED. If the group's members cannot be determined, that is a
 # failure, not a pass — the whole point of this file is to not wave things
@@ -50,6 +53,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           BASE: ${{ github.event.merge_group.base_ref }}
+          HEAD: ${{ github.event.merge_group.head_ref }}
         run: bash .github/scripts/merge-group-members.sh hold
 
   agent_review:
@@ -64,4 +68,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           BASE: ${{ github.event.merge_group.base_ref }}
+          HEAD: ${{ github.event.merge_group.head_ref }}
         run: bash .github/scripts/merge-group-members.sh review
