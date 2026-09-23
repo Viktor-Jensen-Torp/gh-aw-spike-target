@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage, unique, first } = require('../src/index.js');
+const { sum, movingAverage, unique, first, count } = require('../src/index.js');
 
 test('sum adds the numbers', () => {
   assert.strictEqual(sum([1, 2, 3]), 6);
@@ -102,5 +102,32 @@ test('first does not modify the input array', () => {
   const original = [1, 2, 3];
   const copy = [...original];
   first(original);
+  assert.deepStrictEqual(original, copy);
+});
+
+test('count returns number of elements satisfying predicate', () => {
+  assert.strictEqual(count([1, 2, 3, 4], n => n % 2 === 0), 2);
+});
+
+test('count returns zero for empty list', () => {
+  assert.strictEqual(count([], n => true), 0);
+});
+
+test('count returns zero when no elements satisfy predicate', () => {
+  assert.strictEqual(count([1, 2, 3], n => false), 0);
+});
+
+test('count throws TypeError for non-array argument', () => {
+  assert.throws(() => count('nope', n => true), TypeError);
+});
+
+test('count throws TypeError for non-function predicate', () => {
+  assert.throws(() => count([1, 2], 'nope'), TypeError);
+});
+
+test('count does not modify the input array', () => {
+  const original = [1, 2, 3, 4];
+  const copy = [...original];
+  count(original, n => n % 2 === 0);
   assert.deepStrictEqual(original, copy);
 });
