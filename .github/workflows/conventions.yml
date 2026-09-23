@@ -27,45 +27,25 @@ jobs:
       - uses: actions/checkout@v5
         with: { fetch-depth: 0, persist-credentials: false }
 
-      - name: One helper, one file
+      - name: Check the conventions
         env:
           BASE: ${{ github.event.pull_request.base.ref || 'develop' }}
         run: |
           set -euo pipefail
 
-          # A merge group has no pull request to diff. The rule was enforced when
-          # each change entered the queue; there is nothing new to check here.
+          # A merge group has no pull request to diff, and each change in it was
+          # already checked on its own way in.
           if [ "${GITHUB_EVENT_NAME}" = "merge_group" ]; then
-            echo "merge group: the rule was enforced on each pull request"
+            echo "merge group: checked on each pull request"
             exit 0
           fi
 
           git fetch -q origin "$BASE"
-          BEFORE=$(git show "origin/$BASE:src/index.js" 2>/dev/null \
-                   | grep -c '^function ' || true)
-          AFTER=$(grep -c '^function ' src/index.js 2>/dev/null || true)
-
-          if [ "${AFTER:-0}" -le "${BEFORE:-0}" ]; then
-            echo "✅ src/index.js gained no new helper (${BEFORE:-0} -> ${AFTER:-0})"
+          # The same script the implementer runs before it pushes, so the two
+          # cannot drift apart.
+          if bash .github/scripts/check-conventions.sh "origin/$BASE" \
+               | tee "$GITHUB_STEP_SUMMARY"; then
             exit 0
           fi
-
-          ADDED=$(git diff "origin/$BASE"...HEAD -- src/index.js \
-                  | grep '^+function ' | sed 's/^+function \([a-zA-Z0-9_]*\).*/\1/' \
-                  | tr '\n' ' ')
-          {
-            echo "### ❌ A helper was added to \`src/index.js\`"
-            echo ""
-            echo "Added:\`$ADDED\`"
-            echo ""
-            echo "Each exported helper goes in its own file — \`src/<name>.js\`, with"
-            echo "\`test/<name>.test.js\` alongside. \`src/index.js\` ends with one line"
-            echo "listing every export, so two changes that both add a helper both edit"
-            echo "that line and collide **every time**. On 2026-09-22 that is exactly"
-            echo "what happened to two of three parallel changes."
-            echo ""
-            echo "See \`.github/conventions/javascript.md\`."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          echo "::error::A helper was added to src/index.js ($ADDED). One helper, one file — see .github/conventions/javascript.md"
+          echo "::error::A convention was not met — see the job summary and .github/conventions/"
           exit 1

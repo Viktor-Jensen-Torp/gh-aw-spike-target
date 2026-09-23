@@ -147,7 +147,12 @@ Work in this order:
    conventions. Touch only `src/**/*.js` and `test/**/*.js`.
 3. Add or update tests for the behaviour you changed.
 4. Run `npm test`. If it fails, fix the cause and run it again.
-5. Open one pull request with `create_pull_request`. The body states what the
+5. Run `bash .github/scripts/check-conventions.sh origin/develop`. **If it
+   fails, fix what it names and run it again** — it is the same check that gates
+   the pull request, so a breach you leave here comes back as a rejected review,
+   a rework round and a second review. Fixing it now costs nothing; fixing it
+   later costs three runs.
+6. Open one pull request with `create_pull_request`. The body states what the
    issue asked for, what you changed, and the result of `npm test`.
    **Do not set a base branch.** This workflow already targets `develop`, the
    branch agent work merges into; `main` is the release branch and a pull
