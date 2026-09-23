@@ -178,17 +178,32 @@ jobs:
             #    creation: a failure is only a core.warning and the pull request
             #    is still created, so one that will never merge looks exactly
             #    like one that is waiting.
+            #    Under a merge queue this is no longer a rare repair — it is
+            #    the normal path. gh-aw's `auto-merge` ALWAYS names a merge
+            #    method, and a queued branch refuses one: "The merge strategy
+            #    for develop is set by the merge queue." So every agent pull
+            #    request is created unarmed (PR #36), and without this the loop
+            #    is not autonomous at all: the checks go green and nothing
+            #    merges.
+            #
+            #    Arming with no method is what the queue accepts, and it means
+            #    "merge when ready" — which under a queue is "join the queue
+            #    when ready". `gh pr merge --auto` omits the method; the
+            #    GraphQL mutation's `mergeMethod` is optional for the same
+            #    reason, so the repository's own setting decides.
             if [ "$AM" = "null" ] && [ "$DRAFT" = "false" ] && budget_left; then
               NODE=$(gh api "repos/$REPO/pulls/$PR" --jq '.node_id')
               if gh api graphql -f query='
                     mutation($id: ID!) {
-                      enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: SQUASH}) {
+                      enablePullRequestAutoMerge(input: {pullRequestId: $id}) {
                         pullRequest { number }
                       }
                     }' -f id="$NODE" --silent 2>/dev/null; then
                 say "$PR" "<!-- sweeper:armed:$PR -->" \
-                  "**Swept:** auto-merge was not armed on this pull request, so it would have waited for a merge nobody had asked for. Armed it (squash). The \`develop gate\` still decides when it happens."
+                  "**Swept:** auto-merge was not armed, so this pull request would have waited for a merge nobody had asked for. Armed it without naming a method, which is what a queued branch accepts — the merge queue decides how, and the \`develop gate\` decides when."
                 spend; n_armed=$((n_armed+1))
+              else
+                echo "#$PR: could not arm auto-merge"
               fi
             fi
           done
