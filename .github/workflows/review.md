@@ -264,6 +264,11 @@ re-review builds on it instead of restating it.
 
 ## Step 2: Analyse the changed lines
 
+Read `.github/conventions/index.md` and the document it points at, and judge the
+change against it. The conventions are the repository's stated rules; a finding
+that cites one is a fact rather than a preference, and the `conventions` check
+only covers the part that can be checked mechanically.
+
 Review only lines that appear in the diff. Look for:
 
 - Logic errors, unhandled edge cases, missing error handling
@@ -272,6 +277,7 @@ Review only lines that appear in the diff. Look for:
   cases for the boundaries the change introduces
 - Unsafe input handling, hardcoded credentials, unsafe string interpolation
 - Performance traps: unnecessary passes over data, N+1 patterns
+- Departures from `.github/conventions/` that the mechanical check cannot catch
 - Unclear names, magic numbers, comments that no longer match the code
 - Dead or commented-out code, duplicated logic, needless complexity
 

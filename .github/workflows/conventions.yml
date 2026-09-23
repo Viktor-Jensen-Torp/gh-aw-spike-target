@@ -1,0 +1,68 @@
+name: Conventions
+
+# Gives the conventions teeth. A rule that is only written down is a rule that
+# gets ignored: the refiner disregarded a bolded, reasoned instruction three runs
+# in a row (FINDINGS, 2026-09-22). Prose states the aim; this makes it true.
+#
+# Checks `.github/conventions/javascript.md`'s one rule that can be checked
+# mechanically: a new helper does not go into the shared export line, because
+# that line is what made two of three parallel changes collide.
+
+on:
+  pull_request:
+    branches: [develop]
+    paths: ['src/**', 'test/**']
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0, persist-credentials: false }
+
+      - name: One helper, one file
+        env:
+          BASE: ${{ github.event.pull_request.base.ref || 'develop' }}
+        run: |
+          set -euo pipefail
+
+          # A merge group has no pull request to diff. The rule was enforced when
+          # each change entered the queue; there is nothing new to check here.
+          if [ "${GITHUB_EVENT_NAME}" = "merge_group" ]; then
+            echo "merge group: the rule was enforced on each pull request"
+            exit 0
+          fi
+
+          git fetch -q origin "$BASE"
+          BEFORE=$(git show "origin/$BASE:src/index.js" 2>/dev/null \
+                   | grep -c '^function ' || true)
+          AFTER=$(grep -c '^function ' src/index.js 2>/dev/null || true)
+
+          if [ "${AFTER:-0}" -le "${BEFORE:-0}" ]; then
+            echo "✅ src/index.js gained no new helper (${BEFORE:-0} -> ${AFTER:-0})"
+            exit 0
+          fi
+
+          ADDED=$(git diff "origin/$BASE"...HEAD -- src/index.js \
+                  | grep '^+function ' | sed 's/^+function \([a-zA-Z0-9_]*\).*/\1/' \
+                  | tr '\n' ' ')
+          {
+            echo "### ❌ A helper was added to \`src/index.js\`"
+            echo ""
+            echo "Added:\`$ADDED\`"
+            echo ""
+            echo "Each exported helper goes in its own file — \`src/<name>.js\`, with"
+            echo "\`test/<name>.test.js\` alongside. \`src/index.js\` ends with one line"
+            echo "listing every export, so two changes that both add a helper both edit"
+            echo "that line and collide **every time**. On 2026-09-22 that is exactly"
+            echo "what happened to two of three parallel changes."
+            echo ""
+            echo "See \`.github/conventions/javascript.md\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::error::A helper was added to src/index.js ($ADDED). One helper, one file — see .github/conventions/javascript.md"
+          exit 1

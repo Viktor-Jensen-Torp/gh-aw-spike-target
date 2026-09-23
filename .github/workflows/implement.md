@@ -137,10 +137,14 @@ ${{ github.repository }}. Its sanitized title and body are:
 
 Work in this order:
 
-1. Read the issue and the existing code under `src/` and `test/`. Read
-   `package.json` for the commands this repository uses.
-2. Make the smallest change that satisfies the issue. Touch only `src/**/*.js`
-   and `test/**/*.js`.
+1. **Read `.github/conventions/index.md` first, and then the document it points
+   at for the kind of change this is.** It is not background reading: it states
+   how code is laid out here, and a pull request that ignores it fails the
+   `conventions` check and cannot merge. Then read the issue and the existing
+   code under `src/` and `test/`, and `package.json` for the commands this
+   repository uses.
+2. Make the smallest change that satisfies the issue, following those
+   conventions. Touch only `src/**/*.js` and `test/**/*.js`.
 3. Add or update tests for the behaviour you changed.
 4. Run `npm test`. If it fails, fix the cause and run it again.
 5. Open one pull request with `create_pull_request`. The body states what the
