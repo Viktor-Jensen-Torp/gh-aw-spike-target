@@ -36,7 +36,7 @@ Separate files have nothing in common to collide over.
 **Checked by** `.github/workflows/conventions.yml`, which fails a pull request
 that adds an export to `src/index.js`.
 
-## Exports
+## Exports, and how a consumer reaches a helper
 
 Each file exports exactly what it defines:
 
@@ -47,9 +47,21 @@ function clamp(value, min, max) { /* … */ }
 module.exports = { clamp };
 ```
 
-`src/index.js` stays as it is for what is already there. Do not add to it, and do
-not rewrite it to re-export the new files — that would recreate the shared line
-this rule exists to remove.
+**A consumer requires the file it wants, directly:**
+
+```js
+const { clamp } = require('./src/clamp.js');
+```
+
+**There is no barrel, and that is the point.** `src/index.js` stays as it is for
+what is already there: do not add to it, and do not rewrite it to re-export the
+new files. A file that lists every helper is the shared line this rule exists to
+remove — re-creating it under another name brings the collisions straight back.
+
+So "export it", in an issue, means **export it from its own file**. A helper is
+finished when its own file exports it; nothing else needs to change for it to be
+usable. Do not treat the absence of a central export as an unfinished job — it
+is the convention working.
 
 ## Tests
 
