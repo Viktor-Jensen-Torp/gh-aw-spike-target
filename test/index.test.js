@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage, unique, first, count } = require('../src/index.js');
+const { sum, movingAverage, unique, first, count, sumOfSquares } = require('../src/index.js');
 
 test('sum adds the numbers', () => {
   assert.strictEqual(sum([1, 2, 3]), 6);
@@ -129,5 +129,28 @@ test('count does not modify the input array', () => {
   const original = [1, 2, 3, 4];
   const copy = [...original];
   count(original, n => n % 2 === 0);
+  assert.deepStrictEqual(original, copy);
+});
+
+test('sumOfSquares of [1,2,3] equals 14', () => {
+  assert.strictEqual(sumOfSquares([1, 2, 3]), 14);
+});
+
+test('sumOfSquares of empty list is zero', () => {
+  assert.strictEqual(sumOfSquares([]), 0);
+});
+
+test('sumOfSquares of [-2] equals 4', () => {
+  assert.strictEqual(sumOfSquares([-2]), 4);
+});
+
+test('sumOfSquares with non-array argument throws TypeError', () => {
+  assert.throws(() => sumOfSquares('nope'), TypeError);
+});
+
+test('sumOfSquares does not modify the input array', () => {
+  const original = [1, 2, 3];
+  const copy = [...original];
+  sumOfSquares(original);
   assert.deepStrictEqual(original, copy);
 });

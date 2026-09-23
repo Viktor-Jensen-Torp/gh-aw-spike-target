@@ -65,4 +65,12 @@ function count(list, predicate) {
   return counter;
 }
 
-module.exports = { sum, movingAverage, unique, first, count };
+/** Returns the sum of each number squared. */
+function sumOfSquares(numbers) {
+  if (!Array.isArray(numbers)) {
+    throw new TypeError('Argument must be an array');
+  }
+  return numbers.reduce((total, n) => total + (n * n), 0);
+}
+
+module.exports = { sum, movingAverage, unique, first, count, sumOfSquares };
