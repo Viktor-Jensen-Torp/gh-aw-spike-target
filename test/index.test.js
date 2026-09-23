@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage, unique, first, count, sumOfSquares } = require('../src/index.js');
+const { sum, movingAverage, unique, first, count, sumOfSquares, range } = require('../src/index.js');
 
 test('sum adds the numbers', () => {
   assert.strictEqual(sum([1, 2, 3]), 6);
@@ -153,4 +153,40 @@ test('sumOfSquares does not modify the input array', () => {
   const copy = [...original];
   sumOfSquares(original);
   assert.deepStrictEqual(original, copy);
+});
+
+test('range(0, 4) returns [0,1,2,3]', () => {
+  assert.deepStrictEqual(range(0, 4), [0, 1, 2, 3]);
+});
+
+test('range(2, 5) returns [2,3,4]', () => {
+  assert.deepStrictEqual(range(2, 5), [2, 3, 4]);
+});
+
+test('range(3, 3) returns empty list', () => {
+  assert.deepStrictEqual(range(3, 3), []);
+});
+
+test('range(5, 1) returns empty list', () => {
+  assert.deepStrictEqual(range(5, 1), []);
+});
+
+test('range(0, 1.5) throws TypeError', () => {
+  assert.throws(() => range(0, 1.5), TypeError);
+});
+
+test('range with non-integer start throws TypeError', () => {
+  assert.throws(() => range(1.5, 5), TypeError);
+});
+
+test('range with non-integer end throws TypeError', () => {
+  assert.throws(() => range(0, 2.5), TypeError);
+});
+
+test('range with negative start and positive end', () => {
+  assert.deepStrictEqual(range(-2, 2), [-2, -1, 0, 1]);
+});
+
+test('range with both negative numbers', () => {
+  assert.deepStrictEqual(range(-5, -2), [-5, -4, -3]);
 });

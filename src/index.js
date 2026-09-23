@@ -73,4 +73,25 @@ function sumOfSquares(numbers) {
   return numbers.reduce((total, n) => total + (n * n), 0);
 }
 
-module.exports = { sum, movingAverage, unique, first, count, sumOfSquares };
+/** Returns integers from start up to but not including end. */
+function range(start, end) {
+  if (!Number.isInteger(start)) {
+    throw new TypeError('start must be an integer');
+  }
+  if (!Number.isInteger(end)) {
+    throw new TypeError('end must be an integer');
+  }
+  
+  const result = [];
+  if (end <= start) {
+    return result;
+  }
+  
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  
+  return result;
+}
+
+module.exports = { sum, movingAverage, unique, first, count, sumOfSquares, range };
