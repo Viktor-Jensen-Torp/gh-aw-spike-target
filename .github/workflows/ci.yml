@@ -4,6 +4,10 @@ on:
   pull_request:
   push:
     branches: [main, develop]
+  # The queue's temporary branch, where this change is tested against the ones
+  # ahead of it. This is the one required check with real work to do here: it is
+  # what catches two changes that are each correct alone and broken together.
+  merge_group:
 
 permissions:
   contents: read
