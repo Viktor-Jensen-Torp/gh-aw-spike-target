@@ -47,4 +47,22 @@ function first(list) {
   return list[0];
 }
 
-module.exports = { sum, movingAverage, unique, first };
+/** Returns the count of elements that satisfy the predicate. */
+function count(list, predicate) {
+  if (!Array.isArray(list)) {
+    throw new TypeError('Argument must be an array');
+  }
+  if (typeof predicate !== 'function') {
+    throw new TypeError('Predicate must be a function');
+  }
+  
+  let counter = 0;
+  for (const item of list) {
+    if (predicate(item)) {
+      counter++;
+    }
+  }
+  return counter;
+}
+
+module.exports = { sum, movingAverage, unique, first, count };
