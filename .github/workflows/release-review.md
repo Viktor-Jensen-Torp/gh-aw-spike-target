@@ -5,13 +5,17 @@ intent: Give a developer the one thing per-change review cannot give them — wh
 
 on:
   pull_request:
-    # `opened` and `reopened` only. The release pull request is opened by hand
-    # when someone decides to ship, so it is short-lived — and every push to
-    # `develop` while it is open would otherwise buy another full read. The
-    # first release accumulated SIX, one per merge, each costing a run. To get a
-    # fresh read before merging, close and reopen it, or run the workflow by
-    # hand.
-    types: [opened, reopened]
+    # Including `synchronize`, because the release pull request's branch IS
+    # `develop` — so anything that changes what is shipping changes this pull
+    # request, and the read must follow. The case that matters: a person reads
+    # the release, decides against one of the changes, reverts it on `develop`,
+    # and the old read now describes something that is no longer in it.
+    #
+    # What made this unaffordable was the stacking, not the re-reading: PR #43
+    # collected seven reads that all remained visible. `hide-older-comments`
+    # below collapses the old ones, and a manually-opened release is short-lived,
+    # so in normal use this fires once or twice.
+    types: [opened, reopened, synchronize]
     # The release pull request only. review.md is scoped to `develop` and takes
     # the individual agent pull requests.
     branches: [main]
