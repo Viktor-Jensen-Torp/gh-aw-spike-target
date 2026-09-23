@@ -14,6 +14,16 @@ name: Hold
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
+  # A required check that never reports on the queue's temporary branch leaves
+  # the entry to time out and be ejected — silently. So this must report here
+  # too. A merge group carries no labels, so the step below simply finds nothing
+  # to hold and passes: the hold was enforced when the pull request was allowed
+  # into the queue.
+  #
+  # The gap that leaves, honestly: a `needs-human` applied AFTER a pull request
+  # is queued does not bite. Closing it needs the label handler to remove the
+  # entry from the queue.
+  merge_group:
 
 permissions:
   contents: read
