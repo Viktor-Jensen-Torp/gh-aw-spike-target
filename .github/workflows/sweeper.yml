@@ -60,7 +60,7 @@ jobs:
           set -euo pipefail
 
           acted=0
-          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0
+          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0 n_approved=0
 
           budget_left() { [ "$acted" -lt "$MAX_ACTIONS" ]; }
           spend() { acted=$((acted + 1)); }
@@ -208,6 +208,42 @@ jobs:
             fi
           done
 
+          # ---- workflow runs waiting for approval -----------------------------
+          # A push from `github-actions[bot]` leaves its workflow runs in
+          # `action_required`, waiting for a person. The unblocker's push is
+          # exactly that: resolving a conflict produces a MERGE commit, gh-aw's
+          # signed-commit path refuses merge commits, and the unsigned path
+          # pushes as `github-actions[bot]` rather than the App — there is no
+          # config to set the commit identity. So the re-review after a
+          # conflict fix never starts, and the pull request waits on a verdict
+          # that will never come (PR #41: Review run 35814898713,
+          # `action_required`, caught by the no-verdict case four hours later).
+          #
+          # Approving is scoped hard: only runs on the head branch of an OPEN
+          # pull request carrying `agent`. A run on anything else is none of
+          # this job's business.
+          PENDING=$(gh api "repos/$REPO/actions/runs?status=action_required&per_page=30" \
+            --jq '[.workflow_runs[] | {id, name, head_branch}]' 2>/dev/null || echo '[]')
+          AGENT_BRANCHES=$(gh pr list --repo "$REPO" --state open --base "$BASE" --limit 100 \
+            --json headRefName,labels \
+            --jq '[.[] | select([.labels[].name] | index("agent")) | .headRefName]')
+          for row in $(jq -r '.[] | @base64' <<<"$PENDING"); do
+            budget_left || break
+            RID=$(base64 -d <<<"$row" | jq -r '.id')
+            RBR=$(base64 -d <<<"$row" | jq -r '.head_branch')
+            RNM=$(base64 -d <<<"$row" | jq -r '.name')
+            if ! jq -e --arg b "$RBR" 'index($b)' >/dev/null <<<"$AGENT_BRANCHES"; then
+              echo "waiting run $RID ($RNM on $RBR): not an agent branch, leaving it"
+              continue
+            fi
+            if gh api -X POST "repos/$REPO/actions/runs/$RID/approve" --silent 2>/dev/null; then
+              echo "approved run $RID ($RNM on $RBR)"
+              spend; n_approved=$((n_approved+1))
+            else
+              echo "could not approve run $RID ($RNM on $RBR)"
+            fi
+          done
+
           # ---- branches of merged agent pull requests ------------------------
           # delete_branch_on_merge is off, so every merged agent branch survives.
           # Only branches whose pull request was opened by the implementer App
@@ -234,6 +270,7 @@ jobs:
             echo "| no review verdict → needs-human | $n_noverdict |"
             echo "| dropped rework → needs-rework | $n_stuck |"
             echo "| auto-merge armed | $n_armed |"
+            echo "| gated runs approved | $n_approved |"
             echo "| merged branches deleted | $n_branch |"
             echo "| skipped (already held by a person) | $n_skipped |"
             echo ""
