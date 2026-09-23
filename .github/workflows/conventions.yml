@@ -8,10 +8,13 @@ name: Conventions
 # mechanically: a new helper does not go into the shared export line, because
 # that line is what made two of three parallel changes collide.
 
+# No `paths:` filter, deliberately. This is a REQUIRED check, and a required
+# check that does not report leaves a pull request waiting forever — the
+# silent-gate shape FINDINGS keeps running into. So it runs on every pull
+# request and passes trivially when nothing was added to the shared file.
 on:
   pull_request:
     branches: [develop]
-    paths: ['src/**', 'test/**']
   merge_group:
 
 permissions:
