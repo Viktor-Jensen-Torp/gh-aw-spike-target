@@ -128,9 +128,27 @@ safe-outputs:
     # A resolution IS a merge commit, and gh-aw's signed-commit path refuses
     # one outright ("merge commit detected, refusing unsigned push fallback").
     signed-commits: false
-    allowed-files:
-      - "src/**"
-      - "test/**"
+    # No `allowed-files`, and that is forced rather than chosen. The allowlist is
+    # evaluated against the WHOLE patch, and a merge patch legitimately contains
+    # everything the base branch changed — so `[src/**, test/**]` rejected a
+    # correct resolution that had touched nothing else (run 35800087449
+    # resolved both files and passed all 25 tests, then could not push).
+    # `allowed-files` and merging are incompatible; this is not configurable
+    # around.
+    #
+    # What still guards the push, none of it weakened:
+    #   - `required-labels: [agent]` — only the pipeline's own pull requests;
+    #   - the pre-agent step refuses anything not open and not `agent`;
+    #   - gh-aw's `protected-files` default still blocks lockfiles, CODEOWNERS
+    #     and the rest;
+    #   - the App has no `workflows: write`, so the agent cannot introduce a
+    #     workflow change. A clean merge that merely CARRIES the base's workflow
+    #     files is fine — GitHub documents the exemption: "Workflow files can be
+    #     committed without this scope if the same file (with both the same path
+    #     and contents) exists on another branch in the same repository."
+    #     A workflow file the agent had to RESOLVE matches no branch, so the
+    #     exemption lapses and the push fails — which is the right outcome, and
+    #     the role escalates.
     if-no-changes: error
     commit-title-suffix: " [unblock]"
     # Without this gh-aw REQUESTS `administration: read` when minting the App
@@ -191,6 +209,9 @@ Rules:
   Step 4, not a licence to drop one.
 - **Never leave conflict markers** (`<<<<<<<`, `=======`, `>>>>>>>`) in a file.
   A file containing them is broken, not resolved.
+- **Never resolve a conflict inside `.github/`.** Carrying the base branch's
+  copy through untouched is fine and expected; editing one is not, and the push
+  will be refused. If a conflict lands there, that is Step 4.
 - Keep the file's existing order and style — alphabetical if it was
   alphabetical, declaration order if it was that.
 
