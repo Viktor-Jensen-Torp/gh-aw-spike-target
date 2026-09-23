@@ -1,9 +1,6 @@
 // Small helpers used by the reporting dashboard.
 
-/** Returns the sum of a list of numbers. */
-function sum(numbers) {
-  return numbers.reduce((total, n) => total + n, 0);
-}
+const { sum } = require('./sum.js');
 
 /** Returns a list of averages of consecutive runs of windowSize values. */
 function movingAverage(numbers, windowSize) {
@@ -86,4 +83,4 @@ function range(start, end) {
   return result;
 }
 
-module.exports = { sum, movingAverage, unique, first, count, range };
+module.exports = { movingAverage, unique, first, count, range };
