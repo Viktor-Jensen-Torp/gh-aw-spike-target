@@ -84,6 +84,12 @@ safe-outputs:
     # Agent work targets `develop`, not `main`. Without this the base is
     # `github.ref_name`, which on an `issues` event is the default branch.
     base-branch: develop
+    # Belt to that brace. On run 35806260362 the agent passed `main` as the base
+    # itself — the repository default, which is the obvious guess and the wrong
+    # answer — and gh-aw refused the whole pull request because per-run
+    # overrides were not allowed. Naming the one permitted base turns a failed
+    # run into a corrected one.
+    allowed-base-branches: [develop]
     # Arm the merge at creation; the `develop gate` ruleset decides when it
     # happens (required checks: test, hold, Agent review). Established on
     # PR #14: arming is allowed while a required check is RED, and a check
@@ -139,6 +145,9 @@ Work in this order:
 4. Run `npm test`. If it fails, fix the cause and run it again.
 5. Open one pull request with `create_pull_request`. The body states what the
    issue asked for, what you changed, and the result of `npm test`.
+   **Do not set a base branch.** This workflow already targets `develop`, the
+   branch agent work merges into; `main` is the release branch and a pull
+   request against it will be refused.
 
 Stop and call `noop` with a short reason, without opening a pull request, when:
 
