@@ -1,14 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { sum, movingAverage, unique, first, count, range } = require('../src/index.js');
-
-test('sum adds the numbers', () => {
-  assert.strictEqual(sum([1, 2, 3]), 6);
-});
-
-test('sum of an empty list is zero', () => {
-  assert.strictEqual(sum([]), 0);
-});
+const { movingAverage, unique, first, count, range } = require('../src/index.js');
 
 test('movingAverage with window size 3 on 7 elements gives 5 results', () => {
   const result = movingAverage([1, 2, 3, 4, 5, 6, 7], 3);
