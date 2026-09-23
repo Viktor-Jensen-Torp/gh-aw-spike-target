@@ -1,0 +1,67 @@
+name: Merge group gate
+
+# Reports `hold` and `Agent review` for a merge group — for real, not as a
+# formality.
+#
+# The constraint: a merge queue requires EVERY required status check to report
+# on its temporary branch, and there is no way to mark a check
+# pull-request-only. But `Agent review` is a check run the reviewer App posts
+# against a PULL REQUEST's head commit, and `hold` reads a label a temporary
+# branch does not have. Neither can report here by itself.
+#
+# The easy answer is to pass trivially and say the real gate happened at the
+# queue door. That is a vacuous gate, and FINDINGS is explicit that an absent
+# gate is visible while a vacuous one is not.
+#
+# So instead this VERIFIES the thing the queue door is supposed to have
+# guaranteed: every pull request in this group carries a green `Agent review`
+# on the exact commit that entered the queue, and none of them is being held by
+# a person. That is a real invariant, it is checked deterministically, and it
+# catches the two ways the door can be wrong — a verdict that was never posted,
+# and a `needs-human` applied AFTER the pull request was queued, which the
+# pull-request-side check can no longer see.
+#
+# Which pull requests are in the group is derived from git ancestry, not from
+# the temporary branch's name: GitHub documents only the
+# `gh-readonly-queue/{base_branch}` prefix and does not specify how the rest of
+# the name represents one pull request or several.
+#
+# Both jobs FAIL CLOSED. If the group's members cannot be determined, that is a
+# failure, not a pass — the whole point of this file is to not wave things
+# through.
+
+on:
+  merge_group:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  hold:
+    name: hold
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0, persist-credentials: false }
+      - name: Refuse if any queued pull request is being held
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.event.merge_group.base_ref }}
+        run: bash .github/scripts/merge-group-members.sh hold
+
+  agent_review:
+    # Must match the required check's name exactly; rulesets match by name.
+    name: Agent review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0, persist-credentials: false }
+      - name: Confirm every queued pull request was reviewed and passed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.event.merge_group.base_ref }}
+        run: bash .github/scripts/merge-group-members.sh review
