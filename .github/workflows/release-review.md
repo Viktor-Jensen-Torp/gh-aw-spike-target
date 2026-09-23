@@ -91,13 +91,24 @@ safe-outputs:
   github-app:
     client-id: ${{ vars.REVIEWER_CLIENT_ID }}
     private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
-  submit-pull-request-review:
+  # A comment, not a review, and that is the right container for advice.
+  #
+  # It was a COMMENT review, which stacked: PR #43 collected SEVEN reads, one per
+  # push to `develop` while it was open, each a separate model run saying the
+  # same facts in different words. `supersede-older-reviews` does not help —
+  # it dismisses older REQUEST_CHANGES reviews only, and this role never posts
+  # one, so it would have been a no-op. GitHub cannot dismiss a COMMENT review
+  # at all.
+  #
+  # `hide-older-comments` does what was wanted: it minimises this workflow's
+  # previous comments before posting the new one, so a reader sees the current
+  # read and not a pile. And a comment is the honest shape anyway — this role
+  # advises the person merging and holds no authority over the release, which is
+  # exactly what a review is *not*.
+  add-comment:
     max: 1
-    # COMMENT only, deliberately. This role advises the person who merges; it
-    # holds no authority over the release and REQUEST_CHANGES would claim some.
-    # `main` is merged by a human with this read in front of them.
-    allowed-events: [COMMENT]
-    supersede-older-reviews: true
+    target: "*"
+    hide-older-comments: true
   noop:
   threat-detection:
     engine:
@@ -132,7 +143,7 @@ Do not re-read every diff; you have a budget and the detail is not the job.
 
 ## Step 2: Write the read
 
-Submit one review with `submit_pull_request_review`, event `COMMENT`, shaped:
+Post one comment with `add_comment` on this pull request, shaped:
 
 1. **One line on the release**: how many changes, and what they add up to.
 2. **What is shipping** — one line per change, in the order they merged:
@@ -159,6 +170,7 @@ End with the three ways this release can go, and which you would pick:
 Never recommend holding the whole release without naming what would have to
 change for it to go out. A gate whose only answer is "stop" stops being used.
 
-You cannot approve or request changes, and you are not a gate: `main` is merged
-by a person. If there is genuinely nothing to say — an empty release — call
-`noop` with a one-line reason instead of submitting an empty review.
+You are not a gate and hold no authority here: `main` is merged by a person, and
+this is the note they read first. If there is genuinely nothing to say — an
+empty release — call `noop` with a one-line reason instead of posting an empty
+comment.
