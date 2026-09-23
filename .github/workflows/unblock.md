@@ -157,9 +157,14 @@ safe-outputs:
     # already fixed in rework.md; repeated here anyway.
     check-branch-protection: false
   add-labels:
-    max: 1
+    max: 2
     target: "*"
-    allowed: [needs-human]
+    # `recheck` asks the reviewer to look again. It is needed because the push
+    # this role makes can never trigger a review by itself: a merge commit
+    # forces the unsigned push path, which authenticates as github-actions[bot],
+    # and gh-aw denies a `synchronize` whose actor is a bot that did not open
+    # the pull request. A `labeled` event is exempt by design.
+    allowed: [needs-human, recheck]
   add-comment:
     max: 1
     target: "*"
@@ -191,8 +196,8 @@ You are on the pull request's branch with the merge in progress. `git status`,
 `git diff` and reading the files all work normally.
 
 **If the state is `clean`**, the branch merged with no conflicts. Call
-`push_to_pull_request_branch` with `pull_request_number`
-${{ inputs.pr }} and stop. Nothing needs deciding.
+`push_to_pull_request_branch` with `pull_request_number` ${{ inputs.pr }}, then
+`add_labels` with `recheck`, and stop. Nothing needs deciding.
 
 ## Step 2: Resolve, keeping both sides' intent
 
@@ -224,8 +229,10 @@ conflict you just resolved — a missed export, a duplicated name. If it still
 fails, do **not** push: that is Step 4.
 
 Then call `push_to_pull_request_branch` with `pull_request_number`
-${{ inputs.pr }}. Pushing re-fires CI and the reviewer on the merged result,
-which is what should judge this work now.
+${{ inputs.pr }}, **and then `add_labels` with `recheck`** on the same pull
+request. The push alone will not get this reviewed — a review cannot be
+triggered by a push from this role — and the label is what asks for one. A
+resolution nobody reviews cannot merge, so both calls are required.
 
 ## Step 4: When you cannot
 

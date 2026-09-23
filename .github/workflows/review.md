@@ -5,7 +5,21 @@ intent: Give an agent-authored pull request a review a maintainer would trust, w
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    # `labeled` is how a conflict fix gets re-reviewed, and it is the door gh-aw
+    # deliberately left open. Its confused-deputy guard fires ONLY on
+    # `synchronize` with a bot actor, and its own comment says why: "Other
+    # pull_request actions (labeled, unlabeled, assigned…) legitimately have
+    # actor != pr_author". A conflict fix always pushes as `github-actions[bot]`
+    # — gh-aw's signed path cannot represent a merge commit, and its unsigned
+    # path authenticates with the checkout's GITHUB_TOKEN rather than the App it
+    # minted — so `synchronize` is denied and no verdict is ever posted
+    # (Review run 35814898713). A label is not.
+    #
+    # `names:` filters ONLY the labeled action; the compiled condition is
+    # `event.action != 'labeled' || event.label.name == 'recheck'`, so opened,
+    # synchronize and reopened are unaffected.
+    types: [opened, synchronize, reopened, labeled]
+    names: [recheck]
     # Agent pull requests only. The release pull request (`develop -> main`) is a
     # different job — a day's work rather than one change — and is read by
     # release-review.md. Without this filter that reviewer and this one would
@@ -15,6 +29,9 @@ on:
   # The implementer App is not a repository collaborator, so without this the
   # role check in pre_activation denies its pull requests.
   bots: [gh-aw-spike-implementer]
+  # The label may be applied by either App depending on which role fixed it.
+  # For a non-`synchronize` action the allowlist IS consulted, unlike the
+  # guard above, so this is the legitimate grant rather than a bypass.
 
 permissions:
   contents: read
@@ -186,6 +203,11 @@ jobs:
 
           # REST, not `gh pr edit`: the latter goes through GraphQL and fails
           # on the Projects (classic) deprecation in this repo.
+          # `recheck` is a one-shot request, like `implement`. Leaving it on
+          # would mean the next label change never re-fires anything.
+          gh api -X DELETE "repos/$REPO/issues/$PR/labels/recheck" --silent 2>/dev/null \
+            && echo "-> cleared recheck"
+
           case "$VERDICT" in
             block)
               gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
