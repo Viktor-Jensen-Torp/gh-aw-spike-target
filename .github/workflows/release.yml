@@ -89,8 +89,16 @@ jobs:
             echo
             echo "## Shipping"
             echo
+            # Only what actually shipped. A sync merge of `main` into `develop`
+            # is bookkeeping, not a change, and nine of them in a row made the
+            # first release's list unreadable. Squashed agent work always ends
+            # with its pull request number, so that is the filter.
             gh api "repos/$REPO/compare/main...develop" \
-              --jq '.commits[] | "- \(.commit.message | split("\n")[0])"'
+              --jq '.commits[]
+                    | select((.parents | length) == 1)
+                    | .commit.message | split("\n")[0]
+                    | select(test("\\(#[0-9]+\\)$"))
+                    | "- \(.)"'
             echo
             if [ -n "$CLOSES" ]; then
               echo "## Resolves"

@@ -5,7 +5,13 @@ intent: Give a developer the one thing per-change review cannot give them — wh
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    # `opened` and `reopened` only. The release pull request is opened by hand
+    # when someone decides to ship, so it is short-lived — and every push to
+    # `develop` while it is open would otherwise buy another full read. The
+    # first release accumulated SIX, one per merge, each costing a run. To get a
+    # fresh read before merging, close and reopen it, or run the workflow by
+    # hand.
+    types: [opened, reopened]
     # The release pull request only. review.md is scoped to `develop` and takes
     # the individual agent pull requests.
     branches: [main]
