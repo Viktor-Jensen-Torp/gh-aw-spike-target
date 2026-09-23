@@ -60,7 +60,7 @@ jobs:
           set -euo pipefail
 
           acted=0
-          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0 n_approved=0
+          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0 n_approved=0 n_reopened=0
 
           budget_left() { [ "$acted" -lt "$MAX_ACTIONS" ]; }
           spend() { acted=$((acted + 1)); }
@@ -150,10 +150,31 @@ jobs:
               PUSHED=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.committer.date')
               AGE=$(( ( $(date -u +%s) - $(date -u -d "$PUSHED" +%s) ) / 60 ))
               if [ "$AGE" -ge "$VERDICT_GRACE_MINUTES" ] && budget_left; then
-                label_as_app "$PR" needs-human
-                say "$PR" "<!-- sweeper:noverdict:$SHA -->" \
-                  "**Swept:** no \`Agent review\` verdict on \`${SHA:0:8}\` after ${AGE} minutes, so the review was skipped rather than delayed. The required check will never report and this pull request cannot merge. Closing and reopening it re-fires the review; labelled \`needs-human\` so the merge stays held until someone does."
-                spend; n_noverdict=$((n_noverdict+1))
+                # Try the known remedy before calling a person. A review is
+                # denied when the actor that pushed does not match the pull
+                # request's author — "Potential confused deputy attack detected.
+                # Actor 'github-actions[bot]' does not match the event author"
+                # (Review run 35814898713). That is what a conflict fix always
+                # looks like: resolving needs a MERGE commit, gh-aw's signed
+                # path refuses merge commits, and the unsigned path pushes as
+                # github-actions[bot].
+                #
+                # Reopening as the implementer App fires `reopened` with an
+                # actor that DOES match the author, so the review runs. Once
+                # per head commit, marked, and only then escalate.
+                if ! already_said "$PR" "<!-- sweeper:reopened:$SHA -->"; then
+                  GH_TOKEN="$APP_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=closed --silent
+                  sleep 3
+                  GH_TOKEN="$APP_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=open --silent
+                  say "$PR" "<!-- sweeper:reopened:$SHA -->" \
+                    "**Swept:** no \`Agent review\` verdict on \`${SHA:0:8}\` after ${AGE} minutes. A review is denied when the actor that pushed does not match the pull request's author, which is what a conflict fix looks like. Closed and reopened as the implementer App so the review fires with a matching actor. If this leaves no verdict either, the next sweep calls a person."
+                  spend; n_reopened=$((n_reopened+1))
+                else
+                  label_as_app "$PR" needs-human
+                  say "$PR" "<!-- sweeper:noverdict:$SHA -->" \
+                    "**Swept:** still no \`Agent review\` verdict on \`${SHA:0:8}\` after a reopen, so the review is not going to run on its own. The required check will never report and this pull request cannot merge. Labelled \`needs-human\`."
+                  spend; n_noverdict=$((n_noverdict+1))
+                fi
               fi
               continue
             fi
@@ -267,7 +288,8 @@ jobs:
             echo "| case | acted |"
             echo "|---|---|"
             echo "| conflicted → unblocker dispatched | $n_conflict |"
-            echo "| no review verdict → needs-human | $n_noverdict |"
+            echo "| no verdict → reopened for review | $n_reopened |"
+            echo "| still no verdict → needs-human | $n_noverdict |"
             echo "| dropped rework → needs-rework | $n_stuck |"
             echo "| auto-merge armed | $n_armed |"
             echo "| gated runs approved | $n_approved |"
