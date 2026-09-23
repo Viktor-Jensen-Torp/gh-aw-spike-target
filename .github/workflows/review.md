@@ -190,9 +190,21 @@ jobs:
                   | last | .state // \"\"")
           echo "head $SHA: check=${CHECK:-none} review=${STATE:-none}"
 
-          if [ "$CHECK" = "failure" ] || [ "$STATE" = "CHANGES_REQUESTED" ]; then
+          # Any OTHER required check that is red also needs someone sent, and
+          # rework is cheaper than a person: ~4.7 AI credits against your time.
+          # Without this, a red `conventions` or `test` on an agent pull request
+          # summons nobody — the pull request simply sits blocked, looking like
+          # it is waiting. rework's own gate already tells "a check is failing"
+          # (fix-ci) from "the reviewer objected" (address-review), so it knows
+          # what to do once it is started.
+          FAILING=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
+            --jq "[.check_runs[] | select(.name == \"test\" or .name == \"conventions\")
+                   | select(.conclusion == \"failure\")] | length")
+          [ "${FAILING:-0}" -eq 0 ] || echo "required checks failing on $SHA: $FAILING"
+
+          if [ "$CHECK" = "failure" ] || [ "$STATE" = "CHANGES_REQUESTED" ] || [ "${FAILING:-0}" -gt 0 ]; then
             VERDICT=block
-            if [ "$CHECK" != "failure" ] || [ "$STATE" != "CHANGES_REQUESTED" ]; then
+            if [ "${FAILING:-0}" -eq 0 ] && { [ "$CHECK" != "failure" ] || [ "$STATE" != "CHANGES_REQUESTED" ]; }; then
               echo "::warning::verdicts disagree (check=${CHECK:-none}, review=${STATE:-none}); treating as blocking"
             fi
           elif [ "$CHECK" = "success" ]; then
