@@ -23,6 +23,15 @@ on:
 concurrency:
   job-discriminator: ${{ inputs.pr }}
 
+# Full history, because this role MERGES. gh-aw's default checkout is a shallow
+# clone (`fetch-depth: 1`), which has no commit in common with the branch being
+# merged in — git then refuses with "fatal: refusing to merge unrelated
+# histories" and the role escalates a conflict it could have resolved (run
+# 35798391185). Every other role only reads or appends, so this is the first
+# place depth has mattered.
+checkout:
+  fetch-depth: 0
+
 permissions:
   contents: read
   pull-requests: read
@@ -78,6 +87,9 @@ pre-agent-steps:
 
       git config user.name "gh-aw-spike-implementer[bot]"
       git config user.email "gh-aw-spike-implementer[bot]@users.noreply.github.com"
+      # --unshallow as a belt to the frontmatter's braces: it errors on a repo
+      # that is already complete, so fall back to a plain fetch.
+      git fetch -q --unshallow origin 2>/dev/null || true
       git fetch -q origin "$BASE" "refs/pull/$PR/head:pr-head"
       git checkout -q pr-head
 
