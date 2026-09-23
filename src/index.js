@@ -26,19 +26,6 @@ function movingAverage(numbers, windowSize) {
   return result;
 }
 
-/** Returns a new list with only the first occurrence of each element. */
-function unique(array) {
-  const seen = new Set();
-  const result = [];
-  for (const item of array) {
-    if (!seen.has(item)) {
-      seen.add(item);
-      result.push(item);
-    }
-  }
-  return result;
-}
-
 /** Returns the first element of a list, or undefined if the list is empty. */
 function first(list) {
   if (!Array.isArray(list)) {
@@ -86,4 +73,4 @@ function range(start, end) {
   return result;
 }
 
-module.exports = { sum, movingAverage, unique, first, count, range };
+module.exports = { sum, movingAverage, first, count, range };
