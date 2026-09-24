@@ -34,9 +34,11 @@ jobs:
   report:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # push the metrics branch
-      issues: write     # update the one standing report issue
-      actions: read     # gh aw logs / health / outcomes read run history
+      contents: write        # push the metrics branch
+      issues: write          # update the one standing report issue
+      actions: read          # gh aw logs / health read run history
+      pull-requests: read    # gh aw outcomes looks up each PR's current state
+      checks: read           # ...and the check runs attached to it
     steps:
       - uses: actions/checkout@v5
 
