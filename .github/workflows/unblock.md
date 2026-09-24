@@ -10,6 +10,11 @@ intent: Get a pull request that collided with someone else's merge moving again,
 # IS the conflict cannot be triggered by the pull request it is fixing. It is
 # handed the number instead, by unblock.yml, which runs on the push that caused
 # the conflict. See FINDINGS.md.
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   workflow_dispatch:
     inputs:
@@ -170,12 +175,6 @@ safe-outputs:
     target: "*"
   noop:
     report-as-issue: false
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    continue-on-error: false
-    retries: 2
 
 timeout-minutes: 20
 ---

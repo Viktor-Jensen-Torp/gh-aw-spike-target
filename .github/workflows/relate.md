@@ -3,6 +3,11 @@ emoji: "🔗"
 description: Records how open issues relate to each other — what blocks what, and what belongs under what.
 intent: Give the backlog the relationships a per-issue reader cannot see, so nobody starts work that cannot finish.
 
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   # Daily, and offset from the refiner: this role reads issues the refiner has
   # already rewritten, so it is worth running after it rather than beside it.
@@ -147,12 +152,6 @@ safe-outputs:
                             | [.blocked, .blocker, .reason] | @tsv' "$GH_AW_AGENT_OUTPUT")
             echo "linked $COUNT dependency edge(s)" >> "$GITHUB_STEP_SUMMARY"
 
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    continue-on-error: false
-    retries: 2
 
 timeout-minutes: 20
 ---
