@@ -47,6 +47,26 @@ on:
   # For a non-`synchronize` action the allowlist IS consulted, unlike the
   # guard above, so this is the legitimate grant rather than a bypass.
 
+# gh-aw's default PR concurrency group is one group per PR number, shared by
+# every pull_request action, cancel-in-progress: true (reference/concurrency.md:
+# "new commits cancel outdated runs"). That is right for opened/synchronize/
+# reopened, wrong for `labeled`: the implementer opens a PR carrying
+# `labels: [agent, needs-review]`, and each label attachment is its own
+# `labeled` event — not a new commit — that lands in the SAME group and
+# cancels the review already running for `opened`. Established live on PR #56
+# (2026-09-24): the `opened`-triggered run was cancelled mid-agent by the
+# `needs-review` label event, and because that event is not `recheck` it
+# self-skipped rather than replacing the cancelled run — no verdict was ever
+# posted, and nothing but the sweeper's 20-minute needs-human escalation would
+# have recovered it. Partitioning the group by event action keeps the
+# intended behaviour (a real `synchronize` still cancels a stale review) while
+# stopping a same-PR label attachment from cancelling one — matching what the
+# `names:` filter above already tries to say but cannot enforce at the
+# concurrency layer on its own.
+concurrency:
+  group: "gh-aw-${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.action == 'labeled' && 'labels' || 'code' }}"
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: read
