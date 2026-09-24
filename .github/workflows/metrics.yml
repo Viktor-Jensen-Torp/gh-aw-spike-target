@@ -84,6 +84,15 @@ jobs:
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Park the freshly written files OUTSIDE the work tree first. Switching
+          # branches restores metrics/* from whatever is committed there, which
+          # silently discarded this run's row on 35948197850 and then reported
+          # "nothing changed" with every step green.
+          STAGE="${RUNNER_TEMP}/metrics-out"
+          mkdir -p "$STAGE"
+          cp metrics/history.jsonl metrics/pending.json "$STAGE/"
+
           # An orphan branch: this history shares no ancestry with the code and
           # should never be mergeable into it.
           if git ls-remote --exit-code --heads origin metrics >/dev/null 2>&1; then
@@ -94,6 +103,7 @@ jobs:
             git rm -rqf . >/dev/null 2>&1 || true
           fi
           mkdir -p metrics
+          cp "$STAGE/history.jsonl" "$STAGE/pending.json" metrics/
           git add -f metrics/history.jsonl metrics/pending.json
           if git diff --cached --quiet; then
             echo "nothing changed"
