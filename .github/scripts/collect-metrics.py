@@ -80,7 +80,14 @@ def within(ts, cutoff):
 
 def collect_runs(cutoff):
     """Per-run cost. `gh aw health` reports total_tokens: 0 for every workflow
-    on this repository, so cost comes from `logs`, not `health`."""
+    on this repository, so cost comes from `logs`, not `health`.
+
+    IMPORTANT: `aic` here is the AGENT's spend only. It matches the first figure
+    in a run's footer exactly, and excludes threat detection and evals, which
+    run their own model on every run. Measured against four runs' footers, the
+    true total averages 2.8x this — and detection cost scales with patch size,
+    so one unblock round was 4.8x. Everything this script reports is therefore a
+    LOWER BOUND, and the report says so rather than quietly understating."""
     data = jsh(["gh", "aw", "logs", "-c", "200", "--json"], timeout=900) or {}
     runs = data.get("runs") or []
     return runs, [r for r in runs if within(r.get("created_at"), cutoff)]
@@ -128,7 +135,7 @@ def main():
     total_aic = sum(w["aic"] for w in by_wf.values())
     # The headline. Cost per accepted result, not cost per run: a factory can get
     # cheaper because it got better or because it did less, and only this ratio
-    # tells the two apart.
+    # tells the two apart. Agent-only, for the reason in collect_runs().
     aic_per_merged = round(total_aic / len(merged), 1) if merged else None
     resolved = len(merged) + len(closed)
 
@@ -180,12 +187,14 @@ def main():
         "",
         "| | |",
         "|---|---|",
-        f"| Total AIC | **{row['total_aic']}**{delta('total_aic')} |",
+        f"| Agent AIC | **{row['total_aic']}**{delta('total_aic')} "
+        f"<sub>(excl. threat detection — true total ≈ 2.8x)</sub> |",
         f"| Pull requests merged | {len(merged)}{delta('prs_merged', '{:+d}')} |",
     ]
     if aic_per_merged is not None:
-        out.append(f"| **AIC per merged PR** | **{aic_per_merged}**"
-                   f"{delta('aic_per_merged_pr')} |")
+        out.append(f"| **Agent AIC per merged PR** | **{aic_per_merged}**"
+                   f"{delta('aic_per_merged_pr')} "
+                   f"<sub>(all-in ≈ {round(aic_per_merged * 2.8)})</sub> |")
     else:
         out.append("| **AIC per merged PR** | — <sub>(nothing merged in the window)</sub> |")
     if row["acceptance_rate"] is not None:
@@ -212,9 +221,14 @@ def main():
     out += [
         "<!-- factory-metrics-report -->",
         "",
-        "_Deterministic report — no agent ran to produce this. For per-safe-output "
-        "detail run `gh aw outcomes <run-id>` by hand; it is left out of this job "
-        "because it costs roughly a thousand API calls._",
+        "_Deterministic report — no agent ran to produce this._",
+        "",
+        "_AIC figures are the **agent's** spend. Threat detection runs a second "
+        "model on every run and is not counted here; measured against run "
+        "footers the true total averages **2.8x** these numbers, and more when "
+        "patches are large. 1 AIC = $0.01. For per-safe-output detail run "
+        "`gh aw outcomes <run-id>` by hand; it is left out of this job because "
+        "it costs roughly a thousand API calls._",
     ]
     print("\n".join(out))
 

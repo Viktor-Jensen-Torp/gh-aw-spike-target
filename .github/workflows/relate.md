@@ -3,6 +3,13 @@ emoji: "🔗"
 description: Records how open issues relate to each other — what blocks what, and what belongs under what.
 intent: Give the backlog the relationships a per-issue reader cannot see, so nobody starts work that cannot finish.
 
+# Per-run inference cap. The default is 1000 AIC — $10 a run, effectively
+# unbounded for work this size. Measured agent spend over 94 runs: median ~5,
+# highest ever 43.1 (an unblock round). 100 leaves better than double the
+# headroom of anything real while stopping a loop that has stopped making
+# progress. Detection has its own cap, in shared/threat-detection.md.
+max-ai-credits: 100
+
 inlined-imports: true
 
 imports:
