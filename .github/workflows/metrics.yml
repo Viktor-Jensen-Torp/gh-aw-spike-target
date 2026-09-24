@@ -37,8 +37,7 @@ jobs:
       contents: write        # push the metrics branch
       issues: write          # update the one standing report issue
       actions: read          # gh aw logs / health read run history
-      pull-requests: read    # gh aw outcomes looks up each PR's current state
-      checks: read           # ...and the check runs attached to it
+      pull-requests: read    # what actually merged
     steps:
       - uses: actions/checkout@v5
 
@@ -62,7 +61,6 @@ jobs:
           if git ls-remote --exit-code --heads origin metrics >/dev/null 2>&1; then
             git fetch origin metrics --depth 1
             git show origin/metrics:metrics/history.jsonl > metrics/history.jsonl 2>/dev/null || true
-            git show origin/metrics:metrics/pending.json  > metrics/pending.json  2>/dev/null || true
             echo "restored $(wc -l < metrics/history.jsonl 2>/dev/null || echo 0) previous row(s)"
           else
             echo "no metrics branch yet; this is the first collection"
@@ -93,7 +91,7 @@ jobs:
           # "nothing changed" with every step green.
           STAGE="${RUNNER_TEMP}/metrics-out"
           mkdir -p "$STAGE"
-          cp metrics/history.jsonl metrics/pending.json "$STAGE/"
+          cp metrics/history.jsonl "$STAGE/"
 
           # An orphan branch: this history shares no ancestry with the code and
           # should never be mergeable into it.
@@ -105,8 +103,8 @@ jobs:
             git rm -rqf . >/dev/null 2>&1 || true
           fi
           mkdir -p metrics
-          cp "$STAGE/history.jsonl" "$STAGE/pending.json" metrics/
-          git add -f metrics/history.jsonl metrics/pending.json
+          cp "$STAGE/history.jsonl" metrics/
+          git add -f metrics/history.jsonl
           if git diff --cached --quiet; then
             echo "nothing changed"
           else
