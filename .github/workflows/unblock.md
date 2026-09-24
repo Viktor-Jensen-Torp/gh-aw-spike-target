@@ -206,7 +206,26 @@ request's work, the other is work that has already been accepted onto the base
 branch. **Neither side is a mistake.** Keep what each side was *trying to do*.
 
 **A side's intent is the change it made, which may be a removal.** Work out what
-each side did to the conflicting lines before you decide what they should say:
+each side did to the conflicting lines before you decide what they should say.
+
+**Comparing the two sides to each other cannot tell you this**, and reaching for
+`git show HEAD:<file>` and `git show origin/develop:<file>` is the trap: two end
+states differ in the same way whether a name was added on one side or deleted on
+the other. You must diff each side against their common ancestor:
+
+```bash
+BASE=$(git merge-base HEAD MERGE_HEAD)
+git diff "$BASE" HEAD       -- <file>   # what THIS pull request did
+git diff "$BASE" MERGE_HEAD -- <file>   # what the base branch did
+```
+
+Read those two diffs before you write anything. A `-` line is a removal and a
+`+` line is an addition; that is the only reliable way to tell them apart. On
+run 35938215027 the agent skipped this, compared the two end states, and
+concluded that the pull request was *adding* the very function the base branch
+had just moved out — exactly backwards — then escalated on that reasoning.
+
+With both diffs in hand:
 
 - Both sides **added** something — keep both additions. Two functions in the
   same place, two names on the same export list, two cases in the same test
