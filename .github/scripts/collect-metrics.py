@@ -32,6 +32,20 @@ PENDING = "metrics/pending.json"
 # Cap the per-run outcome scoring: `gh aw outcomes` downloads each run's
 # artifacts, so an unbounded set turns a report into a half-hour job.
 MAX_SCORED = int(os.environ.get("MAX_SCORED", "60"))
+# How long a run stays worth re-checking. After this it is whatever it is.
+RESCORE_DAYS = int(os.environ.get("RESCORE_DAYS", "30"))
+# Only these safe outputs can move from `pending` to a verdict in this
+# repository. The rest — our `Agent review` check run, inline review comments,
+# and labels the state machine is *meant* to remove — either have no rule in
+# gh-aw's outcome model or are permanently pending by construction. Carrying
+# them forward forever is what made the first CI run hit the scoring cap with
+# eighty deferred runs and no headline figure.
+RESOLVABLE = {
+    "create_pull_request", "push_to_pull_request_branch", "create_issue",
+    "add_comment", "update_issue", "update_pull_request", "close_issue",
+    "close_pull_request", "submit_pull_request_review", "assign_to_agent",
+    "mark_pull_request_as_ready_for_review", "assign_milestone", "add_reviewer",
+}
 
 
 def sh(args, timeout=600):
@@ -94,6 +108,22 @@ def load_pending():
         return set()
 
 
+def worth_rechecking(item):
+    """A pending item is only worth another pass if its type can actually reach
+    a verdict, and if it is still young enough for the repository to change its
+    mind about it."""
+    if item.get("outcome_status") != "pending":
+        return False
+    if (item.get("type") or "") not in RESOLVABLE:
+        return False
+    created = (item.get("created_at") or "").replace("Z", "+00:00")
+    try:
+        age = datetime.now(timezone.utc) - datetime.fromisoformat(created)
+    except ValueError:
+        return True  # unknown age: give it the benefit of the doubt once
+    return age <= timedelta(days=RESCORE_DAYS)
+
+
 def score_outcomes(run_ids):
     """Returns (items, still_pending_run_ids, scored_count, truncated)."""
     items, still = [], set()
@@ -108,7 +138,7 @@ def score_outcomes(run_ids):
         got = data.get("items") or []
         scored += 1
         items.extend(got)
-        if any(i.get("outcome_status") == "pending" for i in got):
+        if any(worth_rechecking(i) for i in got):
             still.add(str(rid))
     # Anything the cap cut is still unresolved as far as we know, so carry it
     # forward rather than dropping it: an un-scored run must not silently
