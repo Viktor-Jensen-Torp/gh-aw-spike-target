@@ -203,15 +203,33 @@ You are on the pull request's branch with the merge in progress. `git status`,
 
 For each conflicted file, the two sides are both wanted: one is this pull
 request's work, the other is work that has already been accepted onto the base
-branch. **Neither side is a mistake.** Almost always the answer is to keep both
-— two functions added in the same place, two names added to the same export
-list, two cases added to the same test file.
+branch. **Neither side is a mistake.** Keep what each side was *trying to do*.
+
+**A side's intent is the change it made, which may be a removal.** Work out what
+each side did to the conflicting lines before you decide what they should say:
+
+- Both sides **added** something — keep both additions. Two functions in the
+  same place, two names on the same export list, two cases in the same test
+  file.
+- Both sides **removed** something — keep both removals. If one side deleted a
+  name from a list and the other deleted a different name, the answer has
+  **neither** name in it. Putting either one back reverses work that was
+  reviewed and merged.
+- One added and one removed — keep the addition and the removal. They are not
+  in competition unless they touch the same name.
+
+The common case is two additions, so "keep both" is a reflex worth distrusting:
+check the diff, do not assume. **Re-adding something a side deleted is the most
+likely way to get this wrong, and the least likely to be noticed** — the tests
+that covered it still pass, because putting it back is exactly what they were
+written against.
 
 Rules:
 
-- **Never delete work that is already on the base branch.** It is merged; it
-  passed review. If keeping both is impossible, that is the escalation in
-  Step 4, not a licence to drop one.
+- **Never reverse work that is already on the base branch.** It is merged; it
+  passed review. That includes its deletions: if the base branch removed a
+  function, a name or a test, it stays removed. If honouring both sides is
+  impossible, that is the escalation in Step 4, not a licence to undo one.
 - **Never leave conflict markers** (`<<<<<<<`, `=======`, `>>>>>>>`) in a file.
   A file containing them is broken, not resolved.
 - **Never resolve a conflict inside `.github/`.** Carrying the base branch's
