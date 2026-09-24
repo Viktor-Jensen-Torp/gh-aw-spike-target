@@ -7,6 +7,9 @@ inlined-imports: true
 
 imports:
   - shared/threat-detection.md
+  - uses: shared/postconditions.md
+    with:
+      role: refine
 
 on:
   # Refine one issue now, without waiting for tonight. gh-aw removes the label
@@ -53,14 +56,6 @@ engine:
     PI_ROLE: refine
 
 pre-agent-steps:
-  - name: Install role postconditions extension
-    run: |
-      set -euo pipefail
-      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
-      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
-      echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE"
-    env:
-      PI_ROLE: refine
 
   # Which issues are candidates is a filter, not a judgement, so it is decided
   # here. The cap keeps a growing backlog from becoming a context-window failure

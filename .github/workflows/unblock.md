@@ -14,6 +14,9 @@ inlined-imports: true
 
 imports:
   - shared/threat-detection.md
+  - uses: shared/postconditions.md
+    with:
+      role: unblock
 
 on:
   workflow_dispatch:
@@ -57,14 +60,6 @@ runtimes:
     version: "24"
 
 pre-agent-steps:
-  - name: Install role postconditions extension
-    run: |
-      set -euo pipefail
-      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
-      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
-      echo "installed, role=$PI_ROLE"
-    env:
-      PI_ROLE: unblock
 
   # The merge itself is mechanical and is done here, not by the agent. The agent
   # is left with exactly one job: decide what the conflicting hunks should say.
