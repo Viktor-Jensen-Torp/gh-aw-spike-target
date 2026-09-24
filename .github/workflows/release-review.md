@@ -3,16 +3,12 @@ emoji: "🚢"
 description: Reads a release pull request (develop → main) for the person who will merge it.
 intent: Give a developer the one thing per-change review cannot give them — what a day's agent work does together — without taking the decision away from them.
 
-# Per-run inference cap. The default is 1000 AIC — $10 a run, effectively
-# unbounded for work this size. Measured agent spend over 94 runs: median ~5,
-# highest ever 43.1 (an unblock round). 100 leaves better than double the
-# headroom of anything real while stopping a loop that has stopped making
-# progress. Detection has its own cap, in shared/threat-detection.md.
-max-ai-credits: 100
 
 inlined-imports: true
 
 imports:
+  - shared/model.md
+  - shared/budget.md
   - shared/threat-detection.md
   - uses: shared/postconditions.md
     with:
@@ -45,7 +41,6 @@ permissions:
 
 engine:
   id: pi
-  model: anthropic/claude-haiku-4-5-20251001
   env:
     PI_ROLE: release
 

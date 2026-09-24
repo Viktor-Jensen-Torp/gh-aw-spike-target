@@ -3,16 +3,12 @@ emoji: 🛠️
 description: Implements a labelled issue as a pull request with tests.
 intent: Turn an accepted issue into a reviewable pull request that passes the repository's checks, without a person writing the code.
 
-# Per-run inference cap. The default is 1000 AIC — $10 a run, effectively
-# unbounded for work this size. Measured agent spend over 94 runs: median ~5,
-# highest ever 43.1 (an unblock round). 100 leaves better than double the
-# headroom of anything real while stopping a loop that has stopped making
-# progress. Detection has its own cap, in shared/threat-detection.md.
-max-ai-credits: 100
 
 inlined-imports: true
 
 imports:
+  - shared/model.md
+  - shared/budget.md
   - shared/threat-detection.md
   - uses: shared/postconditions.md
     with:
@@ -50,7 +46,6 @@ engine:
   # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
   env:
     PI_ROLE: implement
-model: anthropic/claude-haiku-4-5-20251001
 
 network:
   allowed:

@@ -17,16 +17,12 @@ intent: Close the loop from a rejected review to a corrected branch, with a boun
 # unreachable from this trigger. A conflicted pull request never fires it.
 # This is very likely why gh-aw's own pr-sous-chef is a scheduled sweeper
 # rather than an event-driven rework agent.
-# Per-run inference cap. The default is 1000 AIC — $10 a run, effectively
-# unbounded for work this size. Measured agent spend over 94 runs: median ~5,
-# highest ever 43.1 (an unblock round). 100 leaves better than double the
-# headroom of anything real while stopping a loop that has stopped making
-# progress. Detection has its own cap, in shared/threat-detection.md.
-max-ai-credits: 100
 
 inlined-imports: true
 
 imports:
+  - shared/model.md
+  - shared/budget.md
   - shared/threat-detection.md
   - uses: shared/postconditions.md
     with:
@@ -146,7 +142,6 @@ permissions:
 
 engine:
   id: pi
-  model: anthropic/claude-haiku-4-5-20251001
   # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
   env:
     PI_ROLE: rework
