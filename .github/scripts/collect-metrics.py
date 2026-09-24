@@ -82,15 +82,44 @@ def collect_runs(cutoff):
     """Per-run cost. `gh aw health` reports total_tokens: 0 for every workflow
     on this repository, so cost comes from `logs`, not `health`.
 
-    IMPORTANT: `aic` here is the AGENT's spend only. It matches the first figure
-    in a run's footer exactly, and excludes threat detection and evals, which
-    run their own model on every run. Measured against four runs' footers, the
-    true total averages 2.8x this — and detection cost scales with patch size,
-    so one unblock round was 4.8x. Everything this script reports is therefore a
-    LOWER BOUND, and the report says so rather than quietly understating."""
+    IMPORTANT: `aic` here is the AGENT's spend only — it matches the first
+    figure in a run's footer exactly and excludes threat detection, which runs
+    its own model on every run. Detection is the LARGER share: 1087 AIC against
+    the agents' 632 over the first 94 runs. component_costs() below reads the
+    real per-component figures instead of applying a multiplier."""
     data = jsh(["gh", "aw", "logs", "-c", "200", "--json"], timeout=900) or {}
     runs = data.get("runs") or []
-    return runs, [r for r in runs if within(r.get("created_at"), cutoff)]
+    loc = data.get("logs_location")
+    return runs, [r for r in runs if within(r.get("created_at"), cutoff)], loc
+
+
+def component_costs(logs_location, run_id):
+    """Real per-component AIC for one run, or None where it is not on disk.
+
+    `gh aw logs` defaults `--artifacts` to `usage`, so it has already written
+    <logs>/run-<id>/usage/{agent,detection,evals}/token_usage.jsonl. Each line
+    carries a running `ai_credits_total`, so the last line is that component's
+    total. Reading these costs nothing extra — no API calls, no downloads — and
+    replaces an earlier 2.8x multiplier that was a mean of four samples ranging
+    1.67 to 4.83, which had no business being in a report."""
+    base = os.path.join(logs_location or ".github/aw/logs", f"run-{run_id}", "usage")
+
+    def last_total(component):
+        path = os.path.join(base, component, "token_usage.jsonl")
+        if not os.path.exists(path):
+            return None
+        last = None
+        try:
+            with open(path) as fh:
+                for line in fh:
+                    line = line.strip()
+                    if line:
+                        last = json.loads(line)
+        except (OSError, json.JSONDecodeError):
+            return None
+        return (last or {}).get("ai_credits_total")
+
+    return {c: last_total(c) for c in ("agent", "detection", "evals")}
 
 
 def collect_health():
@@ -120,30 +149,41 @@ def main():
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(days=WINDOW_DAYS)
 
-    all_runs, recent = collect_runs(cutoff)
+    all_runs, recent, logs_location = collect_runs(cutoff)
     health = collect_health()
     prs, merged, closed, open_ = collect_prs(cutoff)
 
-    by_wf = defaultdict(lambda: {"runs": 0, "aic": 0.0, "tokens": 0, "minutes": 0.0})
+    by_wf = defaultdict(lambda: {"runs": 0, "aic": 0.0, "detection": 0.0,
+                                 "tokens": 0, "minutes": 0.0})
+    missing_components = 0
     for r in recent:
         w = by_wf[r.get("workflow_name") or "?"]
         w["runs"] += 1
         w["aic"] += r.get("aic") or 0
         w["tokens"] += r.get("token_usage") or 0
         w["minutes"] += r.get("action_minutes") or 0
+        comp = component_costs(logs_location, r.get("run_id"))
+        if comp["detection"] is None:
+            missing_components += 1
+        w["detection"] += (comp["detection"] or 0) + (comp["evals"] or 0)
 
     total_aic = sum(w["aic"] for w in by_wf.values())
+    total_detection = sum(w["detection"] for w in by_wf.values())
+    total_all = total_aic + total_detection
     # The headline. Cost per accepted result, not cost per run: a factory can get
     # cheaper because it got better or because it did less, and only this ratio
     # tells the two apart. Agent-only, for the reason in collect_runs().
-    aic_per_merged = round(total_aic / len(merged), 1) if merged else None
+    aic_per_merged = round(total_all / len(merged), 1) if merged else None
     resolved = len(merged) + len(closed)
 
     row = {
         "collected_at": now.isoformat(),
         "window_days": WINDOW_DAYS,
         "runs": len(recent),
-        "total_aic": round(total_aic, 1),
+        "agent_aic": round(total_aic, 1),
+        "detection_aic": round(total_detection, 1),
+        "total_aic": round(total_all, 1),
+        "runs_missing_component_costs": missing_components,
         "total_tokens": sum(w["tokens"] for w in by_wf.values()),
         "actions_minutes": round(sum(w["minutes"] for w in by_wf.values()), 1),
         "prs_opened": len(prs),
@@ -187,14 +227,18 @@ def main():
         "",
         "| | |",
         "|---|---|",
-        f"| Agent AIC | **{row['total_aic']}**{delta('total_aic')} "
-        f"<sub>(excl. threat detection — true total ≈ 2.8x)</sub> |",
+        f"| **Total AIC** | **{row['total_aic']}**{delta('total_aic')} "
+        f"<sub>(${row['total_aic'] / 100:.2f})</sub> |",
+        f"| ├ agents | {row['agent_aic']} |",
+        f"| └ threat detection | {row['detection_aic']} "
+        f"<sub>({100 * row['detection_aic'] / row['total_aic']:.0f}% of spend)</sub> |"
+        if row["total_aic"] else "| └ threat detection | 0 |",
         f"| Pull requests merged | {len(merged)}{delta('prs_merged', '{:+d}')} |",
     ]
     if aic_per_merged is not None:
-        out.append(f"| **Agent AIC per merged PR** | **{aic_per_merged}**"
+        out.append(f"| **AIC per merged PR** | **{aic_per_merged}**"
                    f"{delta('aic_per_merged_pr')} "
-                   f"<sub>(all-in ≈ {round(aic_per_merged * 2.8)})</sub> |")
+                   f"<sub>(${aic_per_merged / 100:.2f}, all-in)</sub> |")
     else:
         out.append("| **AIC per merged PR** | — <sub>(nothing merged in the window)</sub> |")
     if row["acceptance_rate"] is not None:
@@ -209,26 +253,31 @@ def main():
 
     if by_wf:
         out += ["### Cost by role", "",
-                "| Role | Runs | AIC | Median AIC/run | Success (30d) |",
-                "|---|---:|---:|---:|---:|"]
-        for name, v in sorted(by_wf.items(), key=lambda kv: -kv[1]["aic"]):
-            per = round(v["aic"] / v["runs"], 1) if v["runs"] else 0
+                "| Role | Runs | Agent | Detection | Total | Per run | Success (30d) |",
+                "|---|---:|---:|---:|---:|---:|---:|"]
+        for name, v in sorted(by_wf.items(), key=lambda kv: -(kv[1]["aic"] + kv[1]["detection"])):
+            tot = v["aic"] + v["detection"]
+            per = round(tot / v["runs"], 1) if v["runs"] else 0
             hr = health.get(name, {}).get("success_rate")
             hs = f"{hr:.0f}%" if isinstance(hr, (int, float)) else "—"
-            out.append(f"| {name} | {v['runs']} | {v['aic']:.1f} | {per} | {hs} |")
+            out.append(f"| {name} | {v['runs']} | {v['aic']:.1f} | {v['detection']:.1f} "
+                       f"| **{tot:.1f}** | {per} | {hs} |")
         out.append("")
+        if missing_components:
+            out.append(f"_{missing_components} run(s) had no usage artifact on disk; "
+                       f"their detection cost is not counted, so the totals are a "
+                       f"slight undercount._")
+            out.append("")
 
     out += [
         "<!-- factory-metrics-report -->",
         "",
         "_Deterministic report — no agent ran to produce this._",
         "",
-        "_AIC figures are the **agent's** spend. Threat detection runs a second "
-        "model on every run and is not counted here; measured against run "
-        "footers the true total averages **2.8x** these numbers, and more when "
-        "patches are large. 1 AIC = $0.01. For per-safe-output detail run "
-        "`gh aw outcomes <run-id>` by hand; it is left out of this job because "
-        "it costs roughly a thousand API calls._",
+        "_1 AIC = $0.01. Agent and detection costs are read per run from the "
+        "usage artifacts `gh aw logs` already downloads, not estimated. For "
+        "per-safe-output detail run `gh aw outcomes <run-id>` by hand; it is "
+        "left out of this job because it costs roughly a thousand API calls._",
     ]
     print("\n".join(out))
 
