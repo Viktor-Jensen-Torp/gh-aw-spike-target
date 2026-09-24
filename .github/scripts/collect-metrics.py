@@ -32,6 +32,12 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
 WINDOW_DAYS = int(os.environ.get("WINDOW_DAYS", "7"))
+# Fetch limits. These are the only numbers here that can make the report say
+# less than the truth, so each one is checked against what came back and
+# declared in the output if it binds. A silently truncated total is how the
+# first version of this script reported a third of the real cost.
+RUN_FETCH = int(os.environ.get("RUN_FETCH", "400"))
+PR_FETCH = int(os.environ.get("PR_FETCH", "300"))
 HISTORY = "metrics/history.jsonl"
 
 _REPORTED = set()
@@ -87,7 +93,7 @@ def collect_runs(cutoff):
     its own model on every run. Detection is the LARGER share: 1087 AIC against
     the agents' 632 over the first 94 runs. component_costs() below reads the
     real per-component figures instead of applying a multiplier."""
-    data = jsh(["gh", "aw", "logs", "-c", "200", "--json"], timeout=900) or {}
+    data = jsh(["gh", "aw", "logs", "-c", str(RUN_FETCH), "--json"], timeout=900) or {}
     runs = data.get("runs") or []
     loc = data.get("logs_location")
     return runs, [r for r in runs if within(r.get("created_at"), cutoff)], loc
@@ -131,9 +137,10 @@ def collect_prs(cutoff):
     """What the factory actually shipped. Agent pull requests carry the `agent`
     label, applied at creation by the implementer's own safe output."""
     data = jsh([
-        "gh", "pr", "list", "--state", "all", "--limit", "100",
+        "gh", "pr", "list", "--state", "all", "--limit", str(PR_FETCH),
         "--json", "number,state,labels,createdAt,mergedAt",
     ]) or []
+    truncated = len(data) >= PR_FETCH
     prs = [
         p for p in data
         if any(l.get("name") == "agent" for l in (p.get("labels") or []))
@@ -142,7 +149,7 @@ def collect_prs(cutoff):
     merged = [p for p in prs if p.get("mergedAt")]
     closed = [p for p in prs if p.get("state") == "CLOSED" and not p.get("mergedAt")]
     open_ = [p for p in prs if p.get("state") == "OPEN"]
-    return prs, merged, closed, open_
+    return prs, merged, closed, open_, truncated
 
 
 def main():
@@ -151,7 +158,8 @@ def main():
 
     all_runs, recent, logs_location = collect_runs(cutoff)
     health = collect_health()
-    prs, merged, closed, open_ = collect_prs(cutoff)
+    prs, merged, closed, open_, prs_truncated = collect_prs(cutoff)
+    runs_truncated = len(all_runs) >= RUN_FETCH
 
     by_wf = defaultdict(lambda: {"runs": 0, "aic": 0.0, "detection": 0.0,
                                  "tokens": 0, "minutes": 0.0})
@@ -184,6 +192,7 @@ def main():
         "detection_aic": round(total_detection, 1),
         "total_aic": round(total_all, 1),
         "runs_missing_component_costs": missing_components,
+        "fetch_truncated": bool(runs_truncated or prs_truncated),
         "total_tokens": sum(w["tokens"] for w in by_wf.values()),
         "actions_minutes": round(sum(w["minutes"] for w in by_wf.values()), 1),
         "prs_opened": len(prs),
@@ -223,7 +232,12 @@ def main():
     out = [
         f"## Factory metrics — {now:%Y-%m-%d}",
         "",
-        f"Last {WINDOW_DAYS} days. {len(recent)} agent runs, {len(all_runs)} lifetime.",
+        f"Last {WINDOW_DAYS} days: {len(recent)} runs that executed an agent "
+        f"({len(all_runs)} in `gh aw logs`' whole history).",
+        "",
+        "_Cancelled and skipped runs are not listed by `gh aw logs` and are not "
+        "counted here. Spot-checked: a cancelled run's usage artifact showed "
+        "0.00 AIC, so they cost nothing — but that is a sample, not a proof._",
         "",
         "| | |",
         "|---|---|",
@@ -263,10 +277,19 @@ def main():
             out.append(f"| {name} | {v['runs']} | {v['aic']:.1f} | {v['detection']:.1f} "
                        f"| **{tot:.1f}** | {per} | {hs} |")
         out.append("")
+        notes = []
         if missing_components:
-            out.append(f"_{missing_components} run(s) had no usage artifact on disk; "
-                       f"their detection cost is not counted, so the totals are a "
-                       f"slight undercount._")
+            notes.append(f"{missing_components} run(s) had no usage artifact to read "
+                         f"(no agent executed, or the artifact expired), so their "
+                         f"cost is not counted")
+        if runs_truncated:
+            notes.append(f"**the run fetch hit its limit of {RUN_FETCH}** — these "
+                         f"totals are an undercount; raise `RUN_FETCH`")
+        if prs_truncated:
+            notes.append(f"**the pull request fetch hit its limit of {PR_FETCH}** — "
+                         f"the merge count is an undercount; raise `PR_FETCH`")
+        if notes:
+            out.append("_" + "; ".join(notes) + "._")
             out.append("")
 
     out += [
