@@ -1,0 +1,124 @@
+name: Metrics
+
+# The factory's own report card, weekly.
+#
+# NOT an agentic workflow, deliberately — the same call as sweeper.yml. Nothing
+# here needs judgement, only arithmetic, and a report about what the agents cost
+# must not itself cost agent credits or the observer inflates what it observes.
+#
+# History lives on its own `metrics` branch rather than in the report, because a
+# single week's numbers are close to meaningless: gh-aw's own measuring-impact
+# guidance is "do not overreact to single numbers, trend data is usually more
+# useful". The branch is written with GITHUB_TOKEN so the push starts no
+# workflows, and it is outside the two protected branches.
+
+on:
+  schedule:
+    # Monday 07:00 UTC — after the week it reports on, before anyone looks.
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+    inputs:
+      window_days:
+        description: "Days of history to report on"
+        required: false
+        default: "7"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the metrics branch
+      issues: write     # update the one standing report issue
+      actions: read     # gh aw logs / health / outcomes read run history
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install the gh-aw CLI, pinned
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Pinned to the version the workflows were compiled with. The
+          # documented setup-cli action is referenced at @main, which is not a
+          # thing to put in a scheduled workflow.
+          gh extension install github/gh-aw --pin v0.88.7
+          gh aw version
+
+      - name: Restore the metrics history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p metrics
+          if git ls-remote --exit-code --heads origin metrics >/dev/null 2>&1; then
+            git fetch origin metrics --depth 1
+            git show origin/metrics:metrics/history.jsonl > metrics/history.jsonl 2>/dev/null || true
+            git show origin/metrics:metrics/pending.json  > metrics/pending.json  2>/dev/null || true
+            echo "restored $(wc -l < metrics/history.jsonl 2>/dev/null || echo 0) previous row(s)"
+          else
+            echo "no metrics branch yet; this is the first collection"
+          fi
+
+      - name: Collect
+        id: collect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WINDOW_DAYS: ${{ github.event.inputs.window_days || '7' }}
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/collect-metrics.py > report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # An orphan branch: this history shares no ancestry with the code and
+          # should never be mergeable into it.
+          if git ls-remote --exit-code --heads origin metrics >/dev/null 2>&1; then
+            git fetch origin metrics --depth 1
+            git checkout -q -B metrics origin/metrics
+          else
+            git checkout -q --orphan metrics
+            git rm -rqf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p metrics
+          git add -f metrics/history.jsonl metrics/pending.json
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+          else
+            git commit -qm "Metrics: $(date -u +%Y-%m-%d)"
+            git push -q origin metrics
+            echo "pushed"
+          fi
+
+      - name: Update the standing report issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TITLE="Factory metrics"
+          # One issue, edited in place. A new issue or a new comment every week
+          # is how a report becomes noise nobody reads — the same mistake the
+          # release reader made before hide-older-comments.
+          N=$(gh issue list --repo "$REPO" --state open --limit 50 \
+                --search "\"$TITLE\" in:title" --json number,title \
+                --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")
+          if [ -n "$N" ]; then
+            gh issue edit "$N" --repo "$REPO" --body-file report.md
+            echo "updated #$N"
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body-file report.md
+          fi
