@@ -32,3 +32,11 @@ test('unique does not modify the input array', () => {
   unique(original);
   assert.deepStrictEqual(original, copy);
 });
+
+test("unique('nope') throws TypeError", () => {
+  assert.throws(() => unique('nope'), TypeError);
+});
+
+test('unique(null) throws TypeError', () => {
+  assert.throws(() => unique(null), TypeError);
+});
