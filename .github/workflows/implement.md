@@ -3,6 +3,11 @@ emoji: 🛠️
 description: Implements a labelled issue as a pull request with tests.
 intent: Turn an accepted issue into a reviewable pull request that passes the repository's checks, without a person writing the code.
 
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   label_command:
     name: implement
@@ -109,18 +114,6 @@ safe-outputs:
     # makes the branch push and the PR come from the implementer App, so CI
     # fires on `opened` by itself. The extra commit only added a second
     # `synchronize` event, doubling CI and reviewer runs. See FINDINGS.md.
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    # Strict mode. The default (true) lets safe outputs run when the detector
-    # cannot return a verdict: the WTD policy in the safe-outputs spec is keyed
-    # on conclusion == "warning", but an engine failure yields "failure", so
-    # nothing gates the write. See FINDINGS.md, spike 2 run 1.
-    continue-on-error: false
-    # threat-detect's own default is 0, so one clean exit without a verdict is
-    # terminal. Two retries absorb a flaky detector without weakening the gate.
-    retries: 2
 ---
 
 # Implement

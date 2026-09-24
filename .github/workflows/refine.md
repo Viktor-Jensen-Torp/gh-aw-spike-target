@@ -3,6 +3,11 @@ emoji: "✏️"
 description: Moves open issues toward ready — clear enough to start without asking a question, small enough to review.
 intent: Let a person write an issue the way they think, and have it be implementable by morning, without a person rewriting it.
 
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   # Refine one issue now, without waiting for tonight. gh-aw removes the label
   # again after the run, so it reads as a verb rather than a state.
@@ -199,12 +204,6 @@ safe-outputs:
   # way. The run's own summary is the record.
   noop:
     report-as-issue: false
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    continue-on-error: false
-    retries: 2
 
 # Fifteen candidates read properly against the codebase needs more than the
 # 15 minutes the other roles get.

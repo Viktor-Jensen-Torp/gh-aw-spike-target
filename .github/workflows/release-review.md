@@ -3,6 +3,11 @@ emoji: "🚢"
 description: Reads a release pull request (develop → main) for the person who will merge it.
 intent: Give a developer the one thing per-change review cannot give them — what a day's agent work does together — without taking the decision away from them.
 
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   pull_request:
     # Including `synchronize`, because the release pull request's branch IS
@@ -114,12 +119,6 @@ safe-outputs:
     target: "*"
     hide-older-comments: true
   noop:
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    continue-on-error: false
-    retries: 2
 
 timeout-minutes: 15
 ---

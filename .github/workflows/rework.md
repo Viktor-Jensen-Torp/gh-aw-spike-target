@@ -17,6 +17,11 @@ intent: Close the loop from a rejected review to a corrected branch, with a boun
 # unreachable from this trigger. A conflicted pull request never fires it.
 # This is very likely why gh-aw's own pr-sous-chef is a scheduled sweeper
 # rather than an event-driven rework agent.
+inlined-imports: true
+
+imports:
+  - shared/threat-detection.md
+
 on:
   pull_request:
     types: [labeled]
@@ -217,12 +222,6 @@ safe-outputs:
   add-comment:
     max: 1
   noop:
-  threat-detection:
-    engine:
-      id: claude
-      model: claude-haiku-4-5-20251001
-    continue-on-error: false
-    retries: 2
 
 timeout-minutes: 20
 
