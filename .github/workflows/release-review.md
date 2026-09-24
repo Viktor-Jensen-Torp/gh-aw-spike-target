@@ -7,6 +7,9 @@ inlined-imports: true
 
 imports:
   - shared/threat-detection.md
+  - uses: shared/postconditions.md
+    with:
+      role: release
 
 on:
   pull_request:
@@ -40,14 +43,6 @@ engine:
     PI_ROLE: release
 
 pre-agent-steps:
-  - name: Install role postconditions extension
-    run: |
-      set -euo pipefail
-      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
-      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
-      echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE"
-    env:
-      PI_ROLE: release
 
   # The one thing per-change review is blind to by construction: two changes
   # that are each correct against the branch they were cut from, and wrong

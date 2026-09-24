@@ -7,6 +7,9 @@ inlined-imports: true
 
 imports:
   - shared/threat-detection.md
+  - uses: shared/postconditions.md
+    with:
+      role: relate
 
 on:
   # Daily, and offset from the refiner: this role reads issues the refiner has
@@ -33,14 +36,6 @@ engine:
     PI_ROLE: relate
 
 pre-agent-steps:
-  - name: Install role postconditions extension
-    run: |
-      set -euo pipefail
-      mkdir -p /tmp/gh-aw/pi-agent-dir/extensions
-      cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
-      echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE"
-    env:
-      PI_ROLE: relate
 
   # The whole open backlog in one file, with the relationships that already
   # exist. This role's judgement is about the SET, so unlike the refiner it must
