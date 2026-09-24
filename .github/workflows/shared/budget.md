@@ -19,4 +19,13 @@ max-ai-credits: 100
 # Note also §9.8: label-command and slash-command invocations bypass it, so
 # `implement` and `refine` are not covered when a person triggers them by label.
 max-daily-ai-credits: 500
+
+# gh-aw's default is 500 chat iterations per run, effectively unbounded here.
+# Deliberately NOT tuned from `gh aw logs` invocation counts: every run this
+# spike has produced so far is a six-line helper, not the real work the
+# factory is meant for, so those counts describe today's toy tasks and not
+# tomorrow's. This is a safeguard against a genuine runaway loop, not a
+# performance budget — one number, same for every role, revisit only once
+# there is real-task data to revisit it with.
+max-turns: 150
 ---
