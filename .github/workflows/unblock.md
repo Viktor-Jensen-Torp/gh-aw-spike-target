@@ -133,8 +133,8 @@ safe-outputs:
     # What still guards the push, none of it weakened:
     #   - `required-labels: [agent]` — only the pipeline's own pull requests;
     #   - the pre-agent step refuses anything not open and not `agent`;
-    #   - gh-aw's `protected-files` default still blocks lockfiles, CODEOWNERS
-    #     and the rest;
+    #   - gh-aw's `protected-files` guard still catches lockfiles, CODEOWNERS
+    #     and the rest — see `protected-files` below for what happens then;
     #   - the App has no `workflows: write`, so the agent cannot introduce a
     #     workflow change. A clean merge that merely CARRIES the base's workflow
     #     files is fine — GitHub documents the exemption: "Workflow files can be
@@ -143,6 +143,16 @@ safe-outputs:
     #     A workflow file the agent had to RESOLVE matches no branch, so the
     #     exemption lapses and the push fails — which is the right outcome, and
     #     the role escalates.
+    #
+    # PR #53's real resolution was blocked exactly this way — a merge patch
+    # containing .github/workflows/unblock.*. Before this line, the only
+    # trace was "Cannot push to pull request branch: patch modifies protected
+    # files" in a job log; the pull request just sat, and #53 was finished by
+    # hand (FINDINGS.md). fallback-to-issue turns that into a human-facing
+    # issue with the patch and instructions to apply or reject it manually,
+    # without weakening the guard itself — no protected file gets pushed
+    # either way.
+    protected-files: fallback-to-issue
     if-no-changes: error
     commit-title-suffix: " [unblock]"
     # Without this gh-aw REQUESTS `administration: read` when minting the App
