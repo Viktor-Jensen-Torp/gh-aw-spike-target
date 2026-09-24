@@ -17,4 +17,10 @@ safe-outputs:
     # threat-detect's own default is 0, so one clean exit without a verdict is
     # terminal. Two retries absorb a flaky detector without weakening the gate.
     retries: 2
+    # Detection is the larger half of this factory's bill: it reads the agent's
+    # output AND the full git patch, so its cost scales with patch size — one
+    # unblock run with a merge patch cost 4.8x its own agent. Measured spend is
+    # under 25 AIC; the default cap is 400, which is $4 a run. This bounds the
+    # tail without changing what the detector inspects or how it fails.
+    max-ai-credits: 150
 ---
