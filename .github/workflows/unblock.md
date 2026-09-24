@@ -17,6 +17,10 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/node-runtime.md
+  - uses: shared/github-app.md
+    with:
+      app_prefix: IMPLEMENTER
   - uses: shared/postconditions.md
     with:
       role: unblock
@@ -51,15 +55,6 @@ engine:
   id: pi
   env:
     PI_ROLE: unblock
-
-network:
-  allowed:
-    - defaults
-    - node
-
-runtimes:
-  node:
-    version: "24"
 
 pre-agent-steps:
 
@@ -115,13 +110,10 @@ tools:
   bash: ["*"]
   timeout: 300
 
+# The implementer App, because a push must come from the App that opened the
+# pull request or gh-aw's confused-deputy guard silently skips the re-review
+# that follows (FINDINGS). Set via shared/github-app.md above.
 safe-outputs:
-  # The implementer App, because a push must come from the App that opened the
-  # pull request or gh-aw's confused-deputy guard silently skips the re-review
-  # that follows (FINDINGS).
-  github-app:
-    client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
-    private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
   push-to-pull-request-branch:
     # Dispatched, so there is no triggering pull request.
     target: "*"

@@ -10,6 +10,9 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - uses: shared/github-app.md
+    with:
+      app_prefix: REVIEWER
   - uses: shared/postconditions.md
     with:
       role: review
@@ -111,9 +114,6 @@ tools:
     memory-id: review
 
 safe-outputs:
-  github-app:
-    client-id: ${{ vars.REVIEWER_CLIENT_ID }}
-    private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
   create-pull-request-review-comment:
     # Matches gh-aw's own reviewer. Comments beyond max are silently skipped
     # (create_pr_review_comment.cjs), so a low cap can drop a real finding.
