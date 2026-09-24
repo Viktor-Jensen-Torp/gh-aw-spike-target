@@ -29,9 +29,14 @@ REPO = os.environ.get("REPO") or ""
 WINDOW_DAYS = int(os.environ.get("WINDOW_DAYS", "7"))
 HISTORY = "metrics/history.jsonl"
 PENDING = "metrics/pending.json"
-# Cap the per-run outcome scoring: `gh aw outcomes` downloads each run's
-# artifacts, so an unbounded set turns a report into a half-hour job.
-MAX_SCORED = int(os.environ.get("MAX_SCORED", "60"))
+# Cap the per-run outcome scoring. `gh aw outcomes` downloads each run's
+# artifacts and then queries the current state of every object it wrote to, so
+# it is expensive in API calls as well as time: five metrics runs in one hour,
+# at sixty scored runs each, exhausted the Actions installation token's
+# 5,000/hour budget outright (run 35950077494 could not even install the CLI).
+# Weekly volume here is ~30 runs, and the deferred set drains, so 25 is enough
+# for a normal week and leaves headroom for everything else in the repository.
+MAX_SCORED = int(os.environ.get("MAX_SCORED", "25"))
 # How long a run stays worth re-checking. After this it is whatever it is.
 RESCORE_DAYS = int(os.environ.get("RESCORE_DAYS", "30"))
 # Only these safe outputs can move from `pending` to a verdict in this
