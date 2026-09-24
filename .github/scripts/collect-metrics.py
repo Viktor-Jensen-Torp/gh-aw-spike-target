@@ -48,12 +48,30 @@ RESOLVABLE = {
 }
 
 
+_REPORTED = set()
+
+
 def sh(args, timeout=600):
     """Run a command, returning (ok, stdout). Never raises: a report that dies
-    because one subcommand failed is worse than a report with a gap in it."""
+    because one subcommand failed is worse than a report with a gap in it.
+
+    It does, however, say WHY. Swallowing stderr here cost a whole CI round
+    trip: sixty `gh aw outcomes` calls failed in forty-eight seconds and the log
+    showed only a count. The first failure of each command shape is printed in
+    full; the rest are counted, so one broken subcommand cannot flood the log.
+    """
     try:
         p = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
-        return p.returncode == 0, p.stdout
+        if p.returncode != 0:
+            key = " ".join(args[:3])
+            err = (p.stderr or p.stdout or "").strip().splitlines()
+            if key not in _REPORTED:
+                _REPORTED.add(key)
+                print(f"  ! {key} exited {p.returncode}:", file=sys.stderr)
+                for line in err[:6]:
+                    print(f"      {line}", file=sys.stderr)
+            return False, ""
+        return True, p.stdout
     except Exception as exc:  # noqa: BLE001 - deliberately broad, see docstring
         print(f"  ! {' '.join(args[:3])}: {exc}", file=sys.stderr)
         return False, ""
