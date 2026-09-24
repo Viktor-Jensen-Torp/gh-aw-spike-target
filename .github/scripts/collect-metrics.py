@@ -143,8 +143,15 @@ def score_outcomes(run_ids):
     # Anything the cap cut is still unresolved as far as we know, so carry it
     # forward rather than dropping it: an un-scored run must not silently
     # disappear from the next collection's work list.
-    for rid in wanted[MAX_SCORED:]:
-        still.add(str(rid))
+    #
+    # But bound it. Run ids are monotonic, so keeping the highest keeps the
+    # newest. Without this the deferred set is self-sustaining — the cap cuts
+    # some, the cut ones come back next week on top of that week's new runs, and
+    # the report is partial forever. That is exactly what happened once the
+    # first collection wrote a fifty-entry backlog.
+    carried = sorted(wanted[MAX_SCORED:], key=lambda r: int(r) if str(r).isdigit() else 0,
+                     reverse=True)[:MAX_SCORED]
+    still.update(str(r) for r in carried)
     return items, still, scored, truncated
 
 
