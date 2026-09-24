@@ -193,6 +193,13 @@ safe-outputs:
   push-to-pull-request-branch:
     target: "triggering"
     required-labels: [agent]
+    # No `allowed-files` here either (see unblock.md for why that pairs badly
+    # with a role that can touch more than one file per round). fix-ci in
+    # particular has no path restriction in the prompt, so a protected-file
+    # edit is possible, not just theoretical. Same reasoning as unblock.md:
+    # turn a silent refusal into a human-facing issue rather than weaken the
+    # guard.
+    protected-files: fallback-to-issue
     if-no-changes: error
     commit-title-suffix: " [rework]"
     # Skip the pre-push branch-protection lookup. It needs administration: read,
