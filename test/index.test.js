@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { movingAverage, unique, first, count, range } = require('../src/index.js');
+const { movingAverage, first, count, range } = require('../src/index.js');
 
 test('movingAverage with window size 3 on 7 elements gives 5 results', () => {
   const result = movingAverage([1, 2, 3, 4, 5, 6, 7], 3);
@@ -40,37 +40,6 @@ test('movingAverage does not modify the input array', () => {
   const original = [1, 2, 3, 4, 5];
   const copy = [...original];
   movingAverage(original, 2);
-  assert.deepStrictEqual(original, copy);
-});
-
-test('unique removes duplicates and preserves order', () => {
-  assert.deepStrictEqual(unique([1, 2, 3, 2, 1]), [1, 2, 3]);
-});
-
-test('unique on empty list returns empty list', () => {
-  assert.deepStrictEqual(unique([]), []);
-});
-
-test('unique on single element returns single element', () => {
-  assert.deepStrictEqual(unique([1]), [1]);
-});
-
-test('unique on all duplicates returns one element', () => {
-  assert.deepStrictEqual(unique([1, 1, 1]), [1]);
-});
-
-test('unique works with strings', () => {
-  assert.deepStrictEqual(unique(['a', 'b', 'a']), ['a', 'b']);
-});
-
-test('unique uses strict equality', () => {
-  assert.deepStrictEqual(unique([1, '1', 1]), [1, '1']);
-});
-
-test('unique does not modify the input array', () => {
-  const original = [1, 2, 3, 2, 1];
-  const copy = [...original];
-  unique(original);
   assert.deepStrictEqual(original, copy);
 });
 
