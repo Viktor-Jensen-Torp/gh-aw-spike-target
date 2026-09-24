@@ -10,6 +10,9 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - uses: shared/github-app.md
+    with:
+      app_prefix: REVIEWER
   - uses: shared/postconditions.md
     with:
       role: release
@@ -94,9 +97,6 @@ tools:
   timeout: 300
 
 safe-outputs:
-  github-app:
-    client-id: ${{ vars.REVIEWER_CLIENT_ID }}
-    private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
   # A comment, not a review, and that is the right container for advice.
   #
   # It was a COMMENT review, which stacked: PR #43 collected SEVEN reads, one per

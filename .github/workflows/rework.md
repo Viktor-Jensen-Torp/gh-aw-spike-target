@@ -24,6 +24,10 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/node-runtime.md
+  - uses: shared/github-app.md
+    with:
+      app_prefix: IMPLEMENTER
   - uses: shared/postconditions.md
     with:
       role: rework
@@ -146,15 +150,6 @@ engine:
   env:
     PI_ROLE: rework
 
-network:
-  allowed:
-    - defaults
-    - node
-
-runtimes:
-  node:
-    version: "24"
-
 # Outer backstops. The strike counter bounds one pull request; these bound the
 # workflow. gh-aw's own first line of defence — that agentic writes do not
 # trigger workflows — is switched off here by design, because the chain depends
@@ -195,9 +190,6 @@ tools:
   bash: ["*"]
 
 safe-outputs:
-  github-app:
-    client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
-    private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
   push-to-pull-request-branch:
     target: "triggering"
     required-labels: [agent]

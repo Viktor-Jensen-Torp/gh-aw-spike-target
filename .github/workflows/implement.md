@@ -10,6 +10,10 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/node-runtime.md
+  - uses: shared/github-app.md
+    with:
+      app_prefix: IMPLEMENTER
   - uses: shared/postconditions.md
     with:
       role: implement
@@ -47,16 +51,6 @@ engine:
   env:
     PI_ROLE: implement
 
-network:
-  allowed:
-    - defaults
-    - node
-
-runtimes:
-  node:
-    version: "24"
-
-
 tools:
   cli-proxy: true
   github:
@@ -68,9 +62,6 @@ tools:
   timeout: 300
 
 safe-outputs:
-  github-app:
-    client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
-    private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
   create-pull-request:
     draft: false
     title-prefix: "[implementer] "
