@@ -8,8 +8,8 @@ intent: Get a pull request that collided with someone else's merge moving again,
 # merge conflict" — because a `pull_request` run needs `refs/pull/N/merge`,
 # which cannot exist while the pull request conflicts. So the one role whose job
 # IS the conflict cannot be triggered by the pull request it is fixing. It is
-# handed the number instead, by unblock.yml, which runs on the push that caused
-# the conflict. See FINDINGS.md.
+# handed the number instead, by unblock-detect.yml, which runs on the push that
+# caused the conflict.
 
 inlined-imports: true
 
@@ -113,7 +113,7 @@ tools:
 
 # The implementer App, because a push must come from the App that opened the
 # pull request or gh-aw's confused-deputy guard silently skips the re-review
-# that follows (FINDINGS). Set via shared/github-app.md above.
+# that follows. Set via shared/github-app.md above.
 safe-outputs:
   push-to-pull-request-branch:
     # Dispatched, so there is no triggering pull request.
@@ -149,7 +149,7 @@ safe-outputs:
     # containing .github/workflows/unblock.*. Before this line, the only
     # trace was "Cannot push to pull request branch: patch modifies protected
     # files" in a job log; the pull request just sat, and #53 was finished by
-    # hand (FINDINGS.md). fallback-to-issue turns that into a human-facing
+    # hand. fallback-to-issue turns that into a human-facing
     # issue with the patch and instructions to apply or reject it manually,
     # without weakening the guard itself — no protected file gets pushed
     # either way.
@@ -158,8 +158,8 @@ safe-outputs:
     commit-title-suffix: " [unblock]"
     # Without this gh-aw REQUESTS `administration: read` when minting the App
     # token, and an App that lacks it fails the whole safe_outputs job — which
-    # is exactly how run 35796425852 died. Already recorded in FINDINGS and
-    # already fixed in rework.md; repeated here anyway.
+    # is exactly how run 35796425852 died. Already fixed in rework.md;
+    # repeated here anyway.
     check-branch-protection: false
   add-labels:
     max: 2

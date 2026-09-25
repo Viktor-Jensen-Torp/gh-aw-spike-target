@@ -8,9 +8,9 @@ name: Sweeper
 # gh-aw's sweeper is agentic because its actuator is a comment addressed to
 # Copilot, which needs judgement to write; ours is a label, which does not. Its
 # detection half is a deterministic shell prefilter too — that half is what this
-# copies. See FINDINGS.md.
+# copies.
 #
-# Every case here is one FINDINGS names as unreachable from events.
+# Every case here is one no event can reach.
 
 on:
   schedule:
@@ -180,7 +180,7 @@ jobs:
             fi
 
             # 3. Changes were requested and nothing is listening. A strike was
-            #    spent on a rework round that never landed (FINDINGS: PRs #12,
+            #    spent on a rework round that never landed (PRs #12,
             #    #16). Re-applying the label as the reviewer App starts another
             #    round; rework's own three-strike gate still bounds it.
             case ",$LABELS," in

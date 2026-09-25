@@ -10,8 +10,8 @@ name: Merge group gate
 # branch does not have. Neither can report here by itself.
 #
 # The easy answer is to pass trivially and say the real gate happened at the
-# queue door. That is a vacuous gate, and FINDINGS is explicit that an absent
-# gate is visible while a vacuous one is not.
+# queue door. That is a vacuous gate, and an absent gate is
+# visible while a vacuous one is not.
 #
 # So instead this VERIFIES the thing the queue door is supposed to have
 # guaranteed: every pull request in this group carries a green `Agent review`
