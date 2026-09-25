@@ -126,17 +126,21 @@ Work in this order:
 2. Make the smallest change that satisfies the issue, following those
    conventions. Touch only `src/**/*.js` and `test/**/*.js`.
 3. Add or update tests for the behaviour you changed.
-4. Run `npm test`. If it fails, fix the cause and run it again.
-5. Run `bash .github/scripts/check-conventions.sh origin/develop`. **If it
-   fails, fix what it names and run it again** — it is the same check that gates
-   the pull request, so a breach you leave here comes back as a rejected review,
-   a rework round and a second review. Fixing it now costs nothing; fixing it
-   later costs three runs.
+4. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
+   it again until it passes**. It runs exactly the checks that gate the pull
+   request (tests, conventions), so a failure you leave here comes back as a
+   rejected review, a rework round and a second review. Fixing it now costs
+   nothing; fixing it later costs three runs.
+5. Commit your changes.
 6. Open one pull request with `create_pull_request`. The body states what the
-   issue asked for, what you changed, and the result of `npm test`.
+   issue asked for, what you changed, and that `verify.sh` passes.
    **Do not set a base branch.** This workflow already targets `develop`, the
    branch agent work merges into; `main` is the release branch and a pull
    request against it will be refused.
+   `create_pull_request` runs the same checks itself before accepting. If it
+   answers **"BLOCKED by the pipeline"**, nothing was submitted: fix what it
+   names, commit, and call `create_pull_request` again. If it tells you to
+   stop, call `report_incomplete` with what still fails — do not keep trying.
 7. **Then stop.** Do not inspect the result — no `git log`, no `git status`, no
    `ls` to confirm the commit, no reading the pull request back. gh-aw pushes
    the branch and opens the pull request after your run ends, so the working
@@ -148,8 +152,10 @@ Work in this order:
 Stop and call `noop` with a short reason, without opening a pull request, when:
 
 - the issue does not describe a change to code under `src/` or `test/`;
-- the change needed falls outside those paths;
-- `npm test` still fails after your fix attempts.
+- the change needed falls outside those paths.
+
+If the checks still fail after your fix attempts, call `report_incomplete`
+(not `noop`) with what still fails, so a person is told.
 
 Never edit files outside `src/` and `test/`, and do not change `package.json`
 or anything under `.github/`.

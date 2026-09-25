@@ -266,9 +266,14 @@ Then `git add` each resolved file and `git commit --no-edit`.
 
 ## Step 3: Prove it still works
 
-Run `npm test`. If it fails, fix the cause if the fix is obvious from the
-conflict you just resolved — a missed export, a duplicated name. If it still
-fails, do **not** push: that is Step 4.
+Run `bash .github/scripts/verify.sh` — the checks that gate the pull request. If
+it fails, fix the cause if the fix is obvious from the conflict you just
+resolved — a missed export, a duplicated name. If it still fails, do **not**
+push: that is Step 4.
+
+`push_to_pull_request_branch` runs the same checks itself before accepting. If
+it answers **"BLOCKED by the pipeline"**, nothing was pushed: fix what it names,
+commit, and push again. If it tells you to stop, go to Step 4.
 
 Then call `push_to_pull_request_branch` with `pull_request_number`
 ${{ inputs.pr }}, **and then `add_labels` with `recheck`** on the same pull

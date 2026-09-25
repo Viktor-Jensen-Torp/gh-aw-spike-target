@@ -245,8 +245,8 @@ Do not re-read the issue and start again.
 `CHANGES_REQUESTED` review. A finding about a missing or weak test is a real
 finding: add the test.
 
-**fix-ci** — read the failing check, reproduce it with `npm test`, and fix the
-cause.
+**fix-ci** — read the failing check, reproduce it with
+`bash .github/scripts/verify.sh`, and fix the cause.
 
 **resolve-conflict** — rebase onto the base branch and resolve the conflict.
 Keep both sides' intent; do not drop someone else's change to make yours apply.
@@ -256,13 +256,17 @@ If a test is genuinely wrong, say so in your comment and explain why.
 
 ## Step 3: Verify before you push
 
-Run `npm test` and make it pass, then run
-`bash .github/scripts/check-conventions.sh origin/develop` and fix anything it
-names. It is the same check that gates the pull request, so a breach left here
-comes back as another rejected review and another round — and this round has
-already spent a strike. Then push with
+Run `bash .github/scripts/verify.sh` and fix everything it names until it
+passes. It runs exactly the checks that gate the pull request, so a failure left
+here comes back as another rejected review and another round — and this round
+has already spent a strike. Commit, then push with
 `push_to_pull_request_branch`, and post one `add_comment` saying what you changed
 and which finding each change answers.
+
+`push_to_pull_request_branch` runs the same checks itself before accepting. If
+it answers **"BLOCKED by the pipeline"**, nothing was pushed: fix what it names,
+commit, and push again. If it tells you to stop, call `report_incomplete` with
+what still fails — do not keep trying.
 
 ## If you cannot do it
 

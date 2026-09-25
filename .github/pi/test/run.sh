@@ -36,13 +36,14 @@ FAKE
 case_() {
   local label="$1" want="$2" cmd="$3" wrapped err rc before after ok
   cmd="${cmd//\/tmp\/gh-aw/$ROOT/gh-aw}"
-  wrapped=$(PI_ROLE=review PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
+  wrapped=$(PI_ROLE="${ROLE:-review}" PI_VERIFY_SCRIPT="$ROOT/verify.sh" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
     const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
     const ev = { toolName: "bash", input: { command: process.env.CMD } };
     h.tool_call(ev).then(() => process.stdout.write(ev.input.command));' "$EXT" 2>/dev/null)
   before=$(ls "$ROOT/calls" | wc -l)
   err=$(PATH="$ROOT/bin:$PATH" bash -c "$wrapped" 2>&1 >/dev/null); rc=$?
   after=$(ls "$ROOT/calls" | wc -l)
+  printf '%s' "$err" > "$ROOT/last_err"
   if [ "$want" = pass ]; then [ $rc -eq 0 ] && [ $((after - before)) -eq 1 ] && ok=1 || ok=0
   else [ $rc -ne 0 ] && [ $((after - before)) -eq 0 ] && ok=1 || ok=0; fi
   printf '%s  %-55s want=%-5s rc=%s\n' "$([ $ok = 1 ] && echo PASS || echo FAIL)" "$label" "$want" "$rc"
@@ -86,6 +87,49 @@ new_root
 # The real binary failing is expected to fail the call; only the recorded state matters here.
 ( FAKE_RC=1 case_ "real binary fails" pass 'echo "{\"event\":\"COMMENT\",\"body\":\"x\"}" | safeoutputs submit_pull_request_review .' >/dev/null )
 [ ! -f "$ROOT/state/submit_pull_request_review.event" ] && echo "PASS  no state recorded after a failed submit" || { echo "FAIL  state after failure"; fails=$((fails + 1)); }
+
+echo "== pre-push verify (code-writing roles)"
+# A fake verify.sh: red while $ROOT/red exists, and counts how often it ran.
+fake_verify() {
+  cat > "$ROOT/verify.sh" <<'V'
+#!/usr/bin/env bash
+echo run >> "$ROOT/verify.runs"
+if [ -f "$ROOT/red" ]; then echo "✗ test: unique rejects strings — expected TypeError"; exit 1; fi
+echo "✓ verify: all checks passed"
+V
+}
+PR='echo "{\"title\":\"t\",\"body\":\"b\",\"branch\":\"x\"}" | safeoutputs create_pull_request .'
+PUSH='echo "{\"message\":\"m\"}" | safeoutputs push_to_pull_request_branch .'
+new_root; fake_verify; touch "$ROOT/red"
+ROLE=implement case_ "red checks: create_pull_request refused (1 of 3)" block "$PR"
+ROLE=implement case_ "still red: refused again (2 of 3)"               block "$PR"
+rm "$ROOT/red"
+ROLE=implement case_ "fixed: the same call now goes through"          pass  "$PR"
+new_root; fake_verify; touch "$ROOT/red"
+ROLE=implement case_ "cap: red 1"                                      block "$PR"
+ROLE=implement case_ "cap: red 2"                                      block "$PR"
+ROLE=implement case_ "cap: red 3 -> told to report_incomplete"        block "$PR"
+grep -q "Stop trying: call report_incomplete" "$ROOT/last_err" && grep -q "expected TypeError" "$ROOT/last_err" \
+  && echo "PASS  third refusal says report_incomplete and shows the failing check" \
+  || { echo "FAIL  third refusal message: $(head -c 200 "$ROOT/last_err")"; fails=$((fails + 1)); }
+rm "$ROOT/red"
+ROLE=implement case_ "after the cap, even green is refused"           block "$PR"
+[ "$(wc -l < "$ROOT/verify.runs")" -eq 3 ] && echo "PASS  verify not re-run once the cap is reached" || { echo "FAIL  verify ran $(wc -l < "$ROOT/verify.runs") times"; fails=$((fails + 1)); }
+new_root; fake_verify; touch "$ROOT/red"
+ROLE=rework  case_ "rework: red push refused"                         block "$PUSH"
+ROLE=unblock case_ "unblock: red push refused"                        block "$PUSH"
+ROLE=implement case_ "--help is not checked"                          pass  'safeoutputs create_pull_request --help'
+ROLE=implement case_ "other tools are not checked"                    pass  'echo "{\"reason\":\"r\"}" | safeoutputs noop .'
+ROLE=review  case_ "review role: no pre-push check"                   pass  "$PR"
+new_root; fake_verify; touch "$ROOT/red"
+for i in 1 2; do ROLE=unblock case_ "unblock red $i" block "$PUSH" >/dev/null; done
+ROLE=unblock case_ "unblock red 3 -> told to escalate (Step 4)"      block "$PUSH"
+grep -q "Stop trying: escalate as in Step 4: add_labels needs-human" "$ROOT/last_err" \
+  && echo "PASS  unblock gives up its own way, not report_incomplete" \
+  || { echo "FAIL  unblock give-up message: $(head -c 200 "$ROOT/last_err")"; fails=$((fails + 1)); }
+new_root   # no verify.sh written: the script is missing
+ROLE=implement case_ "missing verify script fails open (CI is the gate)" pass "$PR"
+grep -q "not found; pushing without" "$ROOT/last_err" && echo "PASS  missing script is logged" || { echo "FAIL  missing script not logged"; fails=$((fails + 1)); }
 
 echo "== agent_end nudge"
 new_root
