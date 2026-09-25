@@ -248,6 +248,8 @@ evals:
     question: Are all of the agent's review comments about lines that appear in the pull request diff, rather than unrelated code?
   - id: criteria_followed
     question: If the agent chose REQUEST_CHANGES, did it name at least one concrete defect? If it chose COMMENT, are all of its findings non-blocking?
+  - id: distinguished_preexisting
+    question: Did the review avoid blocking on a defect that already existed on the base branch before this pull request, rather than treating pre-existing code as something this pull request introduced?
 ---
 
 # Review
