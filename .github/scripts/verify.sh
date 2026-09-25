@@ -22,17 +22,40 @@ ONLY=""
 if [ "${1:-}" = "--only" ]; then ONLY="${2:-}"; shift 2; fi
 BASE="${1:-origin/develop}"
 
-STEPS=(test conventions)
+STEPS=(test conventions lint)
 case "$ONLY" in
   "") ;;
-  test|conventions) STEPS=("$ONLY") ;;
-  *) echo "verify.sh: unknown step '$ONLY' (known: test, conventions)"; exit 2 ;;
+  test|conventions|lint) STEPS=("$ONLY") ;;
+  *) echo "verify.sh: unknown step '$ONLY' (known: test, conventions, lint)"; exit 2 ;;
 esac
+
+# ESLint + Prettier (.github/lint/), through package.json's `lint` script.
+# Skipped where package.json has no `lint` script: .github/ is identical on main
+# and develop, but package.json reaches main only with a release, so main runs
+# this before its package.json knows about lint. Where the script exists, the
+# tools are installed if missing (the agent's checkout and a fresh CI runner
+# start without node_modules).
+lint_step() {
+  if ! node -e 'process.exit(require("./package.json").scripts?.lint ? 0 : 1)' 2>/dev/null; then
+    echo "no \`lint\` script in package.json on this branch — skipped"
+    return 0
+  fi
+  if [ ! -x node_modules/.bin/eslint ] || [ ! -x node_modules/.bin/prettier ]; then
+    # --ignore-scripts, as gh-aw does for its own installs: no dependency's
+    # install script runs, inside the agent's container or on CI.
+    npm ci --ignore-scripts --no-audit --no-fund --loglevel=error >/dev/null || { echo "npm ci failed"; return 1; }
+  fi
+  if ! npm run --silent lint; then
+    echo "Formatting problems fix themselves with: npm run format"
+    return 1
+  fi
+}
 
 run_step() {
   case "$1" in
     test)        npm test ;;
     conventions) bash "$HERE/check-conventions.sh" "$BASE" ;;
+    lint)        lint_step ;;
   esac
 }
 

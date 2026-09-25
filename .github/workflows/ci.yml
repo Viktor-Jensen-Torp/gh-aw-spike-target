@@ -23,3 +23,15 @@ jobs:
       # One definition of the checks, shared with the agents' pre-push hook
       # (.github/scripts/verify.sh). Never inline the command here.
       - run: bash .github/scripts/verify.sh --only test
+
+  # ESLint + Prettier (.github/lint/). A separate job so a lint failure shows as
+  # its own required check (`lint`), not as a test failure. Runs on merge_group
+  # like `test`, because every required check must report on the queue branch.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: bash .github/scripts/verify.sh --only lint

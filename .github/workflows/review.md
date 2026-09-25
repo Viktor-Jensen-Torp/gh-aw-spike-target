@@ -201,8 +201,10 @@ jobs:
           # it is waiting. rework's own gate already tells "a check is failing"
           # (fix-ci) from "the reviewer objected" (address-review), so it knows
           # what to do once it is started.
+          # Every required check that verify.sh runs must be named here, or a
+          # red one summons nobody: test, conventions, lint.
           FAILING=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-            --jq "[.check_runs[] | select(.name == \"test\" or .name == \"conventions\")
+            --jq "[.check_runs[] | select(.name == \"test\" or .name == \"conventions\" or .name == \"lint\")
                    | select(.conclusion == \"failure\")] | length")
           [ "${FAILING:-0}" -eq 0 ] || echo "required checks failing on $SHA: $FAILING"
 

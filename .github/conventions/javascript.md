@@ -33,6 +33,11 @@ the exception, and every collision then costs a repair, a re-review and a merge.
 
 Separate files have nothing in common to collide over.
 
+**Also checked by the lint rule** `local/one-helper-per-file`
+(`.github/lint/rules/`): every `src/` file except `src/index.js` must define one
+function named after the file and export exactly `module.exports = { <name> };`.
+Run `npm run lint` to check, `npm run format` to fix formatting.
+
 **Checked by** `.github/workflows/conventions.yml`, which fails a pull request
 that adds an export to `src/index.js`.
 
