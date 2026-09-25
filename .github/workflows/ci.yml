@@ -20,4 +20,6 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
-      - run: npm test
+      # One definition of the checks, shared with the agents' pre-push hook
+      # (.github/scripts/verify.sh). Never inline the command here.
+      - run: bash .github/scripts/verify.sh --only test

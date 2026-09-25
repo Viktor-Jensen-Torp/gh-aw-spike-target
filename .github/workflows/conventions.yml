@@ -41,9 +41,9 @@ jobs:
           fi
 
           git fetch -q origin "$BASE"
-          # The same script the implementer runs before it pushes, so the two
-          # cannot drift apart.
-          if bash .github/scripts/check-conventions.sh "origin/$BASE" \
+          # The same script the agents' pre-push hook runs, so the two cannot
+          # drift apart (.github/scripts/verify.sh).
+          if bash .github/scripts/verify.sh --only conventions "origin/$BASE" \
                | tee "$GITHUB_STEP_SUMMARY"; then
             exit 0
           fi

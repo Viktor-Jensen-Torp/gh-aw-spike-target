@@ -31,6 +31,17 @@
  *    for follow-ups queued in agent_end (agent-session.js _handlePostAgentRun).
  *    Capped, so a confused agent cannot loop.
  *
+ * 3. PRE-PUSH (tool_call, code-writing roles). create_pull_request and
+ *    push_to_pull_request_branch are the agent's `git push`: gh-aw pins the
+ *    branch to a SHA and builds the patch inside that very call
+ *    (safe_outputs_handlers.cjs createPullRequestHandler), so anything fixed
+ *    after it never reaches the pull request. The same shell guard therefore
+ *    runs .github/scripts/verify.sh — the exact checks CI runs — before letting
+ *    either call through, and refuses it with the failures if any step fails.
+ *    After MAX_VERIFY_BLOCKS failures it tells the agent to stop and call
+ *    report_incomplete (owner's call, 2026-09-25: nothing red reaches review).
+ *    This is an efficiency layer; the required checks remain the gate.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -41,10 +52,15 @@ const MAX_NUDGES = 2;
 // Overridable only so the guard can be tested off-runner; /tmp/gh-aw is rw in the agent container.
 const STATE_DIR = process.env.PI_POSTCONDITIONS_STATE_DIR || "/tmp/gh-aw/postconditions";
 const CALLED_LOG = `${STATE_DIR}/called`;
+// The base-branch copy installed by shared/postconditions.md, never the working
+// tree's: the agent's own edits to the script must not decide whether it passes.
+const VERIFY = process.env.PI_VERIFY_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/verify.sh";
+const MAX_VERIFY_BLOCKS = 3;
 
 /**
  * required: each inner array is "any of these".
  * checks:   per-tool payload rules enforced by the shell guard.
+ * verify:   run verify.sh before create_pull_request / push_to_pull_request_branch.
  */
 const ROLES = {
   review: {
@@ -57,10 +73,12 @@ const ROLES = {
   implement: {
     required: [["create_pull_request", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
+    verify: true,
   },
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
+    verify: true,
   },
   // A quiet night is a correct outcome for the refiner, so `noop` counts — but
   // finishing with no output at all does not, because that is indistinguishable
@@ -80,6 +98,9 @@ const ROLES = {
   unblock: {
     required: [["push_to_pull_request_branch", "add_labels", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
+    verify: true,
+    // Unblock's own way of telling a person is its Step 4, on the pull request.
+    giveUp: "escalate as in Step 4: add_labels needs-human and one add_comment saying what still fails",
   },
   // The release read is advice to a person, never a gate: `main` is merged by a
   // human who has the verdict in front of them. REQUEST_CHANGES would claim an
@@ -110,8 +131,10 @@ function log(msg) {
  * both directions, whichever the agent calls first.
  *
  * @param {Record<string, {field: string, allowed: string[], upper: boolean}>} checks
+ * @param {boolean} [verify] run verify.sh before the agent's push-equivalent calls
+ * @param {string} [giveUp] what to do once the checks have failed MAX_VERIFY_BLOCKS times
  */
-function buildGuard(checks) {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails") {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -149,13 +172,45 @@ function buildGuard(checks) {
   fi`
       : "";
 
+  // The pre-push check. Runs before the call reaches gh-aw, so a refused call
+  // leaves no pull request and no patch behind; the agent sees the failures as
+  // the result of its own command and can fix and call again.
+  const verifyCase = verify
+    ? `
+    create_pull_request|create-pull-request|push_to_pull_request_branch|push-to-pull-request-branch)
+      # Fail open if the script is missing: this is an efficiency layer and the
+      # required checks are the gate. Failing closed would refuse every push.
+      if [ ! -f "${VERIFY}" ]; then
+        echo "[spike/postconditions] WARNING: ${VERIFY} not found; pushing without the pre-push check" >&2
+      elif [ "$2" != "--help" ]; then
+        __vn=$(cat "${STATE_DIR}/verify.blocks" 2>/dev/null || echo 0)
+        if [ "$__vn" -ge ${MAX_VERIFY_BLOCKS} ]; then
+          echo "BLOCKED by the pipeline: the checks have already failed $__vn times in this run. Do not open or update the pull request. Instead, ${giveUp}." >&2
+          return 2
+        fi
+        if ! __vout=$(bash "${VERIFY}" 2>&1); then
+          __vn=$((__vn + 1)); echo "$__vn" > "${STATE_DIR}/verify.blocks"
+          if [ "$__vn" -ge ${MAX_VERIFY_BLOCKS} ]; then
+            echo "BLOCKED by the pipeline: the checks CI will run failed (attempt $__vn of ${MAX_VERIFY_BLOCKS}). Nothing was submitted. Stop trying: ${giveUp}." >&2
+          else
+            echo "BLOCKED by the pipeline: the checks CI will run failed (attempt $__vn of ${MAX_VERIFY_BLOCKS}). Nothing was submitted. Fix what is named below, commit, and call $1 again." >&2
+          fi
+          # Passing tests (✔) and test-runner info (ℹ) are noise to the agent and
+          # can push the actual failure out of view; keep only what went wrong.
+          printf '%s\\n' "$__vout" | grep -v -E '^[[:space:]]*(✔|ℹ)' | tail -n 80 >&2
+          return 2
+        fi
+        echo "[spike/postconditions] verify passed before $1" >&2
+      fi ;;`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
   if [ "$2" = "." ]; then __payload=$(cat); fi
   case "$1" in
-${cases}
+${cases}${verifyCase}
   esac${consistency}
   if [ "$2" = "." ]; then printf '%s' "$__payload" | command safeoutputs "$@"; else command safeoutputs "$@"; fi
   __rc=$?
@@ -204,9 +259,10 @@ function postconditions(pi) {
     log(`no role configured (PI_ROLE=${JSON.stringify(role)}); doing nothing`);
     return;
   }
-  const guard = Object.keys(spec.checks).length > 0 ? buildGuard(spec.checks) : "";
+  const verify = spec.verify === true;
+  const guard = Object.keys(spec.checks).length > 0 || verify ? buildGuard(spec.checks, verify, spec.giveUp) : "";
   let nudges = 0;
-  log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] required=${JSON.stringify(spec.required)}`);
+  log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
 
   if (guard) {
     pi.on("tool_call", async (/** @type {any} */ event) => {
