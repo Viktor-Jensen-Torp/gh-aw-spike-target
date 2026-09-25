@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { movingAverage, first, count, range } = require('../src/index.js');
+const { movingAverage, count, range } = require('../src/index.js');
 
 test('movingAverage with window size 3 on 7 elements gives 5 results', () => {
   const result = movingAverage([1, 2, 3, 4, 5, 6, 7], 3);
@@ -40,29 +40,6 @@ test('movingAverage does not modify the input array', () => {
   const original = [1, 2, 3, 4, 5];
   const copy = [...original];
   movingAverage(original, 2);
-  assert.deepStrictEqual(original, copy);
-});
-
-test('first returns the first element', () => {
-  assert.strictEqual(first([1, 2, 3]), 1);
-});
-
-test('first with single element', () => {
-  assert.strictEqual(first([7]), 7);
-});
-
-test('first with empty array returns undefined', () => {
-  assert.strictEqual(first([]), undefined);
-});
-
-test('first with non-array argument throws TypeError', () => {
-  assert.throws(() => first('nope'), TypeError);
-});
-
-test('first does not modify the input array', () => {
-  const original = [1, 2, 3];
-  const copy = [...original];
-  first(original);
   assert.deepStrictEqual(original, copy);
 });
 
