@@ -17,6 +17,7 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/graders.md
   - shared/node-runtime.md
   - uses: shared/github-app.md
     with:
@@ -176,6 +177,12 @@ safe-outputs:
     report-as-issue: false
 
 timeout-minutes: 20
+
+evals:
+  - id: preserved_both_intents
+    question: Does the resolution keep what both sides were trying to do, rather than dropping one side's work?
+  - id: no_reversal
+    question: Does the resolution avoid reversing any change that was already merged on the base branch?
 ---
 
 # Unblock

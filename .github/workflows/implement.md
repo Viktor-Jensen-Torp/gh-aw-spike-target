@@ -10,6 +10,7 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/graders.md
   - shared/node-runtime.md
   - uses: shared/github-app.md
     with:
@@ -94,6 +95,12 @@ safe-outputs:
     # makes the branch push and the PR come from the implementer App, so CI
     # fires on `opened` by itself. The extra commit only added a second
     # `synchronize` event, doubling CI and reviewer runs. See FINDINGS.md.
+
+evals:
+  - id: tests_added
+    question: Were new or updated tests added for the behaviour this change introduces or fixes?
+  - id: stayed_in_scope
+    question: Does the change stay within what the triggering issue asked for, without touching unrelated code?
 ---
 
 # Implement
