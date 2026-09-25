@@ -17,6 +17,7 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/graders.md
   - shared/node-runtime.md
   - uses: shared/github-app.md
     with:

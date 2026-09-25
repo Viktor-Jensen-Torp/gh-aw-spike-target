@@ -10,6 +10,7 @@ imports:
   - shared/model.md
   - shared/budget.md
   - shared/threat-detection.md
+  - shared/graders.md
   - uses: shared/postconditions.md
     with:
       role: relate
