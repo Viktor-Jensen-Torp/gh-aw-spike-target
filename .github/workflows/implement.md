@@ -76,13 +76,14 @@ safe-outputs:
     # overrides were not allowed. Naming the one permitted base turns a failed
     # run into a corrected one.
     allowed-base-branches: [develop]
-    # Arm the merge at creation; the `develop gate` ruleset decides when it
-    # happens (required checks: test, hold, Agent review). Established on
+    # Arm the merge at creation; the `develop gate` ruleset and its merge queue
+    # decide when it happens (required: test, lint, conventions, hold, Agent
+    # review). Established on
     # PR #14: arming is allowed while a required check is RED, and a check
     # going red pauses the pending merge rather than cancelling it, so the
     # reviewer's REQUEST_CHANGES → rework → green cycle needs nothing re-armed.
-    # Squash because the ruleset allows only squash, and one issue per commit
-    # on `develop` is what makes a revert cheap (../pi-github-test ADR 0011).
+    # Squash because the merge queue squashes, and one issue per commit on
+    # `develop` is what makes a revert cheap (../pi-github-test ADR 0011).
     # Note: arming is best-effort in gh-aw — a failure is only a warning and the
     # PR is still created, so a PR that never merges is a sweeper case.
     auto-merge: squash
@@ -128,7 +129,7 @@ Work in this order:
 3. Add or update tests for the behaviour you changed.
 4. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
    it again until it passes**. It runs exactly the checks that gate the pull
-   request (tests, conventions), so a failure you leave here comes back as a
+   request (tests, conventions, lint), so a failure you leave here comes back as a
    rejected review, a rework round and a second review. Fixing it now costs
    nothing; fixing it later costs three runs.
 5. Commit your changes.
@@ -147,7 +148,7 @@ Work in this order:
    directory you would be looking at cannot show you the outcome either way:
    a clean check and a broken one look identical from in here. On run
    35874352977 the implementer spent four calls doing exactly this and learned
-   nothing. If the write fails, the run fails and the sweeper picks it up.
+   nothing. If the write fails, the run fails and gh-aw reports it as an issue.
 
 Stop and call `noop` with a short reason, without opening a pull request, when:
 

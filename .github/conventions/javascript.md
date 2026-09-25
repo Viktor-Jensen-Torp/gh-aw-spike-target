@@ -39,7 +39,7 @@ function named after the file and export exactly `module.exports = { <name> };`.
 Run `npm run lint` to check, `npm run format` to fix formatting.
 
 **Checked by** `.github/workflows/conventions.yml`, which fails a pull request
-that adds an export to `src/index.js`.
+that adds a function to `src/index.js` or a name to its export line.
 
 ## Exports, and how a consumer reaches a helper
 

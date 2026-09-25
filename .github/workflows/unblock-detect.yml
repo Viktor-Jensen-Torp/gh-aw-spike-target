@@ -37,20 +37,10 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     steps:
-      # The implementer App, because freshening a branch creates a commit on it
-      # and that commit must come from the pull request's own author.
-      - uses: actions/create-github-app-token@v3
-        id: app_token
-        with:
-          client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
-          private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
-
       - name: Find pull requests this push has broken, and send the fixer
         env:
           GH_TOKEN: ${{ github.token }}
-          APP_TOKEN: ${{ steps.app_token.outputs.token }}
           REPO: ${{ github.repository }}
-          BASE_BRANCH: develop
           # A push that breaks more than this is a systemic fault, and firing a
           # fixer at each one turns it into a systemic write.
           MAX_DISPATCH: "5"
@@ -65,7 +55,6 @@ jobs:
           echo "open agent pull requests: $(jq -r 'join(", ") // "none"' <<<"$PRS")"
 
           SENT=0
-          FRESHENED=0
           for PR in $(jq -r '.[]' <<<"$PRS"); do
             # `mergeable` is computed lazily: the first read after a change
             # returns UNKNOWN while a background job runs. Treating UNKNOWN as
@@ -78,28 +67,13 @@ jobs:
               sleep 5
             done
 
+            # A pull request that is merely behind is left alone. Bringing it up
+            # to date would push a commit, which re-runs CI and a full agent
+            # review on every open pull request at every merge. The ruleset does
+            # not require up-to-date branches, and the merge queue tests each
+            # change against the ones ahead of it anyway.
             if [ "$STATE" != "CONFLICTING" ]; then
-              # Not conflicted — but probably now BEHIND, and a pull request
-              # that is behind is a conflict that has not happened yet. Ask
-              # GitHub to merge the base in on its own side.
-              #
-              # This is the cheap mechanical layer, and it is prevention rather
-              # than resolution: no agent, no patch, no local push, so none of
-              # the guards that a merge push trips can apply. It is done with
-              # the App token, not GITHUB_TOKEN, because the commit it creates
-              # must come from the pull request's own author or the review that
-              # follows is denied.
-              #
-              # 422 means "already up to date" or "there is a real conflict";
-              # both are fine to ignore, the conflicted case is handled above on
-              # the next push.
-              if GH_TOKEN="$APP_TOKEN" gh api -X PUT \
-                   "repos/$REPO/pulls/$PR/update-branch" --silent 2>/dev/null; then
-                echo "#$PR: $STATE -> freshened from $BASE_BRANCH"
-                FRESHENED=$((FRESHENED + 1))
-              else
-                echo "#$PR: $STATE"
-              fi
+              echo "#$PR: $STATE"
               continue
             fi
 

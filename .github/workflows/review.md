@@ -43,10 +43,10 @@ on:
     branches: [develop]
   # The implementer App is not a repository collaborator, so without this the
   # role check in pre_activation denies its pull requests.
+  # The implementer App opens agent pull requests, pushes to them (rework,
+  # unblock) and applies `recheck` after a conflict fix. For a non-`synchronize`
+  # action the allowlist IS consulted, unlike the guard above.
   bots: [gh-aw-spike-implementer]
-  # The label may be applied by either App depending on which role fixed it.
-  # For a non-`synchronize` action the allowlist IS consulted, unlike the
-  # guard above, so this is the legitimate grant rather than a bypass.
 
 # gh-aw's default PR concurrency group is one group per PR number, shared by
 # every pull_request action, cancel-in-progress: true (reference/concurrency.md:
@@ -82,8 +82,6 @@ engine:
 cache:
   key: pr-prefetch-${{ github.event.pull_request.head.sha }}
   path: /tmp/gh-aw/agent
-  restore-keys:
-    - pr-prefetch-${{ github.event.pull_request.number }}-
 
 # Fetch the diff, metadata and existing comments on the runner instead of
 # spending agent turns on it. Adapted from gh-aw's own shared/pr-diff-data-fetch.md;
@@ -290,7 +288,7 @@ that cites one is a fact rather than a preference, and the `conventions` check
 only covers the part that can be checked mechanically.
 
 Passing tests and the mechanical conventions check are enforced separately and
-are not your job. Yours is whether the tests check what the issue asked for, and
+are not your job: do not run the tests or `verify.sh`. Yours is whether the tests check what the issue asked for, and
 whether the logic is right — a test suite can pass while testing the wrong thing.
 
 Review only lines that appear in the diff. Look for:

@@ -26,7 +26,30 @@ pre-agent-steps:
       # The pre-push check's scripts, also from the base branch: the agent's own
       # edits to them must not decide whether its work passes.
       cp .github/scripts/verify.sh .github/scripts/check-conventions.sh /tmp/gh-aw/pi-agent-dir/verify/
+      # verify.sh compares against origin/develop. A pull-request checkout does
+      # not fetch it, and without it the conventions check reported a function
+      # "added" to src/index.js on a pull request that added none (review run
+      # 36143201406), which would refuse every rework push.
+      # Shallow only where the checkout already is: a --depth fetch into a full
+      # clone would make it shallow, and unblock needs full history to merge.
+      DEPTH=""; [ "$(git rev-parse --is-shallow-repository)" = "true" ] && DEPTH="--depth=1"
+      git fetch -q --no-tags $DEPTH origin +refs/heads/develop:refs/remotes/origin/develop \
+        || echo "::warning::could not fetch origin/develop; the conventions check will say so"
       echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE, verify=$(ls /tmp/gh-aw/pi-agent-dir/verify | tr '\n' ' ')"
     env:
       PI_ROLE: ${{ github.aw.import-inputs.role }}
 ---
+
+## Calling safe outputs on this engine
+
+Safe outputs are **not** tools you can call directly here. Call each one from
+bash as `safeoutputs <tool>`, with a JSON payload on stdin:
+
+```bash
+cat <<'EOF' | safeoutputs <tool> .
+{ ...fields... }
+EOF
+```
+
+Do not probe with `--help` first; the fields are the ones named in these
+instructions.

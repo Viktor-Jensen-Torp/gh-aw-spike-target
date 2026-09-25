@@ -41,8 +41,6 @@ on:
   # backlog. The deterministic step below does the real filtering.
   skip-if-no-match: "is:issue is:open"
 
-  stop-after: +30d
-
 # Without a discriminator every dispatch shares one conclusion concurrency slot,
 # so a second dispatch cancels the first — the shape that once killed a rework
 # run mid-flight.
@@ -204,7 +202,7 @@ safe-outputs:
     report-as-issue: false
 
 # Fifteen candidates read properly against the codebase needs more than the
-# 15 minutes the other roles get.
+# 15-20 minutes the other roles get.
 timeout-minutes: 25
 ---
 

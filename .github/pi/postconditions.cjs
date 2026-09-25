@@ -103,8 +103,7 @@ const ROLES = {
     giveUp: "escalate as in Step 4: add_labels needs-human and one add_comment saying what still fails",
   },
   // The release read is advice to a person, never a gate: `main` is merged by a
-  // human who has the verdict in front of them. REQUEST_CHANGES would claim an
-  // authority this role does not have, so COMMENT is the only allowed event.
+  // human who has the read in front of them. It posts one comment, or nothing.
   release: {
     required: [["add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
@@ -143,6 +142,11 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
           ? ` gh-aw silently treats a missing event as COMMENT, which does not block the merge, and keeps only the FIRST review you submit. Put "event" in the JSON or pass --event.`
           : "";
       return `    ${tool})
+      # gh-aw keeps only the first; a second call is dropped silently.
+      if grep -qx "${tool}" "${CALLED_LOG}" 2>/dev/null; then
+        echo "BLOCKED by the pipeline: ${tool} was already submitted in this run, and only the first one counts. Do not call it again." >&2
+        return 2
+      fi
       __v=$(printf '%s' "$__payload" | jq -r '.${rule.field} // empty' 2>/dev/null${norm})
       [ -z "$__v" ] && __v=$(__pc_flag "${rule.field}" "$@"${norm})
       case " ${rule.allowed.join(" ")} " in
@@ -188,7 +192,8 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
           echo "BLOCKED by the pipeline: the checks have already failed $__vn times in this run. Do not open or update the pull request. Instead, ${giveUp}." >&2
           return 2
         fi
-        if ! __vout=$(bash "${VERIFY}" 2>&1); then
+        # From the repository root, whatever directory the agent's command is in.
+        if ! __vout=$(cd "\${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" && bash "${VERIFY}" 2>&1); then
           __vn=$((__vn + 1)); echo "$__vn" > "${STATE_DIR}/verify.blocks"
           if [ "$__vn" -ge ${MAX_VERIFY_BLOCKS} ]; then
             echo "BLOCKED by the pipeline: the checks CI will run failed (attempt $__vn of ${MAX_VERIFY_BLOCKS}). Nothing was submitted. Stop trying: ${giveUp}." >&2

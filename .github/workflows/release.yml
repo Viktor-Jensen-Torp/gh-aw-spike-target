@@ -42,8 +42,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          AHEAD=$(gh api "repos/$REPO/compare/main...develop" --jq '.ahead_by')
-          echo "develop is $AHEAD commit(s) ahead of main"
+          # Count changes, not commits: squashed agent work with a `(#n)`
+          # subject. Sync merges are bookkeeping. This is only right while each
+          # release is merged with a merge commit: a squashed release leaves its
+          # changes looking unshipped, and PR #59 re-listed five of them.
+          SHIPPING=$(gh api "repos/$REPO/compare/main...develop" \
+            --jq '.commits[]
+                  | select((.parents | length) == 1)
+                  | .commit.message | split("\n")[0]
+                  | select(test("\\(#[0-9]+\\)$"))')
+          AHEAD=$(printf '%s' "$SHIPPING" | grep -c . || true)
+          echo "develop has $AHEAD change(s) not on main"
 
           if [ "$AHEAD" -eq 0 ]; then
             echo "Nothing to release." >> "$GITHUB_STEP_SUMMARY"
@@ -73,9 +82,7 @@ jobs:
           # person merges this pull request into `main`, which is the intended
           # model: an issue is resolved when it ships, not when it merges.
           CLOSES=""
-          for P in $(gh api "repos/$REPO/compare/main...develop" \
-                       --jq '.commits[].commit.message' \
-                     | grep -oE '\(#[0-9]+\)' | tr -d '(#)' | sort -u); do
+          for P in $(printf '%s\n' "$SHIPPING" | grep -oE '\(#[0-9]+\)$' | tr -d '(#)' | sort -u); do
             for I in $(gh pr view "$P" --repo "$REPO" --json body --jq '.body' 2>/dev/null \
                        | grep -oiE '(fixes|closes|resolves) #[0-9]+' \
                        | grep -oE '[0-9]+'); do
@@ -93,12 +100,7 @@ jobs:
             # is bookkeeping, not a change, and nine of them in a row made the
             # first release's list unreadable. Squashed agent work always ends
             # with its pull request number, so that is the filter.
-            gh api "repos/$REPO/compare/main...develop" \
-              --jq '.commits[]
-                    | select((.parents | length) == 1)
-                    | .commit.message | split("\n")[0]
-                    | select(test("\\(#[0-9]+\\)$"))
-                    | "- \(.)"'
+            printf '%s\n' "$SHIPPING" | sed 's/^/- /'
             echo
             if [ -n "$CLOSES" ]; then
               echo "## Resolves"

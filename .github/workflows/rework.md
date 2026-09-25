@@ -3,20 +3,13 @@ emoji: "🔧"
 description: Sends a pull request back to the implementer once, carrying the named reason it came back.
 intent: Close the loop from a rejected review to a corrected branch, with a bounded number of attempts before a person is called.
 
-# `pull_request`, although `pull_request_target` would be the better trigger.
+# `pull_request`, not `pull_request_target`: gh-aw refuses to compile
+# `pull_request_target` with a checkout of the pull request's head ("extremely
+# insecure"), and rework has to modify that head.
 #
-# A `pull_request` workflow does not run at all when the pull request has a
-# merge conflict, which is one of the reasons rework exists, and it runs the
-# pull request's own copy of this file. `pull_request_target` fixes both, but
-# gh-aw refuses to compile `pull_request_target` together with a checkout:
-# "pull_request_target trigger with checkout enabled is extremely insecure",
-# and it only offers checking out the BASE commit. Rework has to check out and
-# modify the pull request's head, so that guard rules the combination out.
-#
-# Consequence: the `resolve-conflict` door below is
-# unreachable from this trigger. A conflicted pull request never fires it.
-# This is very likely why gh-aw's own pr-sous-chef is a scheduled sweeper
-# rather than an event-driven rework agent.
+# Consequence: a conflicted pull request never fires this workflow (GitHub runs
+# no `pull_request` workflows on one). Conflicts are unblock.md's job, sent by
+# unblock-detect.yml and the sweeper.
 
 inlined-imports: true
 
@@ -68,13 +61,21 @@ on:
         LABELLED_SHA: ${{ github.event.pull_request.head.sha }}
         LIMIT: "3"
         LABEL: ${{ github.event.label.name }}
+        # gh-aw's own activation check, which runs just before this step. If it
+        # refuses the run, the agent will not start, so no strike may be spent:
+        # on PR #48 strikes were spent while the agent was blocked, and the pull
+        # request was escalated on rounds that never happened.
+        MEMBER: ${{ steps.check_membership.outputs.is_team_member }}
       run: |
         set -euo pipefail
-        if [ "$LABEL" != "needs-rework" ]; then
-          echo "Not our label ($LABEL); nothing to do."
-          echo "proceed=false" >> "$GITHUB_OUTPUT"
-          exit 0
-        fi
+        stop() { echo "$1"; echo "proceed=false" >> "$GITHUB_OUTPUT"; exit 0; }
+        # REST, not `gh pr edit`: that goes through GraphQL and can fail on the
+        # Projects (classic) deprecation in this repository.
+        add_label()    { gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$1" --silent; }
+        remove_label() { gh api -X DELETE "repos/$REPO/issues/$PR/labels/$1" --silent 2>/dev/null || true; }
+
+        [ "$LABEL" = "needs-rework" ] || stop "Not our label ($LABEL); nothing to do."
+        [ "$MEMBER" = "true" ] || stop "gh-aw will not activate this run (is_team_member=$MEMBER); no strike spent."
         PRJSON=$(gh pr view "$PR" --repo "$REPO" --json labels,mergeable,headRefOid,statusCheckRollup)
         LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
         CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
@@ -84,25 +85,24 @@ on:
         # went on, that commit has its own review and its own chain. Stop before
         # a strike is spent, and take the label off so the next one can fire.
         if [ "$CURRENT_SHA" != "$LABELLED_SHA" ]; then
-          echo "Stale: labelled $LABELLED_SHA, head is now $CURRENT_SHA."
-          gh pr edit "$PR" --repo "$REPO" --remove-label needs-rework || true
-          echo "proceed=false" >> "$GITHUB_OUTPUT"
-          exit 0
+          remove_label needs-rework
+          stop "Stale: labelled $LABELLED_SHA, head is now $CURRENT_SHA."
         fi
+        # A person holds it; the pipeline does not touch it.
+        if grep -qx needs-human <<< "$LABELS"; then
+          remove_label needs-rework
+          stop "needs-human is on #$PR; a person owns it."
+        fi
+        # Unreachable in practice (a conflicted pull request runs no workflows),
+        # but if it happens the fix is unblock.md, not a rework round.
+        [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."
 
-        # Whose fault is it? A conflict is someone else's work landing first,
-        # not the implementer getting it wrong, so it spends its own budget.
-        # Otherwise: red CI first, because a failing build is a more concrete
-        # task than a review finding, and the reviewer reads built code anyway.
-        FAILED_CI=$(jq -r '[.statusCheckRollup[]? | select(.name != "Agent review")
+        # Red CI first, because a failing build is a more concrete task than a
+        # review finding. `hold` and `Agent review` are not CI.
+        FAILED_CI=$(jq -r '[.statusCheckRollup[]? | select(.name != "Agent review" and .name != "hold")
                             | select(.conclusion == "FAILURE")] | length' <<< "$PRJSON")
-        if [ "$MERGEABLE" = "CONFLICTING" ]; then
-          KIND=conflict; TASK=resolve-conflict
-        elif [ "${FAILED_CI:-0}" -gt 0 ]; then
-          KIND=strike;   TASK=fix-ci
-        else
-          KIND=strike;   TASK=address-review
-        fi
+        if [ "${FAILED_CI:-0}" -gt 0 ]; then TASK=fix-ci; else TASK=address-review; fi
+        KIND=strike
 
         N=0
         for i in 1 2 3 4 5; do
@@ -111,17 +111,18 @@ on:
         N=$((N + 1))
 
         if [ "$N" -ge "$LIMIT" ]; then
-          gh pr edit "$PR" --repo "$REPO" --add-label needs-human --remove-label needs-rework
-          gh pr comment "$PR" --repo "$REPO" --body \
-            "Third consecutive $KIND. A human owns this now (ADR 0009)."
-          echo "proceed=false" >> "$GITHUB_OUTPUT"
-          exit 0
+          add_label needs-human
+          remove_label needs-rework
+          gh api -X POST "repos/$REPO/issues/$PR/comments" --silent \
+            -f body="Third consecutive $KIND. A human owns this now (ADR 0009)."
+          stop "Third consecutive $KIND; escalated to a person."
         fi
 
         # The counter goes on before the agent runs, so a crashed run still
         # spends its round. needs-rework comes off here too: it is a one-shot
         # command, and leaving it on would re-fire this workflow on the push.
-        gh pr edit "$PR" --repo "$REPO" --add-label "$KIND:$N" --remove-label needs-rework
+        add_label "$KIND:$N"
+        remove_label needs-rework
         echo "proceed=true"   >> "$GITHUB_OUTPUT"
         echo "task=$TASK"     >> "$GITHUB_OUTPUT"
         echo "round=$KIND:$N" >> "$GITHUB_OUTPUT"
@@ -148,12 +149,6 @@ engine:
   env:
     PI_ROLE: rework
 
-# Outer backstops. The strike counter bounds one pull request; these bound the
-# workflow. gh-aw's own first line of defence — that agentic writes do not
-# trigger workflows — is switched off here by design, because the chain depends
-# on one agent starting the next.
-max-daily-ai-credits: 500
-
 pre-agent-steps:
   - name: Pre-fetch the review findings and the failing checks
     env:
@@ -163,9 +158,10 @@ pre-agent-steps:
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
+      # --paginate applies --jq per page, so slice after joining the pages.
       gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
-        --jq '[.[] | {id, state, user: .user.login, body: .body[:4000]}] | .[-5:]' \
-        > /tmp/gh-aw/agent/reviews.json
+        --jq '.[] | {id, state, user: .user.login, body: .body[:4000]}' \
+        | jq -s '.[-5:]' > /tmp/gh-aw/agent/reviews.json
       gh api "repos/$REPO/pulls/$PR/comments" --paginate \
         --jq '[.[] | {id, path, line: (.line // .original_line), body: .body[:2000], user: .user.login}]' \
         > /tmp/gh-aw/agent/review-comments.json
@@ -244,9 +240,6 @@ finding: add the test.
 
 **fix-ci** — read the failing check, reproduce it with
 `bash .github/scripts/verify.sh`, and fix the cause.
-
-**resolve-conflict** — rebase onto the base branch and resolve the conflict.
-Keep both sides' intent; do not drop someone else's change to make yours apply.
 
 Whatever the task: **never make a check pass by weakening or deleting a test.**
 If a test is genuinely wrong, say so in your comment and explain why.

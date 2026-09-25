@@ -72,6 +72,7 @@ new_root
 case_ "submit COMMENT"                                 pass  'echo "{\"event\":\"COMMENT\",\"body\":\"ok\"}" | safeoutputs submit_pull_request_review .'
 case_ "then check failure (disagrees)"                 block 'echo "{\"conclusion\":\"failure\",\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
 case_ "then check success (agrees)"                    pass  'echo "{\"conclusion\":\"success\",\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
+case_ "second check run refused (first one counts)"    block 'echo "{\"conclusion\":\"success\",\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
 new_root
 case_ "check failure first"                            pass  'echo "{\"conclusion\":\"failure\",\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
 case_ "then submit COMMENT (disagrees)"                block 'echo "{\"event\":\"COMMENT\",\"body\":\"x\"}" | safeoutputs submit_pull_request_review .'
@@ -94,6 +95,7 @@ fake_verify() {
   cat > "$ROOT/verify.sh" <<'V'
 #!/usr/bin/env bash
 echo run >> "$ROOT/verify.runs"
+pwd > "$ROOT/verify.cwd"
 if [ -f "$ROOT/red" ]; then echo "✗ test: unique rejects strings — expected TypeError"; exit 1; fi
 echo "✓ verify: all checks passed"
 V
@@ -127,6 +129,12 @@ ROLE=unblock case_ "unblock red 3 -> told to escalate (Step 4)"      block "$PUS
 grep -q "Stop trying: escalate as in Step 4: add_labels needs-human" "$ROOT/last_err" \
   && echo "PASS  unblock gives up its own way, not report_incomplete" \
   || { echo "FAIL  unblock give-up message: $(head -c 200 "$ROOT/last_err")"; fails=$((fails + 1)); }
+new_root; fake_verify
+WS="$(git -C "$HERE" rev-parse --show-toplevel)"
+GITHUB_WORKSPACE="$WS" ROLE=implement case_ "called from another directory" pass "cd / && $PR"
+[ "$(cat "$ROOT/verify.cwd")" = "$WS" ] \
+  && echo "PASS  verify runs from the repository root, not the command's directory" \
+  || { echo "FAIL  verify ran in $(cat "$ROOT/verify.cwd")"; fails=$((fails + 1)); }
 new_root   # no verify.sh written: the script is missing
 ROLE=implement case_ "missing verify script fails open (CI is the gate)" pass "$PR"
 grep -q "not found; pushing without" "$ROOT/last_err" && echo "PASS  missing script is logged" || { echo "FAIL  missing script not logged"; fails=$((fails + 1)); }

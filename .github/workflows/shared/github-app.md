@@ -3,13 +3,9 @@ description: >
   The App credential pair for a safe-output write, in one place per App.
   Two App identities exist (implementer, reviewer); the caller picks one.
 
-  EXPERIMENTAL: relies on import-schema substitution happening as plain text
-  before the file is parsed as YAML/GHA, so a substituted value can sit inside
-  a larger `${{ }}` expression rather than being the whole expression (unlike
-  every other import-schema use in this repo, e.g. shared/postconditions.md's
-  whole-value `PI_ROLE: ${{ github.aw.import-inputs.role }}`). Verify the
-  compiled lock names the right vars/secrets before trusting this; if it
-  doesn't, this file is wrong and should be deleted rather than patched.
+  The substituted value sits inside a larger `${{ }}` expression, which the
+  docs do not cover; verified by reading the compiled locks, which name the
+  right vars and secrets. Re-check them after upgrading gh-aw.
 
 import-schema:
   app_prefix:

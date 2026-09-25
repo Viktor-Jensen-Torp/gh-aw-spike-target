@@ -13,7 +13,7 @@ the reviewer checks against the same document afterwards. One source, two
 consumers, so the rule and the check cannot drift apart.
 
 The shape is markdown with YAML frontmatter and a required `type` — the Open
-Knowledge Format v0.1. That costs nothing here, because every workflow and
+Knowledge Format v0.2. That costs nothing here, because every workflow and
 template in this repository is already markdown with frontmatter, and it keeps
 the option of other tools reading these documents later. It is **not** a
 dependency: nothing in the pipeline requires an OKF parser.
