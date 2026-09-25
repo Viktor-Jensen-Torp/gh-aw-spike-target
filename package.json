@@ -4,6 +4,14 @@
   "private": true,
   "description": "Throwaway test repo for the gh-aw spike.",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "lint": "eslint --config .github/lint/eslint.config.cjs --max-warnings 0 src test && prettier --config .github/lint/prettier.json --check src test",
+    "format": "prettier --config .github/lint/prettier.json --write src test && eslint --config .github/lint/eslint.config.cjs --fix src test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9"
   }
 }

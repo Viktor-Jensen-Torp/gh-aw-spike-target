@@ -8,8 +8,14 @@ function movingAverage(numbers, windowSize) {
   if (!Array.isArray(numbers) || numbers.length === 0) {
     throw new RangeError('numbers must be a non-empty array');
   }
-  if (!Number.isInteger(windowSize) || windowSize <= 0 || windowSize > numbers.length) {
-    throw new RangeError('windowSize must be a positive integer no larger than the list');
+  if (
+    !Number.isInteger(windowSize) ||
+    windowSize <= 0 ||
+    windowSize > numbers.length
+  ) {
+    throw new RangeError(
+      'windowSize must be a positive integer no larger than the list',
+    );
   }
 
   // Calculate moving averages
@@ -31,7 +37,7 @@ function count(list, predicate) {
   if (typeof predicate !== 'function') {
     throw new TypeError('Predicate must be a function');
   }
-  
+
   let counter = 0;
   for (const item of list) {
     if (predicate(item)) {
@@ -49,16 +55,16 @@ function range(start, end) {
   if (!Number.isInteger(end)) {
     throw new TypeError('end must be an integer');
   }
-  
+
   const result = [];
   if (end <= start) {
     return result;
   }
-  
+
   for (let i = start; i < end; i++) {
     result.push(i);
   }
-  
+
   return result;
 }
 

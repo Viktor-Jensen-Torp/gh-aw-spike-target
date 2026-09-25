@@ -1,3 +1,6 @@
 
 # Local metrics scratch; the real history lives on the `metrics` branch.
 metrics/
+
+# Dev tooling (ESLint, Prettier), installed by `npm ci`.
+node_modules/
