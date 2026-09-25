@@ -287,6 +287,10 @@ change against it. The conventions are the repository's stated rules; a finding
 that cites one is a fact rather than a preference, and the `conventions` check
 only covers the part that can be checked mechanically.
 
+Passing tests and the mechanical conventions check are enforced separately and
+are not your job. Yours is whether the tests check what the issue asked for, and
+whether the logic is right — a test suite can pass while testing the wrong thing.
+
 Review only lines that appear in the diff. Look for:
 
 - Logic errors, unhandled edge cases, missing error handling
