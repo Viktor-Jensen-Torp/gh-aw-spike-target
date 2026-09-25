@@ -44,19 +44,28 @@ test('movingAverage does not modify the input array', () => {
 });
 
 test('count returns number of elements satisfying predicate', () => {
-  assert.strictEqual(count([1, 2, 3, 4], n => n % 2 === 0), 2);
+  assert.strictEqual(
+    count([1, 2, 3, 4], (n) => n % 2 === 0),
+    2,
+  );
 });
 
 test('count returns zero for empty list', () => {
-  assert.strictEqual(count([], n => true), 0);
+  assert.strictEqual(
+    count([], () => true),
+    0,
+  );
 });
 
 test('count returns zero when no elements satisfy predicate', () => {
-  assert.strictEqual(count([1, 2, 3], n => false), 0);
+  assert.strictEqual(
+    count([1, 2, 3], () => false),
+    0,
+  );
 });
 
 test('count throws TypeError for non-array argument', () => {
-  assert.throws(() => count('nope', n => true), TypeError);
+  assert.throws(() => count('nope', () => true), TypeError);
 });
 
 test('count throws TypeError for non-function predicate', () => {
@@ -66,7 +75,7 @@ test('count throws TypeError for non-function predicate', () => {
 test('count does not modify the input array', () => {
   const original = [1, 2, 3, 4];
   const copy = [...original];
-  count(original, n => n % 2 === 0);
+  count(original, (n) => n % 2 === 0);
   assert.deepStrictEqual(original, copy);
 });
 
