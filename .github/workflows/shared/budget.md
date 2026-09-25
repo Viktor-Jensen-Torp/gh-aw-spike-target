@@ -16,8 +16,9 @@ max-ai-credits: 100
 #
 # Note it is ACTIVE by default, contrary to the glossary and one section of
 # cost-management.md; the spec §9.4 and the compiled locks agree that it is.
-# Note also §9.8: label-command and slash-command invocations bypass it, so
-# `implement` and `refine` are not covered when a person triggers them by label.
+# Note also §9.8: label-command runs and plain workflow_dispatch runs bypass it,
+# so `implement`, label-triggered `refine` and dispatched `unblock` are not
+# covered. The sweeper sends `unblock` once per commit for that reason.
 max-daily-ai-credits: 500
 
 # gh-aw's default is 500 chat iterations per run, effectively unbounded here.

@@ -14,25 +14,43 @@
 #
 # Usage: check-conventions.sh [base-ref]   (default: origin/develop)
 # Exit 0 = conventions met. Exit 1 = a breach, described on stdout.
+# Exit 2 = the base cannot be read, so nothing could be checked.
 set -uo pipefail
 
 BASE="${1:-origin/develop}"
 FAILED=0
 
-# --- One helper, one file -----------------------------------------------------
-# src/index.js ends with a single line listing every export, so two changes that
-# both add a helper both edit that line and collide every time. See
-# .github/conventions/javascript.md.
-BEFORE=$(git show "$BASE:src/index.js" 2>/dev/null | grep -c '^function ' || true)
-AFTER=$(grep -c '^function ' src/index.js 2>/dev/null || true)
+# Without the base there is nothing to compare against. Say so, rather than
+# comparing against nothing: that once reported a function "added" to
+# src/index.js on a pull request that added none (review run 36143201406).
+if ! git rev-parse -q --verify "$BASE^{commit}" >/dev/null; then
+  echo "✗ cannot check conventions: base '$BASE' is not in this checkout."
+  echo "  Fetch it first: git fetch origin +refs/heads/develop:refs/remotes/origin/develop"
+  exit 2
+fi
 
-if [ "${AFTER:-0}" -gt "${BEFORE:-0}" ]; then
-  ADDED=$(git diff "$BASE"...HEAD -- src/index.js 2>/dev/null \
-          | grep '^+function ' | sed 's/^+function \([a-zA-Z0-9_]*\).*/\1/' | tr '\n' ' ')
-  [ -n "${ADDED// /}" ] || ADDED="(a new function)"
-  echo "✗ One helper, one file: \`$ADDED\` was added to src/index.js."
+# --- One helper, one file -----------------------------------------------------
+# src/index.js is the old barrel: it may shrink, never grow. Growing it means a
+# new function in it, or a new name on its export line (a re-export counts: it
+# rebuilds the shared line this rule removes). See .github/conventions/javascript.md.
+exports_of() { # file contents on stdin -> one exported name per line
+  grep -E '^module\.exports *=' | sed -E 's/.*\{(.*)\}.*/\1/' | tr ',' '\n' \
+    | sed -E 's/[[:space:]]//g; s/:.*//' | grep -v '^$' | sort -u
+}
+BASE_SRC=$(git show "$BASE:src/index.js" 2>/dev/null || true)
+HEAD_SRC=$(cat src/index.js 2>/dev/null || true)
+
+NEW_FUNCTIONS=$(comm -13 <(grep -oE '^function [A-Za-z0-9_]+' <<<"$BASE_SRC" | sort -u) \
+                         <(grep -oE '^function [A-Za-z0-9_]+' <<<"$HEAD_SRC" | sort -u) \
+                | sed 's/^function //' | tr '\n' ' ')
+NEW_EXPORTS=$(comm -13 <(exports_of <<<"$BASE_SRC") <(exports_of <<<"$HEAD_SRC") | tr '\n' ' ')
+ADDED=$(printf '%s %s' "$NEW_FUNCTIONS" "$NEW_EXPORTS" | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')
+
+if [ -n "${ADDED// /}" ]; then
+  echo "✗ One helper, one file: \`${ADDED% }\` was added to src/index.js."
   echo "  Put each exported helper in its own file — src/<name>.js, with"
   echo "  test/<name>.test.js alongside — and leave src/index.js as it is."
+  echo "  Do not re-export new files from src/index.js either."
   echo "  Why: src/index.js ends with one line listing every export, so two"
   echo "  changes that both add a helper both edit that line and collide."
   echo "  See .github/conventions/javascript.md."

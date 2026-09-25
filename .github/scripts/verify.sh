@@ -3,7 +3,7 @@
 #
 # Called from two places, so they cannot disagree:
 #   1. CI — each required check runs one step (`--only test`, `--only
-#      conventions`), so the gate is exactly this list;
+#      conventions`, `--only lint`), so the gate is exactly this list;
 #   2. the agent, before its work leaves the run — .github/pi/postconditions.cjs
 #      runs all steps when an implement/rework/unblock agent calls
 #      create_pull_request or push_to_pull_request_branch, and refuses the call
@@ -19,7 +19,10 @@ set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ONLY=""
-if [ "${1:-}" = "--only" ]; then ONLY="${2:-}"; shift 2; fi
+if [ "${1:-}" = "--only" ]; then
+  [ $# -ge 2 ] || { echo "verify.sh: --only needs a step name"; exit 2; }
+  ONLY="$2"; shift 2
+fi
 BASE="${1:-origin/develop}"
 
 STEPS=(test conventions lint)

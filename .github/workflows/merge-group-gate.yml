@@ -15,7 +15,7 @@ name: Merge group gate
 #
 # So instead this VERIFIES the thing the queue door is supposed to have
 # guaranteed: every pull request in this group carries a green `Agent review`
-# on the exact commit that entered the queue, and none of them is being held by
+# on its current head commit, and none of them is being held by
 # a person. That is a real invariant, it is checked deterministically, and it
 # catches the two ways the door can be wrong — a verdict that was never posted,
 # and a `needs-human` applied AFTER the pull request was queued, which the

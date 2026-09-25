@@ -65,9 +65,15 @@ pre-agent-steps:
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
+      # Only real changes: squashed agent work, one parent, subject ending
+      # `(#n)` — the same filter release.yml uses. Sync merges are bookkeeping,
+      # and counting them polluted the overlap list.
       CMP=$(gh api "repos/$REPO/compare/$BASE...$HEAD" --jq \
-        "{ahead: .ahead_by, commits: [.commits[] | {sha: .sha, subject: (.commit.message | split(\"\n\")[0])}] }")
-      echo "$CMP" | jq --argjson m "$MAX_COMMITS" '.commits |= .[-$m:]' > /tmp/gh-aw/agent/release-compare.json
+        "[.commits[] | select((.parents | length) == 1)
+                     | {sha: .sha, subject: (.commit.message | split(\"\n\")[0])}
+                     | select(.subject | test(\"\\\\(#[0-9]+\\\\)$\"))]")
+      echo "$CMP" | jq --argjson m "$MAX_COMMITS" '{ahead: length, commits: .[-$m:]}' \
+        > /tmp/gh-aw/agent/release-compare.json
 
       # Per-commit file lists, then the files more than one commit touched.
       : > /tmp/gh-aw/agent/release-files.jsonl

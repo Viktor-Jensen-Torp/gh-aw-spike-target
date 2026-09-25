@@ -138,17 +138,16 @@ def collect_prs(cutoff):
     label, applied at creation by the implementer's own safe output."""
     data = jsh([
         "gh", "pr", "list", "--state", "all", "--limit", str(PR_FETCH),
-        "--json", "number,state,labels,createdAt,mergedAt",
+        "--json", "number,state,labels,createdAt,mergedAt,closedAt",
     ]) or []
     truncated = len(data) >= PR_FETCH
-    prs = [
-        p for p in data
-        if any(l.get("name") == "agent" for l in (p.get("labels") or []))
-        and within(p.get("createdAt"), cutoff)
-    ]
-    merged = [p for p in prs if p.get("mergedAt")]
-    closed = [p for p in prs if p.get("state") == "CLOSED" and not p.get("mergedAt")]
-    open_ = [p for p in prs if p.get("state") == "OPEN"]
+    agent = [p for p in data if any(l.get("name") == "agent" for l in (p.get("labels") or []))]
+    # Each count by the date its event happened, so they share the cost window.
+    prs = [p for p in agent if within(p.get("createdAt"), cutoff)]
+    merged = [p for p in agent if p.get("mergedAt") and within(p.get("mergedAt"), cutoff)]
+    closed = [p for p in agent if p.get("state") == "CLOSED" and not p.get("mergedAt")
+              and within(p.get("closedAt"), cutoff)]
+    open_ = [p for p in agent if p.get("state") == "OPEN"]
     return prs, merged, closed, open_, truncated
 
 
@@ -173,6 +172,7 @@ def main():
         comp = component_costs(logs_location, r.get("run_id"))
         if comp["detection"] is None:
             missing_components += 1
+        # Everything that is not the agent: detection, plus evals (0 so far).
         w["detection"] += (comp["detection"] or 0) + (comp["evals"] or 0)
 
     total_aic = sum(w["aic"] for w in by_wf.values())
@@ -180,7 +180,7 @@ def main():
     total_all = total_aic + total_detection
     # The headline. Cost per accepted result, not cost per run: a factory can get
     # cheaper because it got better or because it did less, and only this ratio
-    # tells the two apart. Agent-only, for the reason in collect_runs().
+    # tells the two apart. All-in: agent plus detection and evals.
     aic_per_merged = round(total_all / len(merged), 1) if merged else None
     resolved = len(merged) + len(closed)
 
@@ -244,7 +244,7 @@ def main():
         f"| **Total AIC** | **{row['total_aic']}**{delta('total_aic')} "
         f"<sub>(${row['total_aic'] / 100:.2f})</sub> |",
         f"| ├ agents | {row['agent_aic']} |",
-        f"| └ threat detection | {row['detection_aic']} "
+        f"| └ threat detection + evals | {row['detection_aic']} "
         f"<sub>({100 * row['detection_aic'] / row['total_aic']:.0f}% of spend)</sub> |"
         if row["total_aic"] else "| └ threat detection | 0 |",
         f"| Pull requests merged | {len(merged)}{delta('prs_merged', '{:+d}')} |",
@@ -267,7 +267,7 @@ def main():
 
     if by_wf:
         out += ["### Cost by role", "",
-                "| Role | Runs | Agent | Detection | Total | Per run | Success (30d) |",
+                "| Role | Runs | Agent | Detection + evals | Total | Per run | Success (30d) |",
                 "|---|---:|---:|---:|---:|---:|---:|"]
         for name, v in sorted(by_wf.items(), key=lambda kv: -(kv[1]["aic"] + kv[1]["detection"])):
             tot = v["aic"] + v["detection"]

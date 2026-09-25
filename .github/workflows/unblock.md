@@ -137,13 +137,10 @@ safe-outputs:
     #   - gh-aw's `protected-files` guard still catches lockfiles, CODEOWNERS
     #     and the rest — see `protected-files` below for what happens then;
     #   - the App has no `workflows: write`, so the agent cannot introduce a
-    #     workflow change. A clean merge that merely CARRIES the base's workflow
-    #     files is fine — GitHub documents the exemption: "Workflow files can be
-    #     committed without this scope if the same file (with both the same path
-    #     and contents) exists on another branch in the same repository."
-    #     A workflow file the agent had to RESOLVE matches no branch, so the
-    #     exemption lapses and the push fails — which is the right outcome, and
-    #     the role escalates.
+    #     workflow change.
+    # Note what this means: any merge patch that carries `.github/` changes from
+    # the base is refused by `protected-files`, even a clean one. Workflow
+    # changes landing under an open agent pull request are human work.
     #
     # PR #53's real resolution was blocked exactly this way — a merge patch
     # containing .github/workflows/unblock.*. Before this line, the only

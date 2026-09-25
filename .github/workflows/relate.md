@@ -1,6 +1,6 @@
 ---
 emoji: "🔗"
-description: Records how open issues relate to each other — what blocks what, and what belongs under what.
+description: Records which open issues block which, so nobody starts work that cannot finish.
 intent: Give the backlog the relationships a per-issue reader cannot see, so nobody starts work that cannot finish.
 
 
@@ -64,8 +64,9 @@ pre-agent-steps:
       # way; there is no bulk endpoint, so this is one call per issue.
       : > /tmp/gh-aw/agent/existing-links.jsonl
       for N in $(jq -r '.[].number' /tmp/gh-aw/agent/backlog.json); do
-        BLOCKERS=$(gh api "repos/$REPO/issues/$N/dependencies/blocked_by" \
-                     --jq '[.[].number]' 2>/dev/null || echo '[]')
+        # Fail rather than assume "no links": an unreadable edge list would make
+        # the agent propose edges that already exist.
+        BLOCKERS=$(gh api "repos/$REPO/issues/$N/dependencies/blocked_by" --jq '[.[].number]')
         [ "$BLOCKERS" = "[]" ] || echo "{\"issue\":$N,\"blocked_by\":$BLOCKERS}" \
           >> /tmp/gh-aw/agent/existing-links.jsonl
       done
@@ -87,7 +88,8 @@ safe-outputs:
   # GITHUB_TOKEN start no workflows, so this role cannot put work into the
   # pipeline. It only describes the backlog it is given.
   add-comment:
-    max: 10
+    # The prompt allows one summary comment per run.
+    max: 1
     target: "*"
   noop:
     report-as-issue: false
@@ -136,14 +138,15 @@ safe-outputs:
               # nonsense, and both are cheaper to refuse than to explain.
               case "$BLOCKED$BLOCKER" in *[!0-9]*) echo "skip: non-numeric ($BLOCKED, $BLOCKER)"; continue;; esac
               [ "$BLOCKED" != "$BLOCKER" ] || { echo "skip: #$BLOCKED cannot block itself"; continue; }
-              BLOCKER_ID=$(gh api "repos/$REPO/issues/$BLOCKER" --jq '.id' 2>/dev/null) || {
-                echo "skip: #$BLOCKER not readable"; continue; }
-              if gh api -X POST "repos/$REPO/issues/$BLOCKED/dependencies/blocked_by" \
-                   -F issue_id="$BLOCKER_ID" --silent 2>/dev/null; then
+              BLOCKER_ID=$(gh api "repos/$REPO/issues/$BLOCKER" --jq '.id' 2>&1) || {
+                echo "skip: #$BLOCKER not readable: $BLOCKER_ID"; continue; }
+              # Print GitHub's own reason on failure rather than guessing one.
+              if ERR=$(gh api -X POST "repos/$REPO/issues/$BLOCKED/dependencies/blocked_by" \
+                   -F issue_id="$BLOCKER_ID" --silent 2>&1); then
                 echo "#$BLOCKED is blocked by #$BLOCKER — $REASON"
                 COUNT=$((COUNT+1))
               else
-                echo "skip: could not link #$BLOCKED to #$BLOCKER (already linked, or closed)"
+                echo "skip: could not link #$BLOCKED to #$BLOCKER: $ERR"
               fi
             done < <(jq -r '.items[] | select(.type == "link_blocked_by")
                             | [.blocked, .blocker, .reason] | @tsv' "$GH_AW_AGENT_OUTPUT")

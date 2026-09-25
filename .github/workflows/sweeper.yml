@@ -43,11 +43,20 @@ jobs:
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
           private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+      # The implementer App, for the one action that must come from the pull
+      # request's author: reopening it so review.md (which accepts only the
+      # implementer as a bot actor) runs again.
+      - uses: actions/create-github-app-token@v3
+        id: implementer_token
+        with:
+          client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
+          private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
 
       - name: Sweep
         env:
           GH_TOKEN: ${{ github.token }}
           APP_TOKEN: ${{ steps.app_token.outputs.token }}
+          IMPLEMENTER_TOKEN: ${{ steps.implementer_token.outputs.token }}
           REPO: ${{ github.repository }}
           BASE: develop
           # Bound every run. A sweeper that acts on everything it finds turns a
@@ -120,20 +129,28 @@ jobs:
             #    that drifted.
             #
             #    It DISPATCHES rather than labelling `needs-human`. Escalating
-            #    here would pre-empt the automatic fix: the sweeper runs every
-            #    30 minutes, and whichever ran first would decide the outcome.
-            #    `needs-human` on a conflict now means one thing only — the
-            #    unblocker tried and could not.
+            #    here would pre-empt the automatic fix. But only ONCE per head
+            #    commit: an unblock run that ends without labelling (a refused
+            #    push, a failed run) would otherwise be re-sent every 30 minutes,
+            #    and dispatched runs skip the daily AI-credit cap (spec §9.8).
+            #    Still conflicted after that one try means a person.
             if [ "$MERGEABLE" = "CONFLICTING" ]; then
               if budget_left; then
-                if gh workflow run unblock.lock.yml -f pr="$PR" 2>/dev/null; then
+                if already_said "$PR" "<!-- sweeper:unblock-sent:$SHA -->"; then
+                  label_as_app "$PR" needs-human
+                  say "$PR" "<!-- sweeper:conflict:$SHA -->" \
+                    "**Swept:** this pull request still conflicts with \`$BASE\` after the unblocker was sent at \`${SHA:0:8}\`. Labelled \`needs-human\`: resolve the conflict, then remove the label to release the merge."
+                  spend
+                elif gh workflow run unblock.lock.yml -f pr="$PR" 2>/dev/null; then
+                  say "$PR" "<!-- sweeper:unblock-sent:$SHA -->" \
+                    "**Swept:** conflicts with \`$BASE\`. Sent the unblocker once for \`${SHA:0:8}\`; if it is still conflicted on the next sweep, a person is called."
                   echo "-> dispatched the unblocker at #$PR"
                   spend; n_conflict=$((n_conflict+1))
                 else
                   # If even the dispatch fails, a person is the only option left.
                   label_as_app "$PR" needs-human
                   say "$PR" "<!-- sweeper:conflict:$SHA -->" \
-                    "**Swept:** this pull request conflicts with \`$BASE\` and the unblocker could not be dispatched. No event can reach a conflicted pull request, so nothing else will retry. Resolve the conflict, then remove \`needs-human\` to release the merge."
+                    "**Swept:** this pull request conflicts with \`$BASE\` and the unblocker could not be dispatched. Resolve the conflict, then remove \`needs-human\` to release the merge."
                   spend
                 fi
               fi
@@ -163,9 +180,9 @@ jobs:
                 # actor that DOES match the author, so the review runs. Once
                 # per head commit, marked, and only then escalate.
                 if ! already_said "$PR" "<!-- sweeper:reopened:$SHA -->"; then
-                  GH_TOKEN="$APP_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=closed --silent
+                  GH_TOKEN="$IMPLEMENTER_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=closed --silent
                   sleep 3
-                  GH_TOKEN="$APP_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=open --silent
+                  GH_TOKEN="$IMPLEMENTER_TOKEN" gh api -X PATCH "repos/$REPO/pulls/$PR" -f state=open --silent
                   say "$PR" "<!-- sweeper:reopened:$SHA -->" \
                     "**Swept:** no \`Agent review\` verdict on \`${SHA:0:8}\` after ${AGE} minutes. A review is denied when the actor that pushed does not match the pull request's author, which is what a conflict fix looks like. Closed and reopened as the implementer App so the review fires with a matching actor. If this leaves no verdict either, the next sweep calls a person."
                   spend; n_reopened=$((n_reopened+1))
@@ -179,17 +196,24 @@ jobs:
               continue
             fi
 
-            # 3. Changes were requested and nothing is listening. A strike was
-            #    spent on a rework round that never landed (PRs #12,
-            #    #16). Re-applying the label as the reviewer App starts another
-            #    round; rework's own three-strike gate still bounds it.
+            # 3. Something is red and nothing is listening: a red `Agent
+            #    review`, or a red required CI check (test, lint, conventions)
+            #    that finished after the review had already routed. A strike
+            #    was spent on a rework round that never landed (PRs #12, #16),
+            #    or none was started. Re-applying the label as the reviewer App
+            #    starts a round; rework's three-strike gate still bounds it.
+            #    Once per head commit.
+            RED_CI=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
+              --jq '[.check_runs[] | select(.name == "test" or .name == "lint" or .name == "conventions")
+                     | select(.conclusion == "failure")] | length')
             case ",$LABELS," in
               *,needs-rework,*) : ;;
               *)
-                if [ "$VERDICT" = "failure" ] && budget_left; then
+                if { [ "$VERDICT" = "failure" ] || [ "${RED_CI:-0}" -gt 0 ]; } \
+                   && ! already_said "$PR" "<!-- sweeper:stuck:$SHA -->" && budget_left; then
                   label_as_app "$PR" needs-rework
                   say "$PR" "<!-- sweeper:stuck:$SHA -->" \
-                    "**Swept:** \`Agent review\` is red on \`${SHA:0:8}\` but nothing was queued to act on it, so the rework round was dropped. Re-applied \`needs-rework\`. Rework's three-strike gate still applies."
+                    "**Swept:** \`${SHA:0:8}\` is red (Agent review: ${VERDICT}, failing CI checks: ${RED_CI:-0}) but nothing was queued to act on it. Applied \`needs-rework\`. Rework's three-strike gate still applies."
                   spend; n_stuck=$((n_stuck+1))
                   continue
                 fi ;;
@@ -198,20 +222,10 @@ jobs:
             # 4. Auto-merge was never armed. gh-aw arms it best-effort at
             #    creation: a failure is only a core.warning and the pull request
             #    is still created, so one that will never merge looks exactly
-            #    like one that is waiting.
-            #    Under a merge queue this is no longer a rare repair — it is
-            #    the normal path. gh-aw's `auto-merge` ALWAYS names a merge
-            #    method, and a queued branch refuses one: "The merge strategy
-            #    for develop is set by the merge queue." So every agent pull
-            #    request is created unarmed (PR #36), and without this the loop
-            #    is not autonomous at all: the checks go green and nothing
-            #    merges.
-            #
-            #    Arming with no method is what the queue accepts, and it means
-            #    "merge when ready" — which under a queue is "join the queue
-            #    when ready". `gh pr merge --auto` omits the method; the
-            #    GraphQL mutation's `mergeMethod` is optional for the same
-            #    reason, so the repository's own setting decides.
+            #    like one that is waiting. (gh-aw's arming does work under the
+            #    merge queue: PR #38 merged through it untouched. This is the
+            #    backstop.) Armed with no method, which a queued branch accepts;
+            #    the queue decides how.
             if [ "$AM" = "null" ] && [ "$DRAFT" = "false" ] && budget_left; then
               NODE=$(gh api "repos/$REPO/pulls/$PR" --jq '.node_id')
               if gh api graphql -f query='
@@ -266,9 +280,9 @@ jobs:
           done
 
           # ---- branches of merged agent pull requests ------------------------
-          # delete_branch_on_merge is off, so every merged agent branch survives.
-          # Only branches whose pull request was opened by the implementer App
-          # and is already merged are touched.
+          # A backstop: delete_branch_on_merge normally removes these. Only
+          # branches whose pull request was opened by the implementer App and is
+          # already merged are touched.
           MERGED=$(gh pr list --repo "$REPO" --state merged --base "$BASE" --limit 50 \
             --json number,headRefName,author,mergedAt \
             --jq '[.[] | select(.author.login == "app/gh-aw-spike-implementer")]')
