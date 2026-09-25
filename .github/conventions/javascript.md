@@ -27,7 +27,7 @@ module.exports = { sum, movingAverage, unique };
 
 Two agents adding two helpers both edit that line. Not occasionally — *every
 time*. On 2026-09-22 three issues were implemented in parallel: one merged and
-the other two collided, both on that line (FINDINGS, stress test). At any real
+the other two collided, both on that line (stress test). At any real
 parallelism a shared mutable list makes collisions the normal case rather than
 the exception, and every collision then costs a repair, a re-review and a merge.
 

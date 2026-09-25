@@ -13,7 +13,7 @@ intent: Close the loop from a rejected review to a corrected branch, with a boun
 # and it only offers checking out the BASE commit. Rework has to check out and
 # modify the pull request's head, so that guard rules the combination out.
 #
-# Consequence, recorded in FINDINGS.md: the `resolve-conflict` door below is
+# Consequence: the `resolve-conflict` door below is
 # unreachable from this trigger. A conflicted pull request never fires it.
 # This is very likely why gh-aw's own pr-sous-chef is a scheduled sweeper
 # rather than an event-driven rework agent.
@@ -187,7 +187,7 @@ tools:
     toolsets: [pull_requests, repos]
   edit:
   # Pi rejects a bash allow-list (the compiler refuses one), so bash is
-  # unrestricted inside the firewalled container. See FINDINGS.md.
+  # unrestricted inside the firewalled container.
   bash: ["*"]
 
 safe-outputs:

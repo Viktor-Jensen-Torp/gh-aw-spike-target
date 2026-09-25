@@ -25,7 +25,7 @@ on:
   stop-after: +30d
 
 # Without a discriminator every dispatch shares one conclusion concurrency slot,
-# so a second dispatch cancels the first (FINDINGS).
+# so a second dispatch cancels the first.
 concurrency:
   job-discriminator: ${{ github.run_id }}
 

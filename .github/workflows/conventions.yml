@@ -2,7 +2,7 @@ name: Conventions
 
 # Gives the conventions teeth. A rule that is only written down is a rule that
 # gets ignored: the refiner disregarded a bolded, reasoned instruction three runs
-# in a row (FINDINGS, 2026-09-22). Prose states the aim; this makes it true.
+# in a row (2026-09-22). Prose states the aim; this makes it true.
 #
 # Checks `.github/conventions/javascript.md`'s one rule that can be checked
 # mechanically: a new helper does not go into the shared export line, because
@@ -10,7 +10,7 @@ name: Conventions
 
 # No `paths:` filter, deliberately. This is a REQUIRED check, and a required
 # check that does not report leaves a pull request waiting forever — the
-# silent-gate shape FINDINGS keeps running into. So it runs on every pull
+# silent-gate shape this pipeline keeps running into. So it runs on every pull
 # request and passes trivially when nothing was added to the shared file.
 on:
   pull_request:

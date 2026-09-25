@@ -26,6 +26,6 @@ dependency: nothing in the pipeline requires an OKF parser.
 
 Everything here that can be checked mechanically **is** checked, and the check is
 named next to the rule. Written instructions are not enough on their own: the
-refiner ignored a bolded, reasoned instruction three runs in a row (FINDINGS,
-2026-09-22). Prose tells an agent what to aim for; a failing check is what makes
+refiner ignored a bolded, reasoned instruction three runs in a row
+(2026-09-22). Prose tells an agent what to aim for; a failing check is what makes
 it true.

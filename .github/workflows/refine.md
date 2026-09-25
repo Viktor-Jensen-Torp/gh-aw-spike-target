@@ -45,7 +45,7 @@ on:
 
 # Without a discriminator every dispatch shares one conclusion concurrency slot,
 # so a second dispatch cancels the first — the shape that once killed a rework
-# run mid-flight (FINDINGS).
+# run mid-flight.
 concurrency:
   job-discriminator: ${{ github.run_id }}
 
@@ -68,8 +68,8 @@ pre-agent-steps:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       # Must stay equal to the safe-output `max` values below. gh-aw drops
-      # output beyond `max` silently (established for review comments in
-      # FINDINGS), so a candidate the agent works on but cannot write is work
+      # output beyond `max` silently (established for review comments), so a
+      # candidate the agent works on but cannot write is work
       # thrown away with no error anywhere.
       MAX_ISSUES: "15"
       # Leave an issue alone until its author has stopped typing. Rewriting a

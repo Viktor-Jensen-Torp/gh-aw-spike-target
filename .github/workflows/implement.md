@@ -58,7 +58,7 @@ tools:
     mode: gh-proxy
     toolsets: [issues, repos]
   # Pi does not support a bash allow-list (the compiler rejects one), so bash is
-  # unrestricted inside the firewalled container. See FINDINGS.md.
+  # unrestricted inside the firewalled container.
   bash: ["*"]
   timeout: 300
 
@@ -94,7 +94,7 @@ safe-outputs:
     # No github-token-for-extra-empty-commit: safe-outputs.github-app already
     # makes the branch push and the PR come from the implementer App, so CI
     # fires on `opened` by itself. The extra commit only added a second
-    # `synchronize` event, doubling CI and reviewer runs. See FINDINGS.md.
+    # `synchronize` event, doubling CI and reviewer runs.
 
 evals:
   - id: tests_added
