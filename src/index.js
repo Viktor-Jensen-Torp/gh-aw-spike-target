@@ -1,9 +1,6 @@
 // Small helpers used by the reporting dashboard.
 
-/** Returns the sum of a list of numbers. */
-function sum(numbers) {
-  return numbers.reduce((total, n) => total + n, 0);
-}
+const { sum } = require('./sum.js');
 
 /** Returns a list of averages of consecutive runs of windowSize values. */
 function movingAverage(numbers, windowSize) {
@@ -24,27 +21,6 @@ function movingAverage(numbers, windowSize) {
   }
 
   return result;
-}
-
-/** Returns a new list with only the first occurrence of each element. */
-function unique(array) {
-  const seen = new Set();
-  const result = [];
-  for (const item of array) {
-    if (!seen.has(item)) {
-      seen.add(item);
-      result.push(item);
-    }
-  }
-  return result;
-}
-
-/** Returns the first element of a list, or undefined if the list is empty. */
-function first(list) {
-  if (!Array.isArray(list)) {
-    throw new TypeError('Argument must be an array');
-  }
-  return list[0];
 }
 
 /** Returns the count of elements that satisfy the predicate. */
@@ -86,4 +62,4 @@ function range(start, end) {
   return result;
 }
 
-module.exports = { sum, movingAverage, unique, first, count, range };
+module.exports = { movingAverage, count, range };
