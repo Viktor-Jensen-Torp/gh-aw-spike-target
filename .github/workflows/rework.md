@@ -40,9 +40,6 @@ on:
   # The reviewer App applies the label, and a bot actor has no repository role.
   bots: [gh-aw-spike-reviewer]
 
-  # Outer backstop: a chain that is still going two days later is a runaway.
-  stop-after: +48h
-
   permissions:
     contents: read
     pull-requests: write

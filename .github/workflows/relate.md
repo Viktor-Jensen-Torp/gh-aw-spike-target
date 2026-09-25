@@ -22,7 +22,6 @@ on:
   workflow_dispatch:
   # Cheap when the backlog is small; skipped entirely when there is nothing open.
   skip-if-no-match: "is:issue is:open"
-  stop-after: +30d
 
 # Without a discriminator every dispatch shares one conclusion concurrency slot,
 # so a second dispatch cancels the first.
