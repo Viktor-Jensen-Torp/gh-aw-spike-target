@@ -25,6 +25,7 @@ imports:
   - uses: shared/postconditions.md
     with:
       role: rework
+  - shared/design-context.md
 
 on:
   pull_request:

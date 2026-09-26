@@ -17,6 +17,7 @@ imports:
   - uses: shared/postconditions.md
     with:
       role: review
+  - shared/design-context.md
   # gh-aw's own pre-fetch of the diff, metadata and existing review comments,
   # so the agent spends no turns on it. Pinned to the installed version.
   - github/gh-aw/.github/workflows/shared/pr-diff-data-fetch.md@v0.88.7

@@ -20,6 +20,11 @@
 # type: Feature, Task or Bug. priority: High, Medium or Low, set only when the
 # person decided it. Each dependency becomes a native "blocked by" link and a
 # `Depends on #N — why` line under the issue's "## Details".
+#
+# Design claims in a body (`design.pen#<id>`) are rendered with the pen.dev CLI
+# and attached to the issue as images, below the claims (`gh issue create
+# --attach`, gh 2.99+). Nothing is committed. Without a logged-in `pen`, the
+# issue is created without images and the script says so.
 set -euo pipefail
 
 DRY=0
@@ -59,6 +64,39 @@ fi
 
 # --- write ------------------------------------------------------------------
 issue_id() { gh api "repos/$REPO/issues/$1" --jq .id; }
+
+RENDERS=$(mktemp -d); trap 'rm -rf "$RENDERS"' EXIT
+PEN_OK=0; command -v pen >/dev/null && pen status >/dev/null 2>&1 && PEN_OK=1
+[ "$PEN_OK" = 1 ] || echo "  warning: pen CLI missing or not logged in; issues get no design images"
+# render <pen file> <id>... : one PNG per id in $RENDERS, named <id>.png
+render() {
+  local file="$1"; shift
+  local ids; ids=$(printf '"%s",' "$@"); ids="[${ids%,}]"
+  printf '%s\n' "execute({ input: 'Export($ids, \"png\", \"$RENDERS\")' })" 'exit()' \
+    | pen interactive --in "$file" --out "$RENDERS/scratch.pen" >/dev/null 2>&1 \
+    || echo "  warning: could not render $file"
+}
+# create_issue <title> <body>: prints the new issue's number. Claimed design
+# parts get their image linked under the claim, then uploaded by --attach.
+create_issue() {
+  local title="$1" body="$2" claims file attach=()
+  claims=$(grep -oE '`[^` ]+\.pen#[A-Za-z0-9_-]+`' <<<"$body" | tr -d '`' | sort -u || true)
+  if [ "$PEN_OK" = 1 ] && [ -n "$claims" ]; then
+    for file in $(cut -d'#' -f1 <<<"$claims" | sort -u); do
+      [ -f "$file" ] || { echo "  warning: $file not found; no images" >&2; continue; }
+      render "$file" $(grep -F "$file#" <<<"$claims" | cut -d'#' -f2) >&2
+    done
+    for c in $claims; do
+      local id="${c#*#}"
+      [ -f "$RENDERS/$id.png" ] || continue
+      # The image goes on the line after its claim; --attach rewrites the link.
+      body=$(awk -v c="\`$c\`" -v img="![$id](./$id.png)" '{print} index($0, c) && !done[c]++ {print ""; print img; print ""}' <<<"$body")
+      attach+=(--attach "./$id.png")
+    done
+  fi
+  printf '%s' "$body" > "$RENDERS/body.md"
+  ( cd "$RENDERS" && gh issue create --repo "$REPO" --title "$title" --body-file body.md ${attach[@]+"${attach[@]}"} ) | tail -1 | grep -oE '[0-9]+$'
+}
 set_type() { gh api -X PATCH "repos/$REPO/issues/$1" -f type="$2" --silent 2>/dev/null \
                || echo "  warning: could not set type $2 on #$1 (does the org have that issue type?)"; }
 set_priority() {
@@ -77,8 +115,7 @@ set_priority() {
 
 EPIC=$(jq -r '.epic.number // empty' "$PLAN")
 if [ -z "$EPIC" ]; then
-  EPIC=$(jq -n --slurpfile p "$PLAN" '{title: $p[0].epic.title, body: $p[0].epic.body}' \
-         | gh api -X POST "repos/$REPO/issues" --input - --jq .number)
+  EPIC=$(create_issue "$(jq -r '.epic.title' "$PLAN")" "$(jq -r '.epic.body' "$PLAN")")
   echo "epic #$EPIC"
   set_type "$EPIC" Epic
 fi
@@ -87,7 +124,7 @@ NUMS='{}'   # key -> issue number; JSON, not `declare -A`, which macOS's bash 3.
 num() { jq -r --arg k "$1" '.[$k]' <<<"$NUMS"; }
 for K in $(jq -r '.issues[].key' "$PLAN"); do
   ITEM=$(jq -c --arg k "$K" '.issues[] | select(.key == $k)' "$PLAN")
-  N=$(jq '{title, body}' <<<"$ITEM" | gh api -X POST "repos/$REPO/issues" --input - --jq .number)
+  N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(jq -r .body <<<"$ITEM")")
   NUMS=$(jq -c --arg k "$K" --argjson n "$N" '. + {($k): $n}' <<<"$NUMS")
   echo "  #$N [$K] $(jq -r .title <<<"$ITEM")"
   set_type "$N" "$(jq -r '.type // "Task"' <<<"$ITEM")"

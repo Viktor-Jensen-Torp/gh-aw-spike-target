@@ -18,6 +18,7 @@ imports:
   - uses: shared/postconditions.md
     with:
       role: implement
+  - shared/design-context.md
 
 on:
   label_command:
