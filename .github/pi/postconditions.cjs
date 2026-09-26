@@ -59,15 +59,16 @@ const MAX_VERIFY_BLOCKS = 3;
 
 /**
  * required: each inner array is "any of these".
- * checks:   per-tool payload rules enforced by the shell guard.
+ * checks:   per-tool payload rules enforced by the shell guard. `once` refuses a
+ *           second call; `onlyWith` applies the rule only when that field is sent.
  * verify:   run verify.sh before create_pull_request / push_to_pull_request_branch.
  */
 const ROLES = {
   review: {
     required: [["submit_pull_request_review"], ["create_check_run"]],
     checks: {
-      submit_pull_request_review: { field: "event", allowed: ["COMMENT", "REQUEST_CHANGES"], upper: true },
-      create_check_run: { field: "conclusion", allowed: ["success", "failure"], upper: false },
+      submit_pull_request_review: { field: "event", allowed: ["COMMENT", "REQUEST_CHANGES"], upper: true, once: true },
+      create_check_run: { field: "conclusion", allowed: ["success", "failure"], upper: false, once: true },
     },
   },
   implement: {
@@ -85,7 +86,11 @@ const ROLES = {
   // from a run that decided something and forgot to write it.
   refine: {
     required: [["update_issue", "add_labels", "add_comment", "set_issue_type", "assign_milestone", "set_issue_field", "noop", "report_incomplete", "missing_tool", "missing_data"]],
-    checks: {},
+    // gh-aw appends a body unless the call says `operation: "replace"`
+    // (safe-outputs.md, update-issue), which doubled 3/3 issues in the stress test.
+    checks: {
+      update_issue: { field: "operation", allowed: ["replace"], upper: false, onlyWith: "body" },
+    },
   },
   // Finding nothing to link is the usual answer over a settled backlog, so
   // `noop` counts; finishing with nothing at all does not.
@@ -129,7 +134,7 @@ function log(msg) {
  * Consistency between the review event and the check conclusion is checked in
  * both directions, whichever the agent calls first.
  *
- * @param {Record<string, {field: string, allowed: string[], upper: boolean}>} checks
+ * @param {Record<string, {field: string, allowed: string[], upper: boolean, once?: boolean, onlyWith?: string}>} checks
  * @param {boolean} [verify] run verify.sh before the agent's push-equivalent calls
  * @param {string} [giveUp] what to do once the checks have failed MAX_VERIFY_BLOCKS times
  */
@@ -141,19 +146,26 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
         tool === "submit_pull_request_review"
           ? ` gh-aw silently treats a missing event as COMMENT, which does not block the merge, and keeps only the FIRST review you submit. Put "event" in the JSON or pass --event.`
           : "";
-      return `    ${tool})
+      const once = rule.once
+        ? `
       # gh-aw keeps only the first; a second call is dropped silently.
       if grep -qx "${tool}" "${CALLED_LOG}" 2>/dev/null; then
         echo "BLOCKED by the pipeline: ${tool} was already submitted in this run, and only the first one counts. Do not call it again." >&2
         return 2
-      fi
+      fi`
+        : "";
+      const skip = rule.onlyWith
+        ? `
+      if [ -z "$(printf '%s' "$__payload" | jq -r '.${rule.onlyWith} // empty' 2>/dev/null)" ] && [ -z "$(__pc_flag "${rule.onlyWith}" "$@")" ]; then :; else`
+        : "";
+      return `    ${tool})${once}${skip}
       __v=$(printf '%s' "$__payload" | jq -r '.${rule.field} // empty' 2>/dev/null${norm})
       [ -z "$__v" ] && __v=$(__pc_flag "${rule.field}" "$@"${norm})
       case " ${rule.allowed.join(" ")} " in
         *" $__v "*) __rec="${STATE_DIR}/${tool}.${rule.field}"; __val="$__v" ;;
         *) echo "BLOCKED by the pipeline: ${tool} needs ${rule.field} set to one of: ${rule.allowed.join(", ")} (got: \${__v:-nothing}).${hint} Nothing was submitted; call it again." >&2
            return 2 ;;
-      esac ;;`;
+      esac${rule.onlyWith ? "\n      fi" : ""} ;;`;
     })
     .join("\n");
 
