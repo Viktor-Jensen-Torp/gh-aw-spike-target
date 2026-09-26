@@ -20,7 +20,10 @@ What is true for a user when this whole epic is done, in a sentence or two.
 ## Sources
 
 Where the decisions live, as paths in this repository: the design file, the
-ADRs. When one of these changes, its sub-issues are checked again.
+ADRs. When an ADR or a doc here changes, every sub-issue is checked again. A
+design file is finer: each sub-issue claims its parts under "## Design", and
+only a change inside a claim sends it back; a change no issue claims is
+reported here as new work.
 
 - `design/…`
 - `docs/adr/…`

@@ -9,7 +9,9 @@ name: Back to refinement
 # What counts as a change:
 #   - a person edits the issue, or comments on it;
 #   - a person edits its epic;
-#   - a commit changes a file listed under its epic's "Sources";
+#   - a commit changes a file listed under its epic's "Sources"; for a pen
+#     design file, only a change inside an element the issue claims
+#     (`design.pen#<id>`), found by .github/scripts/design-diff.sh;
 #   - a spike it is blocked by closes (a spike's result is a decision).
 # A blocker that merely closes changes no requirement, so it does not count.
 #
@@ -36,6 +38,10 @@ jobs:
     if: github.event.sender.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+        if: github.event_name == 'push'
+        with:
+          sparse-checkout: .github/scripts
       - name: Take `ready` away from what this change made stale
         env:
           GH_TOKEN: ${{ github.token }}
@@ -88,11 +94,48 @@ jobs:
               case "$BEFORE" in ""|0000000000000000000000000000000000000000) echo "New branch; nothing to compare."; exit 0 ;; esac
               FILES=$(gh api "repos/$REPO/compare/$BEFORE...$AFTER" --jq '.files[].filename')
               [ -n "$FILES" ] || exit 0
-              # Open epics, and the paths listed under their "## Sources".
-              for E in $(gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
-                           --jq '.[] | select(has("pull_request") | not) | select(.type.name == "Epic") | .number'); do
-                SOURCES=$(gh api "repos/$REPO/issues/$E" --jq '.body // ""' \
-                  | awk '/^## /{f=($0 ~ /^## Sources/)} f' | grep -oE '`[^`]+`' | tr -d '`' | grep -v '…' || true)
+              OPEN=$(gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
+                       --jq '.[] | select(has("pull_request") | not) | {number, body: (.body // ""), type: (.type.name // "")}' | jq -s '.')
+
+              # Design files, element by element. An issue claims the parts it
+              # builds as `path#id`; only a change inside a claim sends it back.
+              # Changes no open issue claims are new work: say so on the epics
+              # that list the file, once per version of it.
+              for PEN in $(grep -E '\.pen$' <<<"$FILES" || true); do
+                fetch() { gh api -H "Accept: application/vnd.github.raw" "repos/$REPO/contents/$PEN?ref=$1" 2>/dev/null \
+                            || echo '{"children": []}'; }
+                fetch "$BEFORE" > old.pen; fetch "$AFTER" > new.pen
+                CHANGES=$(bash .github/scripts/design-diff.sh old.pen new.pen)
+                echo "$PEN: $(jq length <<<"$CHANGES") element(s) changed"
+                [ "$(jq length <<<"$CHANGES")" -gt 0 ] || continue
+                CLAIMED='[]'
+                for N in $(jq -r '.[].number' <<<"$OPEN"); do
+                  IDS=$(jq -r --argjson n "$N" '.[] | select(.number == $n) | .body' <<<"$OPEN" \
+                          | { grep -oE '`[^` ]+#[A-Za-z0-9_-]+`' | grep -F "\`$PEN#" || true; } \
+                          | sed -E 's/.*#([A-Za-z0-9_-]+)`/\1/' | jq -R . | jq -sc '.')
+                  [ "$IDS" != "[]" ] || continue
+                  CLAIMED=$(jq -c --argjson a "$CLAIMED" --argjson b "$IDS" -n '$a + $b | unique')
+                  HITS=$(jq -r --argjson ids "$IDS" '[.[] | select(any(.within[]; . as $w | $ids | index($w))) | "\(.change) \(.name)"]
+                                                     | unique | (.[:5] | join(", ")) + (if length > 5 then ", …" else "" end)' <<<"$CHANGES")
+                  [ -z "$HITS" ] || unready "$N" "the design changed where this issue claims it (\`$PEN\` at ${AFTER:0:8}): $HITS."
+                done
+                UNCOVERED=$(jq -r --argjson ids "$CLAIMED" '[.[] | select(any(.within[]; . as $w | $ids | index($w)) | not)
+                                                          | (.path[0] // .name)] | group_by(.) | map("\(.[0]) (\(length))") | join(", ")' <<<"$CHANGES")
+                [ -n "$UNCOVERED" ] || continue
+                BLOB=$(gh api "repos/$REPO/contents/$PEN?ref=$AFTER" --jq .sha 2>/dev/null || echo removed)
+                for E in $(jq -r --arg p "$PEN" '.[] | select(.type == "Epic") | select(.body | contains("`" + $p)) | .number' <<<"$OPEN"); do
+                  MARK="<!-- design-uncovered:$PEN:$BLOB -->"
+                  gh api --paginate "repos/$REPO/issues/$E/comments" --jq '.[].body' | grep -qF "$MARK" && continue
+                  MSG="Design changes in \`$PEN\` (${AFTER:0:8}) that no open issue claims: $UNCOVERED. Run \`/decompose\` to turn them into issues."
+                  gh api -X POST "repos/$REPO/issues/$E/comments" --silent -f body="$(printf '%s\n%s' "$MARK" "$MSG")"
+                  echo "#$E: told of uncovered design changes"
+                done
+              done
+
+              # Other sources, file by file, through the epics' "## Sources".
+              for E in $(jq -r '.[] | select(.type == "Epic") | .number' <<<"$OPEN"); do
+                SOURCES=$(jq -r --argjson e "$E" '.[] | select(.number == $e) | .body' <<<"$OPEN" \
+                  | awk '/^## /{f=($0 ~ /^## Sources/)} f' | grep -oE '`[^`]+`' | tr -d '`' | grep -v -e '…' -e '\.pen' || true)
                 for P in $SOURCES; do
                   # A listed path is a file or a directory: match it, or anything under it.
                   HIT=""

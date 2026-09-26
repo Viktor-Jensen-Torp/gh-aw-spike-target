@@ -64,6 +64,13 @@ point.
 Cover the boundaries you named in **Details**: the empty case, the maximum, the
 bad input. A case nobody could check is not a case.
 
+## Design
+
+Optional. The parts of a design file this issue builds, one per line, as
+`path#id` and the part's name: `` `design.pen#MJtCe` State — Delete Confirmation ``.
+A change inside one of these sends this issue back to refinement; a part no
+issue claims is not built yet.
+
 ## Out of scope
 
 Optional. Anything nearby that this issue deliberately does not cover.

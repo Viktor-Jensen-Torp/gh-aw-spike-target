@@ -23,6 +23,13 @@ Read the source in full, both templates, `.github/conventions/`, `src/` and
 gh issue list --state open --limit 200 --json number,title,body,labels
 ```
 
+For a design file, the ids decide what is new, not your reading:
+`bash .github/scripts/design-claims.sh <path/to/file.pen>` lists every frame
+with the issues whose claim covers it. `UNCLAIMED` frames are the new work;
+claimed ones are already an issue, open or built. After a design change,
+`bash .github/scripts/design-diff.sh <old.pen> <new.pen>` (the old version from
+`git show <rev>:<path>`) lists exactly which parts changed.
+
 Done when you can list every behaviour the source asks for, and mark each one
 as already built, already an issue (by number), or new.
 
@@ -46,6 +53,10 @@ more slices need it first. Every "Done when" case comes from a decision in
 step 2. What the source leaves out goes under the epic's "Out of scope". The
 epic's "Sources" lists the source paths, so a change to them sends its
 sub-issues back to refinement.
+
+Every piece built from a design names the parts it builds under "## Design",
+as `path#id` and the part's name, from the claims list; together the pieces
+claim every new frame.
 
 Record a dependency only where one piece cannot finish without the other, with
 a one-line why. Type each piece `Feature` (new behaviour), `Bug` or `Task`.
