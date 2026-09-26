@@ -95,7 +95,7 @@ const ROLES = {
   // Finding nothing to link is the usual answer over a settled backlog, so
   // `noop` counts; finishing with nothing at all does not.
   relate: {
-    required: [["link_blocked_by", "add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    required: [["link_blocked_by", "unlink_blocked_by", "add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
   },
   // Either it pushed a resolution, or it handed the disagreement to a person.

@@ -1,5 +1,5 @@
-# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"c9c69d642579994cb7147634af05e7bb00f7a9a5af7cf20f72deb7415da2b711","body_hash":"382aafde7c3bf974d1b52e9eb61026c11d51fa6abed126d28d24da3d48b82c12","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
-# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","link_blocked_by","missing_data","missing_tool","noop"]}]}
+# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"c897b9b93e532ccd1697fa4c6cfbccd1ef91f30743bebb0ab8459ee34755e739","body_hash":"a994f3233360c3bf896f7ea86a59f1e2d171642cf75068b8a29866459918d63b","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
+# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","link_blocked_by","missing_data","missing_tool","noop","unlink_blocked_by"]}]}
 # This file was automatically generated by gh-aw (v0.88.7). DO NOT EDIT. To debug this workflow, load the skill at https://github.com/github/gh-aw/blob/main/debug.md
 #
 #    ___                   _   _
@@ -293,7 +293,7 @@ jobs:
           GH_AW_GITHUB_RUN_ID: ${{ github.run_id }}
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
           GH_AW_PROMPT_CONTENT_0000: "<system>\n"
-          GH_AW_PROMPT_CONTENT_0001: "<safe-output-tools>\nTools: add_comment, missing_tool, missing_data, noop, link_blocked_by\n"
+          GH_AW_PROMPT_CONTENT_0001: "<safe-output-tools>\nTools: add_comment, missing_tool, missing_data, noop, link_blocked_by, unlink_blocked_by\n"
           GH_AW_PROMPT_CONTENT_0002: "</safe-output-tools>\n"
           GH_AW_PROMPT_CONTENT_0003: "<github-context>\nThe following GitHub context information is available for this workflow:\n{{#if github.actor}}\n- **actor**: __GH_AW_GITHUB_ACTOR__\n{{/if}}\n{{#if github.repository}}\n- **repository**: __GH_AW_GITHUB_REPOSITORY__\n{{/if}}\n{{#if github.workspace}}\n- **workspace**: __GH_AW_GITHUB_WORKSPACE__\n{{/if}}\n{{#if github.event.issue.number || (github.aw.context.item_type == 'issue' && github.aw.context.item_number)}}\n- **issue-number**: #__GH_AW_EXPR_802A9F6A__\n{{/if}}\n{{#if github.event.discussion.number || (github.aw.context.item_type == 'discussion' && github.aw.context.item_number)}}\n- **discussion-number**: #__GH_AW_EXPR_1A3A194A__\n{{/if}}\n{{#if github.event.pull_request.number || (github.aw.context.item_type == 'pull_request' && github.aw.context.item_number)}}\n- **pull-request-number**: #__GH_AW_EXPR_463A214A__\n{{/if}}\n{{#if github.event.comment.id || github.aw.context.comment_id}}\n- **comment-id**: __GH_AW_EXPR_FF1D34CE__\n{{/if}}\n{{#if github.run_id}}\n- **workflow-run-id**: __GH_AW_GITHUB_RUN_ID__\n{{/if}}\n- **checkouts**: The following repositories have been checked out and are available in the workspace:\n  - repo `__GH_AW_GITHUB_REPOSITORY__` → `$GITHUB_WORKSPACE` (cwd) [shallow clone, fetch-depth=1 (default)] [additional refs fetched: develop]\n  - **Note**: If a branch you need is not in the list above and is not listed as an additional fetched ref, it has NOT been checked out. For private repositories you cannot fetch it. If the branch is required and not available, exit with an error and ask the user to add it to the `fetch:` option of the `checkout:` configuration (e.g., `fetch: [\"refs/pulls/open/*\"]` for all open PR refs, or `fetch: [\"main\", \"feature/my-branch\"]` for specific branches).\n  - **Warning: No git credentials are available to the agent.** Credentials are\n    intentionally removed after the checkout step for security. This means any git\n    operation that needs to authenticate to the remote will fail. In private repositories, that includes:\n    - `git fetch`, `git pull`, `git clone`, and `git push` (direct push, not via safe-output tools)\n    - Checking out or switching to a remote branch that is not already fetched\n    - Deepening a shallow clone (`git fetch --unshallow`)\n    - On-demand blob fetches in partial/blobless clones (operations on files not in the initial checkout)\n    Do NOT attempt to configure credentials, run `git credential fill`, or modify `.gitconfig` —\n    authentication will not succeed. If you encounter credential prompts or authentication errors,\n    stop immediately and report the limitation rather than spending turns trying to work around it.\n</github-context>\n\n"
           GH_AW_PROMPT_CONTENT_0004: "</system>\n"
@@ -302,7 +302,7 @@ jobs:
           GH_AW_PROMPT_CONTENT_0007: ""
           GH_AW_PROMPT_CONTENT_0008: ""
           GH_AW_PROMPT_CONTENT_0009: "## Calling safe outputs on this engine\n\nSafe outputs are **not** tools you can call directly here. Call each one from\nbash as `safeoutputs <tool>`, with a JSON payload on stdin:\n\n```bash\ncat <<'EOF' | safeoutputs <tool> .\n{ ...fields... }\nEOF\n```\n\nDo not probe with `--help` first; the fields are the ones named in these\ninstructions.\n"
-          GH_AW_PROMPT_CONTENT_0010: "# Relate\n\nYou are describing how this repository's open issues depend on each other. You\ndo not judge whether any single issue is good — that is the refiner's job, and\nit has already run. Your question is about the **set**.\n\n## Step 1: Read the backlog\n\n- `/tmp/gh-aw/agent/backlog.json` — every open issue: number, title, labels, and\n  the first part of the body.\n- `/tmp/gh-aw/agent/existing-links.jsonl` — the blocked-by edges that already\n  exist. **Anything already recorded there is done. Do not propose it again.**\n\nRead `src/` and `test/` if you need to know what exists today.\n\n## Step 2: Find the dependencies that are real\n\nRecord an edge with `link_blocked_by` when one issue genuinely **cannot be\nfinished until another is**, for a reason you can state in one sentence:\n\n- it needs a function, file or behaviour that the other issue creates;\n- it changes something the other issue is replacing, so doing it first wastes\n  the work;\n- it asks for a decision the other issue settles.\n\n**Do not record an edge for issues that are merely related, similar, or in the\nsame area.** \"These both touch the dashboard\" is not a dependency. A backlog\nwhere everything blocks something is a backlog nobody can start, and an edge is\na claim that work must wait — the most expensive thing you can say about an\nissue. When you are unsure, say nothing.\n\nNever claim an issue blocks itself, and never record a cycle: if A waits for B,\nB cannot wait for A. Before recording, check the edge you are about to add\nagainst the ones you have already added this run.\n\n## Step 3: Say what is now blocked, once\n\nIf you recorded any edges, add **one** comment with `add_comment`, on the issue\nthat ended up with the most blockers, summarising what now waits on what and\nwhy. One comment per run, not one per edge: the edges are visible on the issues\nthemselves, and this is for whoever reads the backlog next.\n\n## Step 4: Nothing to link is the usual answer\n\nMost runs over a settled backlog should find nothing new. Call `noop` with a\none-line reason. A role that invents a relationship in order to have done\nsomething makes the backlog worse than leaving it alone.\n\n## What you must never do\n\n- Never edit an issue's title or body — that is the refiner's job and yours\n  would overwrite it.\n- Never add or remove labels, close an issue, or touch a pull request.\n- Never record an edge that is already in `existing-links.jsonl`.\n\n"
+          GH_AW_PROMPT_CONTENT_0010: "# Relate\n\nYou are describing how this repository's open issues depend on each other. You\ndo not judge whether any single issue is good — that is the refiner's job, and\nit has already run. Your question is about the **set**.\n\n## Step 1: Read the backlog\n\n- `/tmp/gh-aw/agent/backlog.json` — every open issue not yet merged: number,\n  title, labels, and the first part of the body. Merged issues are already on\n  `develop`; they are not work to wait for, so they are left out.\n- `/tmp/gh-aw/agent/existing-links.jsonl` — the blocked-by edges that already\n  exist, each with `added_by` (`pipeline` or `person`) and `declared` (the issue\n  says `Depends on #N`, and those were linked for you before this run).\n  **Anything already recorded there is done. Do not propose it again.**\n\nRead `src/` and `test/` if you need to know what exists today.\n\n## Step 2: Find the dependencies that are real\n\nRecord an edge with `link_blocked_by` when one issue genuinely **cannot be\nfinished until another is**, for a reason you can state in one sentence:\n\n- it needs a function, file or behaviour that the other issue creates;\n- it changes something the other issue is replacing, so doing it first wastes\n  the work;\n- it asks for a decision the other issue settles.\n\n**Do not record an edge for issues that are merely related, similar, or in the\nsame area.** \"These both touch the dashboard\" is not a dependency. A backlog\nwhere everything blocks something is a backlog nobody can start, and an edge is\na claim that work must wait — the most expensive thing you can say about an\nissue. When you are unsure, say nothing.\n\nNever claim an issue blocks itself, and never record a cycle: if A waits for B,\nB cannot wait for A. Before recording, check the edge you are about to add\nagainst the ones you have already added this run.\n\n## Step 3: Remove what no longer holds\n\nAn existing edge is wrong when its reason no longer holds: the blocked issue was\nrewritten and no longer needs the blocker, or the blocker's scope changed so it\nno longer provides what was needed. Call `unlink_blocked_by` with the reason.\nThe pipeline removes the edge only if it added it; for an edge a person added it\nasks them instead. Leave `declared` edges alone: the issue text decides those.\nBe as careful as when adding: when unsure, leave the edge.\n\n## Step 4: Say what is now blocked, once\n\nIf you recorded or removed any edges, add **one** comment with `add_comment`, on the issue\nthat ended up with the most blockers, summarising what now waits on what and\nwhy. One comment per run, not one per edge: the edges are visible on the issues\nthemselves, and this is for whoever reads the backlog next.\n\n## Step 5: Nothing to change is the usual answer\n\nMost runs over a settled backlog should find nothing new. Call `noop` with a\none-line reason. A role that invents a relationship in order to have done\nsomething makes the backlog worse than leaving it alone.\n\n## What you must never do\n\n- Never edit an issue's title or body — that is the refiner's job and yours\n  would overwrite it.\n- Never add or remove labels, close an issue, or touch a pull request.\n- Never record an edge that is already in `existing-links.jsonl`.\n\n"
         with:
           script: |
             const { setupGlobals } = require(process.env.GH_AW_ACTIONS_DIR + '/setup_globals.cjs');
@@ -395,7 +395,9 @@ jobs:
           retention-days: 1
 
   agent:
-    needs: activation
+    needs:
+      - activation
+      - link_declared
     if: needs.activation.outputs.daily_ai_credits_exceeded != 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -561,7 +563,7 @@ jobs:
           MAX_ISSUES: "60"
           REPO: ${{ github.repository }}
         name: Fetch the backlog and its existing relationships
-        run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/agent\ngh issue list --repo \"$REPO\" --state open --limit \"$MAX_ISSUES\" \\\n  --json number,title,body,labels,createdAt \\\n  --jq \"[ .[]\n          | select([.labels[].name] | any(. == \\\"agentic-workflows\\\") | not)\n          | select(.title | startswith(\\\"[aw]\\\") | not)\n          | {number, title, labels: [.labels[].name],\n             body: (.body // \\\"\\\")[0:1200]} ]\" \\\n  > /tmp/gh-aw/agent/backlog.json\n\n# `blocked_by` edges are written from the blocked issue and read the same\n# way; there is no bulk endpoint, so this is one call per issue.\n: > /tmp/gh-aw/agent/existing-links.jsonl\nfor N in $(jq -r '.[].number' /tmp/gh-aw/agent/backlog.json); do\n  # Fail rather than assume \"no links\": an unreadable edge list would make\n  # the agent propose edges that already exist.\n  BLOCKERS=$(gh api \"repos/$REPO/issues/$N/dependencies/blocked_by\" --jq '[.[].number]')\n  [ \"$BLOCKERS\" = \"[]\" ] || echo \"{\\\"issue\\\":$N,\\\"blocked_by\\\":$BLOCKERS}\" \\\n    >> /tmp/gh-aw/agent/existing-links.jsonl\ndone\n\necho \"backlog: $(jq 'length' /tmp/gh-aw/agent/backlog.json) open issue(s)\"\necho \"already linked: $(wc -l < /tmp/gh-aw/agent/existing-links.jsonl) issue(s) with blockers\""
+        run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/agent\ngh issue list --repo \"$REPO\" --state open --limit \"$MAX_ISSUES\" \\\n  --json number,title,body,labels,createdAt \\\n  --jq \"[ .[]\n          | select([.labels[].name] | any(. == \\\"agentic-workflows\\\" or . == \\\"merged\\\") | not)\n          | select(.title | startswith(\\\"[aw]\\\") | not)\n          | {number, title, labels: [.labels[].name],\n             body: (.body // \\\"\\\")[0:1200]} ]\" \\\n  > /tmp/gh-aw/agent/backlog.json\n\n# Each existing edge, with who added it (GitHub's timeline records the\n# actor: `github-actions` is this pipeline, anyone else is a person) and\n# whether the issue declares it with a `Depends on #N` line.\n# Fail rather than assume \"no links\": an unreadable edge list would make\n# the agent propose edges that already exist.\n: > /tmp/gh-aw/agent/existing-links.jsonl\nfor N in $(jq -r '.[].number' /tmp/gh-aw/agent/backlog.json); do\n  BLOCKERS=$(gh api \"repos/$REPO/issues/$N/dependencies/blocked_by\" --jq '[.[].number]')\n  [ \"$BLOCKERS\" != \"[]\" ] || continue\n  ADDED=$(gh api graphql -F owner=\"${REPO%/*}\" -F name=\"${REPO#*/}\" -F n=\"$N\" -f query='\n    query($owner: String!, $name: String!, $n: Int!) { repository(owner: $owner, name: $name) {\n      issue(number: $n) { timelineItems(itemTypes: [BLOCKED_BY_ADDED_EVENT], last: 100) {\n        nodes { ... on BlockedByAddedEvent { actor { login } blockingIssue { number } } } } } } }' \\\n    --jq '[.data.repository.issue.timelineItems.nodes[] | {key: (.blockingIssue.number | tostring), value: (.actor.login // \"\")}] | from_entries')\n  DECLARED=$(jq -r --argjson n \"$N\" '.[] | select(.number == $n) | .body' /tmp/gh-aw/agent/backlog.json \\\n    | { grep -oiE '^[[:space:]*-]*depends on #[0-9]+' | grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -s '.')\n  jq -nc --argjson n \"$N\" --argjson b \"$BLOCKERS\" --argjson a \"$ADDED\" --argjson d \"$DECLARED\" \\\n    '{issue: $n, blocked_by: [$b[] | {number: ., added_by: (if ($a[tostring] // \"\") == \"github-actions\" then \"pipeline\" else \"person\" end), declared: (. as $x | $d | index($x) != null)}]}' \\\n    >> /tmp/gh-aw/agent/existing-links.jsonl\ndone\n\necho \"backlog: $(jq 'length' /tmp/gh-aw/agent/backlog.json) open issue(s)\"\necho \"already linked: $(wc -l < /tmp/gh-aw/agent/existing-links.jsonl) issue(s) with blockers\""
 
       - name: Download container images
         run: bash "${RUNNER_TEMP}/gh-aw/actions/download_docker_images.sh" ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98 ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5 ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34 ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5 ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53 ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23 ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699
@@ -575,7 +577,7 @@ jobs:
         env:
           GH_AW_FILE_ROOT: "${{ runner.temp }}/gh-aw"
           GH_AW_FILE_CONFIG: "{\"files\":[{\"path\":\"safeoutputs/config.json\",\"content_env\":\"GH_AW_SAFE_OUTPUTS_CONFIG\"}]}"
-          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"add_comment\":{\"max\":1,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"link_blocked_by\":{\"description\":\"Record that one issue cannot start until another is finished. `blocked` is the issue that must wait; `blocker` is the issue it waits for. Both are issue numbers, without the #.\",\"inputs\":{\"blocked\":{\"default\":null,\"description\":\"Number of the issue that cannot start yet\",\"required\":true,\"type\":\"string\"},\"blocker\":{\"default\":null,\"description\":\"Number of the issue it is waiting for\",\"required\":true,\"type\":\"string\"},\"reason\":{\"default\":null,\"description\":\"One sentence: what the blocked issue needs from the blocker\",\"required\":true,\"type\":\"string\"}},\"max\":20,\"output\":\"Recorded the blocked-by edges.\"},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"report_incomplete\":{}}"
+          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"add_comment\":{\"max\":1,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"link_blocked_by\":{\"description\":\"Record that one issue cannot start until another is finished. `blocked` is the issue that must wait; `blocker` is the issue it waits for. Both are issue numbers, without the #.\",\"inputs\":{\"blocked\":{\"default\":null,\"description\":\"Number of the issue that cannot start yet\",\"required\":true,\"type\":\"string\"},\"blocker\":{\"default\":null,\"description\":\"Number of the issue it is waiting for\",\"required\":true,\"type\":\"string\"},\"reason\":{\"default\":null,\"description\":\"One sentence: what the blocked issue needs from the blocker\",\"required\":true,\"type\":\"string\"}},\"max\":20,\"output\":\"Recorded the blocked-by edges.\"},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"report_incomplete\":{},\"unlink_blocked_by\":{\"description\":\"Say that an existing edge is wrong: `blocked` no longer needs to wait for `blocker`. Both are issue numbers, without the #. The pipeline removes the edge only if it added it; otherwise it asks the person who did.\",\"inputs\":{\"blocked\":{\"default\":null,\"description\":\"Number of the issue that is waiting\",\"required\":true,\"type\":\"string\"},\"blocker\":{\"default\":null,\"description\":\"Number of the issue it no longer needs to wait for\",\"required\":true,\"type\":\"string\"},\"reason\":{\"default\":null,\"description\":\"One sentence: why the wait no longer holds\",\"required\":true,\"type\":\"string\"}},\"max\":10,\"output\":\"Handled the edges that no longer hold.\"}}"
         with:
           script: |
             const path = require('path');
@@ -619,6 +621,33 @@ jobs:
                     "type": "object"
                   },
                   "name": "link_blocked_by"
+                },
+                {
+                  "description": "Say that an existing edge is wrong: `blocked` no longer needs to wait for `blocker`. Both are issue numbers, without the #. The pipeline removes the edge only if it added it; otherwise it asks the person who did.",
+                  "inputSchema": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "blocked": {
+                        "description": "Number of the issue that is waiting",
+                        "type": "string"
+                      },
+                      "blocker": {
+                        "description": "Number of the issue it no longer needs to wait for",
+                        "type": "string"
+                      },
+                      "reason": {
+                        "description": "One sentence: why the wait no longer holds",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "blocked",
+                      "blocker",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  "name": "unlink_blocked_by"
                 }
               ]
             }
@@ -1132,7 +1161,9 @@ jobs:
       - agent
       - detection
       - link_blocked_by
+      - link_declared
       - safe_outputs
+      - unlink_blocked_by
     if: >
       always() && (needs.agent.result != 'skipped' || needs.activation.outputs.lockdown_check_failed == 'true' ||
       needs.activation.outputs.oauth_token_check_failed == 'true' || needs.activation.outputs.stale_lock_file_failed == 'true' ||
@@ -1691,6 +1722,47 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
 
+  link_declared:
+    needs: activation
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Configure GH_HOST for enterprise compatibility
+        id: ghes-host-config
+        shell: bash
+        run: | # zizmor: ignore[github-env] - GITHUB_SERVER_URL is set by GitHub Actions, not user input.
+          # Derive GH_HOST from GITHUB_SERVER_URL so the gh CLI targets the correct
+          # GitHub instance (GHES/GHEC). On github.com this is a harmless no-op.
+          GH_HOST="${GITHUB_SERVER_URL#https://}"
+          GH_HOST="${GH_HOST#http://}"
+          echo "GH_HOST=${GH_HOST}" >> "$GITHUB_ENV"
+      - name: Link every "Depends on
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
+            --jq '.[] | select(has("pull_request") | not) | [.number, (.body // "")] | @json' \
+          | while read -r ROW; do
+              N=$(jq -r '.[0]' <<<"$ROW")
+              for B in $(jq -r '.[1]' <<<"$ROW" | { grep -oiE '^[[:space:]*-]*depends on #[0-9]+' | grep -oE '[0-9]+' || true; } | sort -u); do
+                [ "$B" != "$N" ] || continue
+                INFO=$(gh api "repos/$REPO/issues/$B" --jq '{id, state}' 2>/dev/null) || { echo "#$N: #$B not readable"; continue; }
+                [ "$(jq -r '.state' <<<"$INFO")" = "open" ] || { echo "#$N: #$B is closed (done)"; continue; }
+                if gh api "repos/$REPO/issues/$N/dependencies/blocked_by" --jq '.[].number' | grep -qx "$B"; then
+                  continue
+                fi
+                if ERR=$(gh api -X POST "repos/$REPO/issues/$N/dependencies/blocked_by" \
+                           -F issue_id="$(jq -r '.id' <<<"$INFO")" --silent 2>&1); then
+                  echo "#$N is blocked by #$B (declared)"
+                else
+                  echo "#$N: could not link #$B: $ERR"
+                fi
+              done
+            done
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+
   pre_activation:
     runs-on: ubuntu-slim
     env:
@@ -1840,7 +1912,7 @@ jobs:
           GH_AW_ALLOWED_DOMAINS: "api.snapcraft.io,archive.ubuntu.com,azure.archive.ubuntu.com,crl.geotrust.com,crl.globalsign.com,crl.identrust.com,crl.sectigo.com,crl.thawte.com,crl.usertrust.com,crl.verisign.com,crl3.digicert.com,crl4.digicert.com,crls.ssl.com,json-schema.org,json.schemastore.org,keyserver.ubuntu.com,ocsp.digicert.com,ocsp.geotrust.com,ocsp.globalsign.com,ocsp.identrust.com,ocsp.sectigo.com,ocsp.ssl.com,ocsp.thawte.com,ocsp.usertrust.com,ocsp.verisign.com,packagecloud.io,packages.cloud.google.com,packages.microsoft.com,ppa.launchpad.net,s.symcb.com,s.symcd.com,security.ubuntu.com,ts-crl.ws.symantec.com,ts-ocsp.ws.symantec.com,www.googleapis.com"
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_API_URL: ${{ github.api_url }}
-          GH_AW_SAFE_OUTPUT_JOBS: "{\"link_blocked_by\":\"\"}"
+          GH_AW_SAFE_OUTPUT_JOBS: "{\"link_blocked_by\":\"\",\"unlink_blocked_by\":\"\"}"
           GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":1,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"report_incomplete\":{}}"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
@@ -1861,3 +1933,55 @@ jobs:
             /tmp/gh-aw/temporary-id-map.json
             /tmp/gh-aw/safe-output-errors.json
           if-no-files-found: ignore
+
+  unlink_blocked_by:
+    name: Remove a blocked-by dependency that no longer holds
+    needs:
+      - agent
+      - detection
+    if: (!cancelled()) && needs.agent.result != 'skipped' && contains(needs.agent.outputs.output_types, 'unlink_blocked_by')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Download agent output artifact
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: "{agent,agent-output-fallback}"
+          merge-multiple: true
+          path: ${{ runner.temp }}/gh-aw/safe-jobs/
+      - name: Remove or propose
+        run: |
+          set -euo pipefail
+          [ -f "$GH_AW_AGENT_OUTPUT" ] || { echo "no agent output"; exit 0; }
+          while IFS=$'\t' read -r BLOCKED BLOCKER REASON; do
+            case "$BLOCKED$BLOCKER" in *[!0-9]*|"") echo "skip: non-numeric ($BLOCKED, $BLOCKER)"; continue;; esac
+            gh api "repos/$REPO/issues/$BLOCKED/dependencies/blocked_by" --jq '.[].number' | grep -qx "$BLOCKER" \
+              || { echo "skip: #$BLOCKED is not blocked by #$BLOCKER"; continue; }
+            if gh api "repos/$REPO/issues/$BLOCKED" --jq '.body // ""' \
+                 | grep -oiE '^[[:space:]*-]*depends on #[0-9]+' | grep -qE "#$BLOCKER\$"; then
+              echo "kept: #$BLOCKED declares 'Depends on #$BLOCKER'; the issue text decides"; continue
+            fi
+            ACTOR=$(gh api graphql -F owner="${REPO%/*}" -F name="${REPO#*/}" -F n="$BLOCKED" -f query='
+              query($owner: String!, $name: String!, $n: Int!) { repository(owner: $owner, name: $name) {
+                issue(number: $n) { timelineItems(itemTypes: [BLOCKED_BY_ADDED_EVENT], last: 100) {
+                  nodes { ... on BlockedByAddedEvent { actor { login } blockingIssue { number } } } } } } }' \
+              --jq "[.data.repository.issue.timelineItems.nodes[] | select(.blockingIssue.number == $BLOCKER)] | last | .actor.login // \"\"")
+            if [ "$ACTOR" = "github-actions" ]; then
+              ID=$(gh api "repos/$REPO/issues/$BLOCKER" --jq '.id')
+              if ERR=$(gh api -X DELETE "repos/$REPO/issues/$BLOCKED/dependencies/blocked_by/$ID" --silent 2>&1); then
+                echo "#$BLOCKED no longer blocked by #$BLOCKER — $REASON"
+              else
+                echo "could not unlink #$BLOCKED from #$BLOCKER: $ERR"
+              fi
+            else
+              gh api -X POST "repos/$REPO/issues/$BLOCKED/comments" --silent -f body="The linker thinks #$BLOCKER no longer blocks this: $REASON @$ACTOR added the link; remove it if you agree."
+              echo "proposed to @$ACTOR: unlink #$BLOCKED from #$BLOCKER"
+            fi
+          done < <(jq -r '.items[] | select(.type == "unlink_blocked_by")
+                          | [.blocked, .blocker, .reason] | @tsv' "$GH_AW_AGENT_OUTPUT")
+        env:
+          GH_AW_AGENT_OUTPUT: ${{ runner.temp }}/gh-aw/safe-jobs/agent_output.json
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
