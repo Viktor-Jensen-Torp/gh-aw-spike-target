@@ -17,6 +17,9 @@ imports:
   - uses: shared/postconditions.md
     with:
       role: review
+  # gh-aw's own pre-fetch of the diff, metadata and existing review comments,
+  # so the agent spends no turns on it. Pinned to the installed version.
+  - github/gh-aw/.github/workflows/shared/pr-diff-data-fetch.md@v0.88.7
 
 on:
   pull_request:
@@ -82,44 +85,6 @@ engine:
 cache:
   key: pr-prefetch-${{ github.event.pull_request.head.sha }}
   path: /tmp/gh-aw/agent
-
-# Fetch the diff, metadata and existing comments on the runner instead of
-# spending agent turns on it. Adapted from gh-aw's own shared/pr-diff-data-fetch.md;
-# we cannot import that file because it lives in the gh-aw repository.
-pre-agent-steps:
-  - name: Pre-fetch PR diff, metadata and existing review comments
-    env:
-      GH_TOKEN: ${{ github.token }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      EXPR_GITHUB_REPOSITORY: ${{ github.repository }}
-      PR_DIFF_MAX_LINES: "2000"
-    run: |
-      set -euo pipefail
-      mkdir -p /tmp/gh-aw/agent
-      CACHE_HEAD_SHA=""
-      if [ -f /tmp/gh-aw/agent/pr-data-head-sha.txt ]; then
-        CACHE_HEAD_SHA="$(tr -d '\n' < /tmp/gh-aw/agent/pr-data-head-sha.txt)"
-      fi
-      if [ "$PR_HEAD_SHA" = "$CACHE_HEAD_SHA" ] \
-        && [ -f /tmp/gh-aw/agent/pr-diff.patch ] \
-        && [ -f /tmp/gh-aw/agent/pr-meta.json ] \
-        && [ -f /tmp/gh-aw/agent/pr-review-comments.json ]; then
-        echo "Cache hit for head ${PR_HEAD_SHA}"
-      else
-        { gh pr diff "$PR_NUMBER" --repo "$EXPR_GITHUB_REPOSITORY" \
-            --exclude '**/*.lock.yml' || true; } \
-          | head -n "${PR_DIFF_MAX_LINES}" > /tmp/gh-aw/agent/pr-diff.patch
-        gh pr view "$PR_NUMBER" --repo "$EXPR_GITHUB_REPOSITORY" \
-          --json number,title,body,headRefName,headRefOid,additions,deletions,changedFiles,files \
-          > /tmp/gh-aw/agent/pr-meta.json
-        gh api "repos/$EXPR_GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments" --paginate \
-          --jq '.[] | {id, path, line: (.line // .original_line), body: .body[:200], user: .user.login}' \
-          2>/dev/null | jq -s '.' > /tmp/gh-aw/agent/pr-review-comments.json \
-          || echo '[]' > /tmp/gh-aw/agent/pr-review-comments.json
-        printf '%s\n' "$PR_HEAD_SHA" > /tmp/gh-aw/agent/pr-data-head-sha.txt
-        echo "Pre-fetched $(wc -l < /tmp/gh-aw/agent/pr-diff.patch) diff lines for head ${PR_HEAD_SHA}"
-      fi
 
 tools:
   cli-proxy: true

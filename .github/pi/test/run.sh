@@ -77,6 +77,15 @@ new_root
 case_ "check failure first"                            pass  'echo "{\"conclusion\":\"failure\",\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
 case_ "then submit COMMENT (disagrees)"                block 'echo "{\"event\":\"COMMENT\",\"body\":\"x\"}" | safeoutputs submit_pull_request_review .'
 
+echo "== refine replaces an issue body, never appends"
+new_root
+ROLE=refine case_ "body without operation (gh-aw appends)"    block 'echo "{\"issue_number\":1,\"body\":\"x\"}" | safeoutputs update_issue .'
+ROLE=refine case_ "body with operation append"                block 'echo "{\"issue_number\":1,\"body\":\"x\",\"operation\":\"append\"}" | safeoutputs update_issue .'
+ROLE=refine case_ "body with operation replace"               pass  'echo "{\"issue_number\":1,\"body\":\"x\",\"operation\":\"replace\"}" | safeoutputs update_issue .'
+ROLE=refine case_ "second issue in the same run"              pass  'echo "{\"issue_number\":2,\"body\":\"y\",\"operation\":\"replace\"}" | safeoutputs update_issue .'
+ROLE=refine case_ "title only needs no operation"             pass  'echo "{\"issue_number\":3,\"title\":\"t\"}" | safeoutputs update_issue .'
+ROLE=refine case_ "--body with --operation replace"           pass  'safeoutputs update_issue --issue_number 4 --body x --operation replace'
+
 echo "== pass-through"
 new_root
 case_ "unguarded tool keeps its stdin payload"         pass  'echo "{\"path\":\"a.js\",\"line\":1,\"body\":\"b\"}" | safeoutputs create_pull_request_review_comment .'

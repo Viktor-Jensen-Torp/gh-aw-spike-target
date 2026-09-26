@@ -249,7 +249,9 @@ ask for something that is already there or describe it in the wrong terms.
 **Make it ready.** If the issue is nearly there and you can close the gap from
 what is already in the repository, rewrite it into the template's shape with
 `update_issue` and add `ready` with `add_labels`. **Replace the body — do not
-append to it.** The new body is the whole issue, in the template's headings,
+append to it:** pass `"operation": "replace"` in the `update_issue` payload.
+gh-aw appends when it is missing, and the pipeline refuses a body without it.
+The new body is the whole issue, in the template's headings,
 with the author's own words carried into them. Leaving the original text above
 your version doubles the issue and makes an implementer read two specifications
 and guess which one counts. The edit history keeps what was there before. Keep the author's intent and their words where you

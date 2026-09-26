@@ -162,13 +162,24 @@ pre-agent-steps:
       gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
         --jq '.[] | {id, state, user: .user.login, body: .body[:4000]}' \
         | jq -s '.[-5:]' > /tmp/gh-aw/agent/reviews.json
-      gh api "repos/$REPO/pulls/$PR/comments" --paginate \
-        --jq '[.[] | {id, path, line: (.line // .original_line), body: .body[:2000], user: .user.login}]' \
-        > /tmp/gh-aw/agent/review-comments.json
+      # Only findings still open, each with its thread id, so the agent can
+      # reply to and resolve exactly the ones it fixed. REST has no thread ids.
+      gh api graphql --paginate -F owner="${REPO%/*}" -F name="${REPO#*/}" -F pr="$PR" -f query='
+        query($owner: String!, $name: String!, $pr: Int!, $endCursor: String) {
+          repository(owner: $owner, name: $name) { pullRequest(number: $pr) {
+            reviewThreads(first: 50, after: $endCursor) {
+              pageInfo { hasNextPage endCursor }
+              nodes { id isResolved path line originalLine
+                      comments(first: 1) { nodes { databaseId body author { login } } } } } } } }' \
+        --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved | not)
+              | {thread_id: .id, comment_id: .comments.nodes[0].databaseId, path,
+                 line: (.line // .originalLine), body: .comments.nodes[0].body[:2000],
+                 user: .comments.nodes[0].author.login}' \
+        | jq -s '.' > /tmp/gh-aw/agent/review-comments.json
       gh pr view "$PR" --repo "$REPO" \
         --json number,title,body,headRefName,statusCheckRollup \
         > /tmp/gh-aw/agent/pr-meta.json
-      echo "fetched $(jq length /tmp/gh-aw/agent/review-comments.json) review comments"
+      echo "fetched $(jq length /tmp/gh-aw/agent/review-comments.json) open review threads"
 
 tools:
   cli-proxy: true
@@ -204,6 +215,14 @@ safe-outputs:
     check-branch-protection: false
   add-comment:
     max: 1
+  # Close the loop per finding: say what changed on the finding itself, and mark
+  # it resolved, so the next review sees only what is still open.
+  # (safe-outputs-pull-requests.md.) Resolving can be refused to an App token;
+  # gh-aw then skips it with a warning, and the reply still lands.
+  reply-to-pull-request-review-comment:
+    max: 10
+  resolve-pull-request-review-thread:
+    max: 10
   noop:
 
 timeout-minutes: 20
@@ -228,8 +247,9 @@ Do not re-read the issue and start again.
 
 - `/tmp/gh-aw/agent/reviews.json` — the last five reviews, newest last. The most
   recent `CHANGES_REQUESTED` is the one you must answer.
-- `/tmp/gh-aw/agent/review-comments.json` — the inline findings, each with
-  `path`, `line` and `body`. These are the specific things to fix.
+- `/tmp/gh-aw/agent/review-comments.json` — the inline findings still open, each
+  with `path`, `line`, `body`, `comment_id` and `thread_id`. These are the
+  specific things to fix.
 - `/tmp/gh-aw/agent/pr-meta.json` — the pull request and its check results.
 
 ## Step 2: Do the named task
@@ -252,6 +272,12 @@ here comes back as another rejected review and another round — and this round
 has already spent a strike. Commit, then push with
 `push_to_pull_request_branch`, and post one `add_comment` saying what you changed
 and which finding each change answers.
+
+Then, for each inline finding your push fixed: `reply_to_pull_request_review_comment`
+with its `comment_id` and one line saying what changed, and
+`resolve_pull_request_review_thread` with its `thread_id`. Leave a finding you did
+not fix unresolved, and say why in your comment. Do this only after the push
+succeeded.
 
 `push_to_pull_request_branch` runs the same checks itself before accepting. If
 it answers **"BLOCKED by the pipeline"**, nothing was pushed: fix what it names,
