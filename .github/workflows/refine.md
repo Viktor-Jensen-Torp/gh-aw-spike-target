@@ -97,6 +97,7 @@ pre-agent-steps:
       # Skip anything a person or an agent is already working from, anything a
       # previous night judged ready, anything parked on a human decision, and
       # gh-aw's own bookkeeping issues — a failure report is not backlog.
+      # `merged` is work already on `develop`, waiting for its release.
       #
       # `draft` is the author's own opt-out: a half-written reminder they intend
       # to finish later. It is opt-OUT rather than an opt-IN "ready to refine"
@@ -110,7 +111,7 @@ pre-agent-steps:
                 | select([.labels[].name] | any(. == \"ready\" or . == \"implement\"
                     or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
                     or . == \"needs-shape\" or . == \"agentic-workflows\"
-                    or . == \"draft\") | not)
+                    or . == \"draft\" or . == \"merged\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],

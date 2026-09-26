@@ -1,0 +1,52 @@
+name: Merged
+
+# Moves an issue to the `merged` stage when the pull request that fixes it lands
+# on `develop`.
+#
+# `develop` is untrusted, so merged is not done: an issue closes only when its
+# release reaches `main`. But work that depends on it can start, because the
+# code is already on `develop`. This label is how the rest of the pipeline tells
+# "merged, not released" apart from open work.
+#
+# Stage labels say where an issue is, so there is one at a time: `ready` comes
+# off as `merged` goes on.
+#
+# The issues come from the pull request body. gh-aw adds "Fixes #N" to every
+# pull request an issue started (create_pull_request.cjs), and GitHub does not
+# link closing keywords on a pull request into a non-default branch, so the body
+# is the only record. Same pattern as release.yml.
+#
+# GITHUB_TOKEN on purpose: these label writes must start no workflow.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+
+permissions:
+  issues: write
+
+jobs:
+  merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label the issues this pull request fixes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          ISSUES=$(printf '%s' "$BODY" | grep -oiE '(fixes|closes|resolves) #[0-9]+' \
+                   | grep -oE '[0-9]+' | sort -u || true)
+          [ -n "$ISSUES" ] || { echo "No issue named in the body; nothing to label."; exit 0; }
+          for I in $ISSUES; do
+            # Only issues: a closing keyword can also name a pull request.
+            if [ "$(gh api "repos/$REPO/issues/$I" --jq 'has("pull_request")')" = "true" ]; then
+              echo "#$I is a pull request; skipped."; continue
+            fi
+            gh api -X POST "repos/$REPO/issues/$I/labels" -f "labels[]=merged" --silent
+            gh api -X DELETE "repos/$REPO/issues/$I/labels/ready" --silent 2>/dev/null || true
+            echo "#$I: merged"
+          done
