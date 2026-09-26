@@ -285,6 +285,10 @@ at the boundaries, and how anyone would know it works. Do not invent a
 requirement the author did not ask for — if a decision is genuinely the
 author's, that is the next case, not a guess.
 
+**Carry the `## Design` claims over exactly** (`path#id` lines): they are how
+a design change finds this issue. Add or change one only when the author or a
+"Back to refinement" comment says the design moved.
+
 **If it needs another issue done first**, say so under **Details** as a line
 `Depends on #N — why`. Do not link issues yourself: the linker reads these lines
 and records the link.
