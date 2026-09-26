@@ -24,6 +24,9 @@ on:
   label_command:
     name: implement
     events: [issues]
+  # The dispatcher applies the label as the reviewer App, and a bot actor has
+  # no repository role (same grant as rework.md).
+  bots: [gh-aw-spike-reviewer]
 
 concurrency:
   job-discriminator: ${{ github.run_id }}

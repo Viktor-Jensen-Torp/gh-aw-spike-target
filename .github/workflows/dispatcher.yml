@@ -1,0 +1,121 @@
+name: Dispatcher
+
+# Starts work, so the pipeline runs while nobody is watching. Deterministic: the
+# order is decided here, not by an agent.
+#
+# Every 30 minutes, while fewer than MAX_OPEN agent pull requests are open (or
+# being written), it labels the next issues `implement`:
+#   - in the current sprint: the open milestone with the earliest due date;
+#   - `ready`, and not an Epic or a Spike (people own those);
+#   - unblocked: every "blocked by" issue is closed, or `merged` (its code is
+#     on develop already, so dependent work can build on it);
+#   - not already being worked: no open pull request fixes it, and no
+#     `implement` or `needs-human` on it;
+#   - High, Medium, Low, then no priority; oldest first within each.
+# People decide what is in the sprint and how much it matters; this only picks
+# the next thing from what they decided.
+#
+# MAX_PER_DAY bounds the spend: label-started implement runs skip gh-aw's daily
+# AI-credit cap (spec §9.8), so this is the cap.
+#
+# The reviewer App applies the label: the label must start a workflow, which a
+# GITHUB_TOKEN write cannot, and implement.md allows this App by name.
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only say what would be started"
+        type: boolean
+        default: false
+
+concurrency:
+  group: dispatcher
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+
+      - name: Start the next ready issues
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          ACTIONS_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          MAX_OPEN: "2"
+          MAX_PER_DAY: "10"
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+          say() { echo "$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; }
+
+          SPRINT=$(gh api "repos/$REPO/milestones?state=open&sort=due_on&direction=asc" \
+                     --jq '[.[] | select(.due_on != null)][0].title // ""')
+          [ -n "$SPRINT" ] || { say "No current sprint (no open milestone with a due date); nothing to start."; exit 0; }
+
+          # Every label change on any issue starts implement.lock.yml, which then
+          # skips itself; only a run whose agent job did not skip is real work. A
+          # run still deciding counts as real, which errs towards starting less.
+          runs() { GH_TOKEN="$ACTIONS_TOKEN" gh run list --repo "$REPO" --workflow implement.lock.yml --limit 100 \
+                     --json databaseId,status,conclusion "$@"; }
+          real() { GH_TOKEN="$ACTIONS_TOKEN" gh run view "$1" --repo "$REPO" --json jobs \
+                     --jq '[.jobs[] | select(.name == "agent")] | (length == 0 or (.[0].conclusion != "skipped"))'; }
+          count_real() { local n=0; for R in $(jq -r '.[] | select(.conclusion != "skipped") | .databaseId'); do
+                           [ "$(real "$R")" = "true" ] && n=$((n + 1)); done; echo "$n"; }
+
+          # Work in flight: open agent pull requests, plus real implement runs not
+          # finished yet (they have not opened their pull request).
+          OPEN_PRS=$(gh pr list --repo "$REPO" --state open --label agent --json number --jq 'length')
+          RUNNING=$(runs --jq '[.[] | select(.status != "completed")]' | count_real)
+          SLOTS=$(( MAX_OPEN - OPEN_PRS - RUNNING ))
+          TODAY=$(runs --created ">=$(date -u +%Y-%m-%d)" | count_real)
+          LEFT_TODAY=$(( MAX_PER_DAY - TODAY ))
+          [ "$LEFT_TODAY" -lt "$SLOTS" ] && SLOTS="$LEFT_TODAY"
+          say "Sprint \`$SPRINT\`: $OPEN_PRS open agent PR(s), $RUNNING run(s) in flight, $TODAY started today; $SLOTS slot(s)."
+          [ "$SLOTS" -gt 0 ] || exit 0
+
+          # Issues an open pull request says it fixes.
+          FIXING=$(gh pr list --repo "$REPO" --state open --limit 200 --json body --jq '.[].body // ""' \
+            | { grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -sc 'unique')
+
+          CANDIDATES=$(gh api graphql --paginate -F owner="${REPO%/*}" -F name="${REPO#*/}" -f query='
+            query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
+              issues(states: OPEN, labels: ["ready"], first: 100, after: $endCursor) {
+                pageInfo { hasNextPage endCursor }
+                nodes { number title createdAt
+                  milestone { title } issueType { name }
+                  labels(first: 30) { nodes { name } }
+                  issueFieldValues(first: 10) { nodes { ... on IssueFieldSingleSelectValue {
+                    name field { ... on IssueFieldSingleSelect { name } } } } }
+                  blockedBy(first: 50) { nodes { number state labels(first: 30) { nodes { name } } } } } } } }' \
+            --jq '.data.repository.issues.nodes[]' | jq -s -c --arg sprint "$SPRINT" --argjson fixing "$FIXING" '
+              map({number, title, createdAt,
+                   sprint: (.milestone.title // ""), type: (.issueType.name // ""),
+                   labels: [.labels.nodes[].name],
+                   priority: ([.issueFieldValues.nodes[] | select(.field.name? == "Priority") | .name][0] // ""),
+                   waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})
+              | map(select(.sprint == $sprint
+                           and (.type != "Epic" and .type != "Spike")
+                           and ([.labels[] | select(. == "implement" or . == "needs-human" or . == "merged")] | length == 0)
+                           and (.number as $n | $fixing | index($n) | not)
+                           and (.waiting | length == 0)))
+              | sort_by([({"High": 0, "Medium": 1, "Low": 2}[.priority] // 3), .createdAt])')
+          say "Startable: $(jq -r 'map("#\(.number)" + (if .priority != "" then " (\(.priority))" else "" end)) | join(", ") | if . == "" then "none" else . end' <<<"$CANDIDATES")"
+
+          for N in $(jq -r --argjson k "$SLOTS" '.[:$k][].number' <<<"$CANDIDATES"); do
+            if [ "$DRY_RUN" = "true" ]; then say "would start #$N"; continue; fi
+            gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=implement" --silent
+            say "started #$N"
+          done
