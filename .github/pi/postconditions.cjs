@@ -85,7 +85,7 @@ const ROLES = {
   // finishing with no output at all does not, because that is indistinguishable
   // from a run that decided something and forgot to write it.
   refine: {
-    required: [["update_issue", "add_labels", "add_comment", "set_issue_type", "assign_milestone", "set_issue_field", "noop", "report_incomplete", "missing_tool", "missing_data"]],
+    required: [["update_issue", "add_labels", "add_comment", "set_issue_type", "set_issue_field", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     // gh-aw appends a body unless the call says `operation: "replace"`
     // (safe-outputs.md, update-issue), which doubled 3/3 issues in the stress test.
     checks: {

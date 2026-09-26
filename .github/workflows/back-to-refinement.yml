@@ -1,0 +1,109 @@
+name: Back to refinement
+
+# `ready` means "refined, and nothing it rests on has changed since". Whatever
+# changes one of those things takes `ready` away, the moment it happens, with a
+# one-line comment saying what changed. The refiner already works on every
+# issue that is not ready, so it picks these up on its next run: it puts `ready`
+# back if the issue still holds, or rewrites it, or asks.
+#
+# What counts as a change:
+#   - a person edits the issue, or comments on it;
+#   - a person edits its epic;
+#   - a commit changes a file listed under its epic's "Sources";
+#   - a spike it is blocked by closes (a spike's result is a decision).
+# A blocker that merely closes changes no requirement, so it does not count.
+#
+# GITHUB_TOKEN on purpose. Its writes start no workflow, so neither this job's
+# comments nor the refiner's own edits (also GITHUB_TOKEN) come back here as a
+# change. Only issues that are `ready` are touched, which also makes a second
+# trigger for the same change (a sync merge re-pushing a source) a no-op.
+
+on:
+  issues:
+    types: [edited, closed]
+  issue_comment:
+    types: [created]
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  unready:
+    # Changes by bots are the pipeline's own; only people change requirements.
+    if: github.event.sender.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Take `ready` away from what this change made stale
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          ACTOR: ${{ github.event.sender.login }}
+          NUMBER: ${{ github.event.issue.number }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+          CHANGED: ${{ github.event.changes.title != null || github.event.changes.body != null }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+
+          # unready <issue> <reason>: only an open, `ready` issue is touched.
+          unready() {
+            local n="$1" why="$2" info
+            info=$(gh api "repos/$REPO/issues/$n" --jq '{state, ready: ([.labels[].name] | index("ready") != null)}')
+            if [ "$(jq -r '.state' <<<"$info")" != "open" ] || [ "$(jq -r '.ready' <<<"$info")" != "true" ]; then
+              echo "#$n: not open and ready; left alone"; return 0
+            fi
+            gh api -X DELETE "repos/$REPO/issues/$n/labels/ready" --silent
+            gh api -X POST "repos/$REPO/issues/$n/comments" --silent \
+              -f body="Back to refinement: $why"
+            echo "#$n: back to refinement ($why)"
+          }
+          sub_issues() { gh api --paginate "repos/$REPO/issues/$1/sub_issues" --jq '.[] | select(.state == "open") | .number'; }
+
+          case "$EVENT/$ACTION" in
+            issues/edited)
+              [ "$CHANGED" = "true" ] || { echo "Only metadata changed; nothing to do."; exit 0; }
+              unready "$NUMBER" "@$ACTOR edited this issue."
+              for S in $(sub_issues "$NUMBER"); do
+                unready "$S" "@$ACTOR edited its epic #$NUMBER."
+              done ;;
+
+            issue_comment/created)
+              [ "$IS_PR" = "false" ] || { echo "A pull request comment; nothing to do."; exit 0; }
+              unready "$NUMBER" "@$ACTOR commented on this issue." ;;
+
+            issues/closed)
+              TYPE=$(gh api "repos/$REPO/issues/$NUMBER" --jq '.type.name // ""')
+              [ "$TYPE" = "Spike" ] || { echo "Not a spike; a closed blocker changes no requirement."; exit 0; }
+              for D in $(gh api --paginate "repos/$REPO/issues/$NUMBER/dependencies/blocking" --jq '.[].number'); do
+                unready "$D" "the spike it waited on, #$NUMBER, closed. Read its result."
+              done ;;
+
+            push/*)
+              case "$BEFORE" in ""|0000000000000000000000000000000000000000) echo "New branch; nothing to compare."; exit 0 ;; esac
+              FILES=$(gh api "repos/$REPO/compare/$BEFORE...$AFTER" --jq '.files[].filename')
+              [ -n "$FILES" ] || exit 0
+              # Open epics, and the paths listed under their "## Sources".
+              for E in $(gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
+                           --jq '.[] | select(has("pull_request") | not) | select(.type.name == "Epic") | .number'); do
+                SOURCES=$(gh api "repos/$REPO/issues/$E" --jq '.body // ""' \
+                  | awk '/^## /{f=($0 ~ /^## Sources/)} f' | grep -oE '`[^`]+`' | tr -d '`' | grep -v '…' || true)
+                for P in $SOURCES; do
+                  # A listed path is a file or a directory: match it, or anything under it.
+                  HIT=""
+                  while IFS= read -r F; do
+                    if [ "$F" = "$P" ] || [ "${F#"${P%/}/"}" != "$F" ]; then HIT="$F"; break; fi
+                  done <<<"$FILES"
+                  [ -n "$HIT" ] || continue
+                  for S in $(sub_issues "$E"); do
+                    unready "$S" "\`$HIT\`, a source of its epic #$E, changed in ${AFTER:0:8}."
+                  done
+                  break
+                done
+              done ;;
+          esac
