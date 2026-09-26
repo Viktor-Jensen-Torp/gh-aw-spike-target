@@ -19,7 +19,9 @@
 #
 # type: Feature, Task or Bug. priority: High, Medium or Low, set only when the
 # person decided it. Each dependency becomes a native "blocked by" link and a
-# `Depends on #N — why` line under the issue's "## Details".
+# `Depends on #N — why` line under the issue's "## Details". Issues are created
+# blockers first, each complete in one `gh issue create` (--type, --parent,
+# --blocked-by), so nothing is patched afterwards.
 #
 # Design claims in a body (`design.pen#<id>`) are rendered with the pen.dev CLI
 # and attached to the issue as images, below the claims (`gh issue create
@@ -45,13 +47,17 @@ BAD=$(jq -r '[.issues[].key] as $k | .issues[] | .key as $me | (.depends_on // [
 BADV=$(jq -r '.issues[] | select(((.type // "Task") as $t | ["Feature","Task","Bug"] | index($t)) == null
                              or (.priority and ((.priority as $p | ["High","Medium","Low"] | index($p)) == null))) | .key' "$PLAN")
 [ -z "$BADV" ] || { echo "plan: type must be Feature/Task/Bug and priority High/Medium/Low: $BADV"; exit 1; }
-# No cycles: peel off issues whose in-plan dependencies are all peeled, until none are left.
+# No cycles: peel off issues whose in-plan dependencies are all peeled, until
+# none are left. The peeling order is also the creation order: blockers first,
+# so every issue is created with its links already pointing at real numbers.
 LEFT=$(jq -c '[.issues[] | {key, deps: [(.depends_on // [])[] | .key // empty]}]' "$PLAN")
+ORDER=""
 while [ "$(jq 'length' <<<"$LEFT")" -gt 0 ]; do
-  NEXT=$(jq -c '[.[].key] as $keys | map(.deps |= map(select(. as $d | $keys | index($d))))
-                | map(select(.deps | length > 0))' <<<"$LEFT")
-  [ "$(jq 'length' <<<"$NEXT")" -lt "$(jq 'length' <<<"$LEFT")" ] || { echo "plan: dependency cycle among: $(jq -r '[.[].key] | join(", ")' <<<"$LEFT")"; exit 1; }
-  LEFT="$NEXT"
+  READY=$(jq -r '.[] | select(.deps | length == 0) | .key' <<<"$LEFT")
+  [ -n "$READY" ] || { echo "plan: dependency cycle among: $(jq -r '[.[].key] | join(", ")' <<<"$LEFT")"; exit 1; }
+  ORDER="$ORDER $READY"
+  LEFT=$(jq -c --arg r "$READY" '($r | split("\n")) as $done | map(select(.key as $k | $done | index($k) | not))
+                                 | map(.deps |= map(select(. as $d | $done | index($d) | not)))' <<<"$LEFT")
 done
 
 if [ "$DRY" = 1 ]; then
@@ -63,8 +69,6 @@ if [ "$DRY" = 1 ]; then
 fi
 
 # --- write ------------------------------------------------------------------
-issue_id() { gh api "repos/$REPO/issues/$1" --jq .id; }
-
 RENDERS=$(mktemp -d); trap 'rm -rf "$RENDERS"' EXIT
 PEN_OK=0; command -v pen >/dev/null && pen status >/dev/null 2>&1 && PEN_OK=1
 [ "$PEN_OK" = 1 ] || echo "  warning: pen CLI missing or not logged in; issues get no design images"
@@ -76,10 +80,11 @@ render() {
     | pen interactive --in "$file" --out "$RENDERS/scratch.pen" >/dev/null 2>&1 \
     || echo "  warning: could not render $file"
 }
-# create_issue <title> <body>: prints the new issue's number. Claimed design
-# parts get their image linked under the claim, then uploaded by --attach.
+# create_issue <title> <body> [gh flags...]: prints the new issue's number.
+# Claimed design parts get their image linked under the claim, then uploaded
+# by --attach.
 create_issue() {
-  local title="$1" body="$2" claims file attach=()
+  local title="$1" body="$2" claims file attach=(); shift 2
   claims=$(grep -oE '`[^` ]+\.pen#[A-Za-z0-9_-]+`' <<<"$body" | tr -d '`' | sort -u || true)
   if [ "$PEN_OK" = 1 ] && [ -n "$claims" ]; then
     for file in $(cut -d'#' -f1 <<<"$claims" | sort -u); do
@@ -95,7 +100,7 @@ create_issue() {
     done
   fi
   printf '%s' "$body" > "$RENDERS/body.md"
-  ( cd "$RENDERS" && gh issue create --repo "$REPO" --title "$title" --body-file body.md ${attach[@]+"${attach[@]}"} ) | tail -1 | grep -oE '[0-9]+$'
+  ( cd "$RENDERS" && gh issue create --repo "$REPO" --title "$title" --body-file body.md ${attach[@]+"${attach[@]}"} "$@" ) | tail -1 | grep -oE '[0-9]+$'
 }
 set_type() { gh api -X PATCH "repos/$REPO/issues/$1" -f type="$2" --silent 2>/dev/null \
                || echo "  warning: could not set type $2 on #$1 (does the org have that issue type?)"; }
@@ -122,41 +127,32 @@ fi
 
 NUMS='{}'   # key -> issue number; JSON, not `declare -A`, which macOS's bash 3.2 lacks
 num() { jq -r --arg k "$1" '.[$k]' <<<"$NUMS"; }
-for K in $(jq -r '.issues[].key' "$PLAN"); do
+# with_depends <body> <lines>: the `Depends on` lines, first under "## Details".
+with_depends() {
+  [ -n "$2" ] || { printf '%s' "$1"; return; }
+  if grep -q '^## Details' <<<"$1"; then
+    local add; add=$(mktemp); printf '%s' "$2" > "$add"   # macOS awk refuses a multi-line -v value
+    awk -v f="$add" '{print} /^## Details/ && !done {print ""; while ((getline l < f) > 0) print l; done=1}' <<<"$1"
+    rm -f "$add"
+  else
+    printf '%s\n\n## Details\n\n%s' "$1" "$2"
+  fi
+}
+for K in $ORDER; do
   ITEM=$(jq -c --arg k "$K" '.issues[] | select(.key == $k)' "$PLAN")
-  N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(jq -r .body <<<"$ITEM")")
-  NUMS=$(jq -c --arg k "$K" --argjson n "$N" '. + {($k): $n}' <<<"$NUMS")
-  echo "  #$N [$K] $(jq -r .title <<<"$ITEM")"
-  set_type "$N" "$(jq -r '.type // "Task"' <<<"$ITEM")"
-  P=$(jq -r '.priority // empty' <<<"$ITEM"); [ -z "$P" ] || set_priority "$N" "$P"
-  gh api -X POST "repos/$REPO/issues/$EPIC/sub_issues" -F sub_issue_id="$(issue_id "$N")" --silent \
-    || echo "  warning: could not add #$N as a sub-issue of #$EPIC"
-done
-
-# Dependencies last, once every issue has a number.
-for K in $(jq -r '.issues[].key' "$PLAN"); do
-  N=$(num "$K")
-  LINES=""
+  BLOCKERS=""; LINES=""
   # One JSON object per line: tab-separated fields would collapse an empty one.
   while read -r DEP; do
     [ -n "$DEP" ] || continue
-    WHY=$(jq -r '.why' <<<"$DEP")
     B=$(jq -r '.number // empty' <<<"$DEP"); [ -n "$B" ] || B=$(num "$(jq -r '.key' <<<"$DEP")")
-    gh api -X POST "repos/$REPO/issues/$N/dependencies/blocked_by" -F issue_id="$(issue_id "$B")" --silent \
-      && echo "  #$N blocked by #$B" || echo "  warning: could not link #$N blocked by #$B"
-    LINES+="Depends on #$B — $WHY"$'\n'
-  done < <(jq -c --arg k "$K" '.issues[] | select(.key == $k) | (.depends_on // [])[]' "$PLAN")
-  [ -n "$LINES" ] || continue
-  BODY=$(gh api "repos/$REPO/issues/$N" --jq '.body // ""')
-  if grep -q '^## Details' <<<"$BODY"; then
-    # From a file: macOS awk refuses a multi-line -v value.
-    ADD=$(mktemp); printf '%s' "$LINES" > "$ADD"
-    BODY=$(awk -v f="$ADD" '{print} /^## Details/ && !done {print ""; while ((getline l < f) > 0) print l; done=1}' <<<"$BODY")
-    rm -f "$ADD"
-  else
-    BODY="$BODY"$'\n\n## Details\n\n'"$LINES"
-  fi
-  jq -n --arg b "$BODY" '{body: $b}' | gh api -X PATCH "repos/$REPO/issues/$N" --input - --silent
+    BLOCKERS="${BLOCKERS:+$BLOCKERS,}$B"
+    LINES+="Depends on #$B — $(jq -r '.why' <<<"$DEP")"$'\n'
+  done < <(jq -c '(.depends_on // [])[]' <<<"$ITEM")
+  N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")" \
+        --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"})
+  NUMS=$(jq -c --arg k "$K" --argjson n "$N" '. + {($k): $n}' <<<"$NUMS")
+  echo "  #$N [$K] $(jq -r .title <<<"$ITEM")${BLOCKERS:+, blocked by #${BLOCKERS//,/, #}}"
+  P=$(jq -r '.priority // empty' <<<"$ITEM"); [ -z "$P" ] || set_priority "$N" "$P"
 done
 
 echo "Done: https://github.com/$REPO/issues/$EPIC"
