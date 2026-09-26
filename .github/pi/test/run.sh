@@ -163,6 +163,27 @@ out=$(PI_ROLE=review PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" GH_AW_SAFE_OUTPUT
     console.log(`${capped} ${sent.length} ${sent[0] && sent[0].deliverAs}`);
   })();' "$EXT" 2>/dev/null)
 [ "$out" = "2 2 followUp" ] && echo "PASS  two follow-up nudges, then gives up; gh-aw's own record counts" || { echo "FAIL  nudge: got '$out'"; fails=$((fails + 1)); }
+# refine: every candidate ends with a stage label. $1 = candidates JSON, $2 = outputs (one per line).
+refine_end() {
+  new_root; printf '%s' "$1" > "$ROOT/cands.json"; printf '%s\n' "$2" > "$ROOT/outputs.jsonl"
+  PI_ROLE=refine PI_REFINE_CANDIDATES="$ROOT/cands.json" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" \
+    GH_AW_SAFE_OUTPUTS="$ROOT/outputs.jsonl" node -e '
+    const h = {}, sent = []; require("fs").mkdirSync(process.env.PI_POSTCONDITIONS_STATE_DIR, { recursive: true });
+    require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage: m => sent.push(m) });
+    h.agent_end({}).then(() => console.log(sent.length ? sent[0].match(/a stage for [#0-9, ]+/)?.[0] || "nudged" : "none"));' "$EXT" 2>/dev/null
+}
+out=$(refine_end '[{"number":64}]' '{"type":"set_issue_type","issue_number":64}
+{"type":"add_labels","labels":["bug"]}
+{"type":"noop","message":"done"}')
+[ "$out" = "a stage for #64" ] && echo "PASS  refine: run 36266779049 replayed (type, bug, noop, no stage) is nudged" || { echo "FAIL  refine #64 replay: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[{"number":64}]' '{"type":"add_labels","labels":["bug","ready"]}')
+[ "$out" = "none" ] && echo "PASS  refine: one candidate, ready without a number counts" || { echo "FAIL  refine single ready: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[{"number":1},{"number":2}]' '{"type":"add_labels","item_number":1,"labels":["needs-shape"]}
+{"type":"add_labels","labels":["ready"]}')
+[ "$out" = "a stage for #2" ] && echo "PASS  refine: two candidates, an unnumbered label decides neither" || { echo "FAIL  refine two: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[]' '{"type":"noop","message":"quiet night"}')
+[ "$out" = "none" ] && echo "PASS  refine: no candidates, noop is enough" || { echo "FAIL  refine quiet: '$out'"; fails=$((fails + 1)); }
+
 out=$(GH_AW_PHASE=evals PI_ROLE=review node -e 'let n=0; require(process.argv[1])({ on: () => n++ }); console.log(n)' "$EXT" 2>/dev/null)
 [ "$out" = "0" ] && echo "PASS  does nothing in the evals phase" || { echo "FAIL  evals registered $out handlers"; fails=$((fails + 1)); }
 

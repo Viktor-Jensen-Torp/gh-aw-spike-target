@@ -62,6 +62,7 @@ const MAX_VERIFY_BLOCKS = 3;
  * checks:   per-tool payload rules enforced by the shell guard. `once` refuses a
  *           second call; `onlyWith` applies the rule only when that field is sent.
  * verify:   run verify.sh before create_pull_request / push_to_pull_request_branch.
+ * decideEach: every issue in `candidates` must end the run with one of `labels`.
  */
 const ROLES = {
   review: {
@@ -90,6 +91,13 @@ const ROLES = {
     // (safe-outputs.md, update-issue), which doubled 3/3 issues in the stress test.
     checks: {
       update_issue: { field: "operation", allowed: ["replace"], upper: false, onlyWith: "body" },
+    },
+    // Every candidate gets a stage. On #64 the refiner set a type, a label and
+    // Effort, then called noop without `ready` (run 36266779049), so the
+    // dispatcher never saw it. Each candidate is a decision it must record.
+    decideEach: {
+      candidates: process.env.PI_REFINE_CANDIDATES || "/tmp/gh-aw/agent/refine-candidates.json",
+      labels: ["ready", "needs-shape", "needs-split"],
     },
   },
   // Finding nothing to link is the usual answer over a settled backlog, so
@@ -262,6 +270,36 @@ function calledTools() {
   return called;
 }
 
+/** Safe-output items the agent has declared so far, from gh-aw's own record. */
+function declaredItems() {
+  const outputs = process.env.GH_AW_SAFE_OUTPUTS;
+  if (!outputs) return [];
+  try {
+    return fs.readFileSync(outputs, "utf8").split("\n").filter(l => l.trim()).flatMap(l => {
+      try { return [JSON.parse(l)]; } catch { return []; }
+    });
+  } catch { return []; }
+}
+
+/**
+ * Candidates with no stage label yet. A label with no issue number went to the
+ * triggering issue, which is unambiguous only when there is one candidate.
+ * @param {{candidates: string, labels: string[]}} rule
+ * @returns {number[]}
+ */
+function undecided(rule) {
+  let numbers = [];
+  try { numbers = JSON.parse(fs.readFileSync(rule.candidates, "utf8")).map((/** @type {any} */ c) => c.number); } catch { return []; }
+  const decided = new Set();
+  for (const item of declaredItems()) {
+    if (item.type !== "add_labels" || !Array.isArray(item.labels)) continue;
+    if (!item.labels.some((/** @type {string} */ l) => rule.labels.includes(l))) continue;
+    const n = Number(item.item_number ?? item.issue_number ?? (numbers.length === 1 ? numbers[0] : NaN));
+    if (Number.isFinite(n)) decided.add(n);
+  }
+  return numbers.filter(n => !decided.has(n));
+}
+
 /** @param {any} pi */
 function postconditions(pi) {
   // Only the agent run is governed. The evals job also runs Pi and must never be
@@ -292,11 +330,13 @@ function postconditions(pi) {
   pi.on("agent_end", async () => {
     const called = calledTools();
     const missing = spec.required.filter(group => !group.some(tool => called.has(tool)));
-    if (missing.length === 0) {
+    const open = spec.decideEach ? undecided(spec.decideEach) : [];
+    if (missing.length === 0 && open.length === 0) {
       log(`postconditions met (called: ${[...called].join(", ") || "none"})`);
       return;
     }
     const names = missing.map(group => group.join(" or "));
+    if (open.length) names.push(`a stage for #${open.join(", #")}`);
     if (nudges >= MAX_NUDGES) {
       log(`postconditions NOT met after ${nudges} nudge(s); giving up. Missing: ${names.join("; ")}`);
       return;
@@ -307,6 +347,9 @@ function postconditions(pi) {
       const why = group.map(tool => WHY[/** @type {keyof typeof WHY} */ (tool)]).find(Boolean);
       return `- \`${group.join("` or `")}\`${why ? ` — ${why}` : ""}`;
     });
+    if (open.length && spec.decideEach) {
+      lines.push(`- a stage for #${open.join(", #")}: every candidate ends with \`add_labels\` of one of ${spec.decideEach.labels.map(l => `\`${l}\``).join(", ")}, with its \`item_number\`. Nothing else tells the pipeline what you decided.`);
+    }
     pi.sendUserMessage(
       `You stopped before finishing. These required safe outputs have not been called yet:\n${lines.join("\n")}\n\nCall them now. If you genuinely cannot complete the task, call \`noop\` or \`report_incomplete\` with the reason instead.`,
       { deliverAs: "followUp" }
@@ -317,3 +360,4 @@ function postconditions(pi) {
 module.exports = postconditions;
 module.exports.buildGuard = buildGuard;
 module.exports.ROLES = ROLES;
+module.exports.undecided = undecided;
