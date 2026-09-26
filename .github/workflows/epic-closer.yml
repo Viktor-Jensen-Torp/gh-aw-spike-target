@@ -1,0 +1,54 @@
+name: Epic closer
+
+# An epic is done when all its sub-issues are. Its sub-issues close when their
+# release reaches `main`, so this runs on every issue closing and walks up: if
+# the closed issue's parent is an epic with no open sub-issue left, close it,
+# and check that epic's own parent the same way.
+#
+# gh-aw's own example (sub-issue-closer.md) runs an agent for this. It is a
+# count, not a judgement, so here it is a plain step, like the sweeper.
+#
+# Only parents of type `Epic` are closed: a person may use sub-issues for
+# something else. GITHUB_TOKEN, so closing starts no workflow; the walk up the
+# tree is this loop, not a chain of events.
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  issues: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close epics whose sub-issues are all closed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CLOSED: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          N="$CLOSED"
+          for _ in 1 2 3 4 5 6 7 8; do   # GitHub nests sub-issues at most 8 deep
+            PARENT=$(gh api graphql -F owner="${REPO%/*}" -F name="${REPO#*/}" -F n="$N" -f query='
+              query($owner: String!, $name: String!, $n: Int!) { repository(owner: $owner, name: $name) {
+                issue(number: $n) { parent { number state issueType { name }
+                  subIssues(first: 100) { totalCount nodes { state } } } } } }' \
+              --jq '.data.repository.issue.parent')
+            # gh prints nothing, not "null", for a missing parent.
+            [ -n "$PARENT" ] && [ "$PARENT" != "null" ] || { echo "#$N has no parent."; exit 0; }
+            P=$(jq -r '.number' <<<"$PARENT")
+            [ "$(jq -r '.issueType.name // ""' <<<"$PARENT")" = "Epic" ] || { echo "#$P is not an epic; left alone."; exit 0; }
+            [ "$(jq -r '.state' <<<"$PARENT")" = "OPEN" ] || { echo "#$P is already closed."; exit 0; }
+            OPEN=$(jq '[.subIssues.nodes[] | select(.state == "OPEN")] | length' <<<"$PARENT")
+            TOTAL=$(jq '.subIssues.totalCount' <<<"$PARENT")
+            [ "$TOTAL" -le 100 ] || { echo "#$P has more than 100 sub-issues; not counted."; exit 0; }
+            [ "$OPEN" -eq 0 ] || { echo "#$P: $OPEN of $TOTAL sub-issues still open."; exit 0; }
+            gh api -X POST "repos/$REPO/issues/$P/comments" --silent \
+              -f body="All $TOTAL sub-issues are done (released), so this epic is done."
+            gh api -X PATCH "repos/$REPO/issues/$P" -f state=closed -f state_reason=completed --silent
+            echo "#$P: closed, all $TOTAL sub-issues done"
+            N="$P"
+          done
