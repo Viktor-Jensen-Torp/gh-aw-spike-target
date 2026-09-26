@@ -83,12 +83,24 @@ pre-agent-steps:
       # Asked for by name: refine exactly that issue, and skip every filter.
       # The settling period, `draft` and `ready` all exist to decide what to
       # touch UNASKED. A person applying the label has already decided.
+      # Issue types are not in `gh issue list --json`; read them from REST once.
+      gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
+        --jq '.[] | select(has("pull_request") | not) | {(.number | tostring): (.type.name // "")}' \
+        | jq -s 'add // {}' > /tmp/gh-aw/agent/issue-types.json
+      # The current sprint is the open milestone with the earliest due date.
+      SPRINT=$(gh api "repos/$REPO/milestones?state=open&sort=due_on&direction=asc" \
+                 --jq '[.[] | select(.due_on != null)][0].title // ""')
+      echo "current sprint: ${SPRINT:-none}"
+      add_types() { jq --slurpfile t /tmp/gh-aw/agent/issue-types.json \
+                      'map(. + {type: ($t[0][(.number | tostring)] // "")})'; }
+
       if [ -n "${TRIGGERING_ISSUE:-}" ] && [ "$TRIGGERING_ISSUE" != "0" ]; then
         gh issue view "$TRIGGERING_ISSUE" --repo "$REPO" \
-          --json number,title,body,labels,createdAt,comments \
+          --json number,title,body,labels,createdAt,comments,milestone \
           --jq "[ {number, title, body: (.body // \"\")[0:4000],
-                   labels: [.labels[].name], createdAt, comments} ]" \
-          > /tmp/gh-aw/agent/refine-candidates.json
+                   labels: [.labels[].name], createdAt, comments,
+                   milestone: (.milestone.title // \"\")} ]" \
+          | add_types > /tmp/gh-aw/agent/refine-candidates.json
         echo "asked by label: #$TRIGGERING_ISSUE"
         exit 0
       fi
@@ -105,8 +117,10 @@ pre-agent-steps:
       # issue that is never refined, and silent starvation is this pipeline's
       # recurring failure shape. The settling period covers the author who is
       # still typing; `draft` covers the one who has deliberately stopped.
+      # The current sprint's issues first (people committed to those), then the
+      # rest, newest first within each.
       gh issue list --repo "$REPO" --state open --limit 100 \
-        --json number,title,body,labels,createdAt,updatedAt,comments \
+        --json number,title,body,labels,createdAt,updatedAt,comments,milestone \
         --jq "[ .[]
                 | select([.labels[].name] | any(. == \"ready\" or . == \"implement\"
                     or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
@@ -115,11 +129,15 @@ pre-agent-steps:
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],
-                   labels: [.labels[].name], createdAt, comments} ]
-              | sort_by(.createdAt) | reverse | .[0:${MAX_ISSUES}]" \
-        > /tmp/gh-aw/agent/refine-candidates.json
+                   labels: [.labels[].name], createdAt, comments,
+                   milestone: (.milestone.title // \"\")} ]
+              | (map(select(.milestone == \"$SPRINT\" and \"$SPRINT\" != \"\")) | sort_by(.createdAt) | reverse)
+                + (map(select((.milestone == \"$SPRINT\" and \"$SPRINT\" != \"\") | not)) | sort_by(.createdAt) | reverse)
+              | .[0:${MAX_ISSUES}]" \
+        | add_types > /tmp/gh-aw/agent/refine-candidates.json
       echo "candidates (settled before $CUTOFF): $(jq 'length' /tmp/gh-aw/agent/refine-candidates.json)"
-      jq -r '.[] | "  #\(.number) \(.title)"' /tmp/gh-aw/agent/refine-candidates.json
+      jq -r '.[] | "  #\(.number) \(.title)\(if .type != "" then " [\(.type)]" else "" end)\(if .milestone != "" then " (\(.milestone))" else "" end)"' \
+        /tmp/gh-aw/agent/refine-candidates.json
 
 tools:
   cli-proxy: true
@@ -179,13 +197,6 @@ safe-outputs:
     max: 15
     target: "*"
     allowed-fields: [Priority, Effort]
-  # Existing milestones only — no `auto_create`. Deciding that a release exists
-  # and what goes in it is planning, and planning stays with people for the same
-  # reason decomposition does (../pi-github-test ADR 0015). With no milestones
-  # defined, this output simply never fires.
-  assign-milestone:
-    max: 15
-    target: "*"
   # A typed record of what the role decided about each issue, alongside the
   # writes. Modelled on gh-aw's own issue-triage-agent. The point is ADR 0018's:
   # a decision derived from named fields cannot be quietly inconsistent with
@@ -239,7 +250,19 @@ boundary and the code does not settle it, that is a question for the author
 ## Step 1: Read the candidates
 
 `/tmp/gh-aw/agent/refine-candidates.json` holds the issues to consider this run,
-already filtered and capped. Nothing outside that file is your business.
+already filtered, capped, and ordered: the current sprint's issues come first.
+Each has its `type` and `milestone`. Nothing outside that file is your business.
+
+**An issue that was ready before** has a comment starting "Back to refinement:"
+naming what changed (an edit, a changed source file, a closed spike). Read that
+change first and judge the issue against it. If the issue still holds, it is
+already ready. If the change follows clearly from the sources (a rename, a
+decision the spike made), rewrite the issue to match. If the direction itself
+changed and the issue may no longer be wanted, it needs a person.
+
+**An issue of type `Epic`** is never built itself; its sub-issues are. Check it
+against `.github/ISSUE_TEMPLATE/epic.md` instead of `work-item.md`, rewrite it
+into that shape or ask its author, and **never mark an epic `ready`**.
 
 Use `gh` and the repository's files read-only to understand what an issue is
 asking for — read `src/` and `test/` to see what already exists, so you do not
@@ -261,6 +284,10 @@ rewriting their request into your own. State the behaviour wanted, what happens
 at the boundaries, and how anyone would know it works. Do not invent a
 requirement the author did not ask for — if a decision is genuinely the
 author's, that is the next case, not a guess.
+
+**If it needs another issue done first**, say so under **Details** as a line
+`Depends on #N — why`. Do not link issues yourself: the linker reads these lines
+and records the link.
 
 **It is already ready.** Add `ready` and change nothing. This is a common and
 correct outcome.
@@ -293,9 +320,8 @@ For every issue you mark `ready`, also:
   always applies; this is not a judgement call to agonise over.
 - **Add at most one topic label** — `bug`, `enhancement` or `documentation` —
   and only when it is obvious. A label nobody filters on is noise.
-- **Assign a milestone** with `assign_milestone` only if an existing milestone
-  clearly covers this work. Never invent one: deciding that a release exists,
-  and what goes in it, is a person's call. If no milestone fits, assign none.
+- **Never set a milestone.** Milestones are sprints, and what goes in a sprint
+  is decided by people at planning.
 - **Set `Effort`** with `set_issue_field` — `Low` for a change of a few lines in
   one file, `Medium` for one file's worth of real work, `High` for anything you
   would have called `needs-split` if it were any bigger. This is a size
