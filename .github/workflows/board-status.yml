@@ -102,7 +102,8 @@ jobs:
             if [ "$DRY_RUN" = "true" ]; then
               echo "would set #$N: '$(jq -r '.status' <<<"$C")' -> '$WANT'"; continue
             fi
-            gh api graphql -F p="$PID" -F i="$(jq -r '.item' <<<"$C")" -F f="$FID" -F o="$OPT" -f query='
+            # -f, not -F: ids are strings, and -F turns a numeric-looking one into a number.
+            gh api graphql -f p="$PID" -f i="$(jq -r '.item' <<<"$C")" -f f="$FID" -f o="$OPT" -f query='
               mutation($p: ID!, $i: ID!, $f: ID!, $o: String!) {
                 updateProjectV2ItemFieldValue(input: {projectId: $p, itemId: $i, fieldId: $f,
                   value: {singleSelectOptionId: $o}}) { projectV2Item { id } } }' --silent

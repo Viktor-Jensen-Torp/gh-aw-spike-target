@@ -114,7 +114,7 @@ set_priority() {
   node=$(gh api "repos/$REPO/issues/$1" --jq .node_id)
   gh api graphql -f query='mutation($issue: ID!, $field: ID!, $option: ID!) {
       setIssueFieldValue(input: {issueId: $issue, issueFields: [{fieldId: $field, singleSelectOptionId: $option}]}) { issue { id } } }' \
-    -F issue="$node" -F field="$(jq -r .field <<<"$opt")" -F option="$(jq -r .option <<<"$opt")" --silent \
+    -f issue="$node" -f field="$(jq -r .field <<<"$opt")" -f option="$(jq -r .option <<<"$opt")" --silent \
     || echo "  warning: could not set Priority on #$1"
 }
 
