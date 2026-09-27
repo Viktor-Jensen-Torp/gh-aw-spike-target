@@ -80,9 +80,6 @@ pre-agent-steps:
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
 
-      # Asked for by name: refine exactly that issue, and skip every filter.
-      # The settling period, `draft` and `ready` all exist to decide what to
-      # touch UNASKED. A person applying the label has already decided.
       # Issue types are not in `gh issue list --json`; read them from REST once.
       gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
         --jq '.[] | select(has("pull_request") | not) | {(.number | tostring): (.type.name // "")}' \
@@ -94,14 +91,34 @@ pre-agent-steps:
       add_types() { jq --slurpfile t /tmp/gh-aw/agent/issue-types.json \
                       'map(. + {type: ($t[0][(.number | tostring)] // "")})'; }
 
+      one() { gh issue view "$1" --repo "$REPO" \
+                --json number,title,body,labels,createdAt,comments,milestone \
+                --jq "{number, title, body: (.body // \"\")[0:4000],
+                       labels: [.labels[].name], createdAt, comments,
+                       milestone: (.milestone.title // \"\")}"; }
+
+      # Asked for by name: refine exactly that issue, and skip every filter.
+      # The settling period, `draft` and `ready` all exist to decide what to
+      # touch UNASKED. A person applying the label has already decided.
+      #
+      # Asked for on an epic: refine the epic's pieces, which is what "refine
+      # this epic" means (an epic itself is never ready). The epic comes first,
+      # as their context. Pieces already ready, merged or being worked are
+      # left alone; the cap still holds, so a larger epic needs a second run.
       if [ -n "${TRIGGERING_ISSUE:-}" ] && [ "$TRIGGERING_ISSUE" != "0" ]; then
-        gh issue view "$TRIGGERING_ISSUE" --repo "$REPO" \
-          --json number,title,body,labels,createdAt,comments,milestone \
-          --jq "[ {number, title, body: (.body // \"\")[0:4000],
-                   labels: [.labels[].name], createdAt, comments,
-                   milestone: (.milestone.title // \"\")} ]" \
-          | add_types > /tmp/gh-aw/agent/refine-candidates.json
-        echo "asked by label: #$TRIGGERING_ISSUE"
+        if [ "$(jq -r --arg n "$TRIGGERING_ISSUE" '.[$n] // ""' /tmp/gh-aw/agent/issue-types.json)" = "Epic" ]; then
+          PIECES=$(gh api --paginate "repos/$REPO/issues/$TRIGGERING_ISSUE/sub_issues" \
+            --jq '.[] | select(.state == "open")
+                  | select([.labels[].name] | any(. == "ready" or . == "merged" or . == "implement"
+                      or . == "agent" or . == "needs-human") | not) | .number' | head -n $((MAX_ISSUES - 1)))
+          { one "$TRIGGERING_ISSUE"; for N in $PIECES; do one "$N"; done; } | jq -s '.' \
+            | add_types > /tmp/gh-aw/agent/refine-candidates.json
+          echo "asked by label on epic #$TRIGGERING_ISSUE: the epic and $(printf '%s\n' $PIECES | grep -c . || true) piece(s)"
+        else
+          one "$TRIGGERING_ISSUE" | jq -s '.' | add_types > /tmp/gh-aw/agent/refine-candidates.json
+          echo "asked by label: #$TRIGGERING_ISSUE"
+        fi
+        jq -r '.[] | "  #\(.number) \(.title)"' /tmp/gh-aw/agent/refine-candidates.json
         exit 0
       fi
 
@@ -259,6 +276,10 @@ change first and judge the issue against it. If the issue still holds, it is
 already ready. If the change follows clearly from the sources (a rename, a
 decision the spike made), rewrite the issue to match. If the direction itself
 changed and the issue may no longer be wanted, it needs a person.
+
+**When the run was asked for on an epic,** the candidates are that epic and its
+pieces that are not ready yet. Read the epic first: its goal, sources and "Out
+of scope" apply to every piece.
 
 **An issue of type `Epic`** is never built itself; its sub-issues are. Check it
 against `.github/ISSUE_TEMPLATE/epic.md` instead of `work-item.md`, rewrite it
