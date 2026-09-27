@@ -192,8 +192,14 @@ jobs:
 
           case "$VERDICT" in
             block)
-              gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
-              echo "-> needs-rework" ;;
+              # Only agent work is sent back to an agent. On a person's pull
+              # request the review and the red check stand, and they fix it.
+              if gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name' | grep -qx agent; then
+                gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
+                echo "-> needs-rework"
+              else
+                echo "-> blocking; not an agent pull request, so no rework"
+              fi ;;
             pass)
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
               for L in $(gh api "repos/$REPO/issues/$PR/labels" \
