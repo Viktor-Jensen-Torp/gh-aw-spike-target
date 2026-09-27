@@ -8,10 +8,12 @@
 #
 # plan.json:
 #   {
+#     "assignee": "octocat",                                        # optional: who is responsible
 #     "epic": { "title": "Todo lists", "body": "## Goal\n..." },   # or { "number": 70 }
-#     "issues": [
+#     "issues": [                                                   # may be empty: an epic for a later wave
 #       { "key": "store", "title": "...", "body": "## What\n...",
 #         "type": "Task", "priority": "High",                      # both optional
+#         "labels": ["human"], "assignee": "someone",                # optional
 #         "depends_on": [ { "key": "other", "why": "needs its store" },
 #                         { "number": 12, "why": "..." } ] }        # optional
 #     ]
@@ -31,13 +33,14 @@ set -euo pipefail
 
 DRY=0
 [ "${1:-}" = "--dry-run" ] && { DRY=1; shift; }
-case "${1:-}" in -h|--help|"") sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;; esac
+case "${1:-}" in -h|--help|"") awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
 PLAN="$1"
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
 OWNER="${REPO%/*}"; NAME="${REPO#*/}"
 
 # --- check the plan before writing anything --------------------------------
-jq -e '.issues | type == "array" and length > 0' "$PLAN" >/dev/null || { echo "plan: no issues"; exit 1; }
+jq -e '(.issues | type == "array") and ((.issues | length) > 0 or (.epic.number | not))' "$PLAN" >/dev/null \
+  || { echo "plan: no issues (an epic-only plan must create its epic)"; exit 1; }
 jq -e '.epic.number or (.epic.title and .epic.body)' "$PLAN" >/dev/null || { echo "plan: epic needs a number, or a title and a body"; exit 1; }
 DUP=$(jq -r '[.issues[].key] | group_by(.) | map(select(length > 1)[0]) | .[]' "$PLAN")
 [ -z "$DUP" ] || { echo "plan: duplicate keys: $DUP"; exit 1; }
@@ -63,7 +66,7 @@ done
 if [ "$DRY" = 1 ]; then
   echo "Would create in $REPO:"
   jq -r 'if .epic.number then "  epic: existing #\(.epic.number)" else "  epic: \(.epic.title)" end' "$PLAN"
-  jq -r '.issues[] | "    - [\(.key)] \(.title)  (\(.type // "Task")\(if .priority then ", \(.priority)" else "" end))"
+  jq -r '.issues[] | "    - [\(.key)] \(.title)  (\(.type // "Task")\(if .priority then ", \(.priority)" else "" end)\(if .labels then ", " + (.labels | join(",")) else "" end))"
                      + ((.depends_on // []) | map("\n        blocked by " + (if .key then "[\(.key)]" else "#\(.number)" end) + " — \(.why)") | join(""))' "$PLAN"
   exit 0
 fi
@@ -120,7 +123,8 @@ set_priority() {
 
 EPIC=$(jq -r '.epic.number // empty' "$PLAN")
 if [ -z "$EPIC" ]; then
-  EPIC=$(create_issue "$(jq -r '.epic.title' "$PLAN")" "$(jq -r '.epic.body' "$PLAN")")
+  ASSIGNEE=$(jq -r '.assignee // empty' "$PLAN")
+  EPIC=$(create_issue "$(jq -r '.epic.title' "$PLAN")" "$(jq -r '.epic.body' "$PLAN")" ${ASSIGNEE:+--assignee "$ASSIGNEE"})
   echo "epic #$EPIC"
   set_type "$EPIC" Epic
 fi
@@ -148,8 +152,11 @@ for K in $ORDER; do
     BLOCKERS="${BLOCKERS:+$BLOCKERS,}$B"
     LINES+="Depends on #$B — $(jq -r '.why' <<<"$DEP")"$'\n'
   done < <(jq -c '(.depends_on // [])[]' <<<"$ITEM")
+  WHO=$(jq -r --arg d "$(jq -r '.assignee // empty' "$PLAN")" '.assignee // $d' <<<"$ITEM")
+  LABELS=$(jq -r '(.labels // []) | join(",")' <<<"$ITEM")
   N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")" \
-        --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"})
+        --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"} \
+        ${WHO:+--assignee "$WHO"} ${LABELS:+--label "$LABELS"})
   NUMS=$(jq -c --arg k "$K" --argjson n "$N" '. + {($k): $n}' <<<"$NUMS")
   echo "  #$N [$K] $(jq -r .title <<<"$ITEM")${BLOCKERS:+, blocked by #${BLOCKERS//,/, #}}"
   P=$(jq -r '.priority // empty' <<<"$ITEM"); [ -z "$P" ] || set_priority "$N" "$P"
