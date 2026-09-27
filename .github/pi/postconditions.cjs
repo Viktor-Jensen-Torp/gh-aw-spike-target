@@ -289,7 +289,12 @@ function declaredItems() {
  */
 function undecided(rule) {
   let numbers = [];
-  try { numbers = JSON.parse(fs.readFileSync(rule.candidates, "utf8")).map((/** @type {any} */ c) => c.number); } catch { return []; }
+  // Epics are never ready (their sub-issues are), so they need no stage.
+  try {
+    numbers = JSON.parse(fs.readFileSync(rule.candidates, "utf8"))
+      .filter((/** @type {any} */ c) => c.type !== "Epic")
+      .map((/** @type {any} */ c) => c.number);
+  } catch { return []; }
   const decided = new Set();
   for (const item of declaredItems()) {
     if (item.type !== "add_labels" || !Array.isArray(item.labels)) continue;

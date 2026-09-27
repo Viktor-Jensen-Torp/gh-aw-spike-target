@@ -181,6 +181,8 @@ out=$(refine_end '[{"number":64}]' '{"type":"add_labels","labels":["bug","ready"
 out=$(refine_end '[{"number":1},{"number":2}]' '{"type":"add_labels","item_number":1,"labels":["needs-shape"]}
 {"type":"add_labels","labels":["ready"]}')
 [ "$out" = "a stage for #2" ] && echo "PASS  refine: two candidates, an unnumbered label decides neither" || { echo "FAIL  refine two: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[{"number":81,"type":"Epic"},{"number":82,"type":"Task"}]' '{"type":"add_labels","item_number":82,"labels":["ready"]}')
+[ "$out" = "none" ] && echo "PASS  refine: an epic needs no stage" || { echo "FAIL  refine epic: '$out'"; fails=$((fails + 1)); }
 out=$(refine_end '[]' '{"type":"noop","message":"quiet night"}')
 [ "$out" = "none" ] && echo "PASS  refine: no candidates, noop is enough" || { echo "FAIL  refine quiet: '$out'"; fails=$((fails + 1)); }
 
