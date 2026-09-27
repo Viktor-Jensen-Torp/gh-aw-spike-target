@@ -4,3 +4,8 @@ metrics/
 
 # Dev tooling (ESLint, Prettier), installed by `npm ci`.
 node_modules/
+
+# The API's local database, and the browser tests' output.
+apps/api/data/
+test-results/
+playwright-report/

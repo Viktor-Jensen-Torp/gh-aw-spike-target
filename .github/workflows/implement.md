@@ -91,11 +91,14 @@ safe-outputs:
     # Note: arming is best-effort in gh-aw — a failure is only a warning and the
     # PR is still created, so a PR that never merges is a sweeper case.
     auto-merge: squash
-    # gh-aw's glob compiles `src/**/*.js` to ^src/.*/[^/]*\.js$, which does NOT
-    # match a file directly in src/. Use `src/**` for "everything under src/".
+    # Application code, its tests, and the architecture map. gh-aw's glob
+    # compiles `x/**/*.ts` to ^x/.*/[^/]*\.ts$, which misses files directly in
+    # x/, so whole directories are listed. Package manifests and lockfiles stay
+    # refused by gh-aw's protected files even inside these paths.
     allowed-files:
-      - "src/**"
-      - "test/**"
+      - "apps/**"
+      - "packages/**"
+      - "docs/architecture.md"
     # No github-token-for-extra-empty-commit: safe-outputs.github-app already
     # makes the branch push and the PR come from the implementer App, so CI
     # fires on `opened` by itself. The extra commit only added a second
@@ -122,18 +125,19 @@ ${{ github.repository }}. Its sanitized title and body are:
 
 Work in this order:
 
-1. **Read `.github/conventions/index.md` first, and then the document it points
-   at for the kind of change this is.** It is not background reading: it states
-   how code is laid out here, and a pull request that ignores it fails the
-   `conventions` check and cannot merge. Then read the issue and the existing
-   code under `src/` and `test/`, and `package.json` for the commands this
-   repository uses.
+1. **Read `.github/conventions/index.md` first, then the documents it lists
+   under Always and those for the paths you will touch.** It is not background
+   reading: it states how code is laid out and tested here, and a pull request
+   that ignores it fails the checks and cannot merge. Then read the issue and the
+   code the architecture map (`docs/architecture.md`) points you to.
 2. Make the smallest change that satisfies the issue, following those
-   conventions. Touch only `src/**/*.js` and `test/**/*.js`.
-3. Add or update tests for the behaviour you changed.
+   conventions. Touch only `apps/`, `packages/` and `docs/architecture.md`.
+3. Write a test for every case under the issue's "Done when", named after it
+   (`.github/conventions/chain/testing.md`).
 4. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
    it again until it passes**. It runs exactly the checks that gate the pull
-   request (tests, conventions, lint), so a failure you leave here comes back as a
+   request (typecheck, tests, browser tests, lint, conventions), so a failure
+   you leave here comes back as a
    rejected review, a rework round and a second review. Fixing it now costs
    nothing; fixing it later costs three runs.
 5. Commit your changes.
@@ -156,11 +160,12 @@ Work in this order:
 
 Stop and call `noop` with a short reason, without opening a pull request, when:
 
-- the issue does not describe a change to code under `src/` or `test/`;
+- the issue does not describe a change to code under `apps/` or `packages/`;
 - the change needed falls outside those paths.
 
 If the checks still fail after your fix attempts, call `report_incomplete`
 (not `noop`) with what still fails, so a person is told.
 
-Never edit files outside `src/` and `test/`, and do not change `package.json`
-or anything under `.github/`.
+Never edit files outside `apps/`, `packages/` and `docs/architecture.md`, and do
+not change any `package.json`, lockfile or anything under `.github/`. If the work
+needs a new dependency, say so in the pull request instead.
