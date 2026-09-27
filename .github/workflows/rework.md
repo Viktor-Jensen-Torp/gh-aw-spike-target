@@ -79,6 +79,10 @@ on:
         [ "$MEMBER" = "true" ] || stop "gh-aw will not activate this run (is_team_member=$MEMBER); no strike spent."
         PRJSON=$(gh pr view "$PR" --repo "$REPO" --json labels,mergeable,headRefOid,statusCheckRollup)
         LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
+        # Rework fixes agent work only; a person fixes their own pull request.
+        # Its push already requires `agent`; stopping here spends no strike and
+        # no agent run on one it could never push to (PR #107).
+        grep -qx agent <<< "$LABELS" || stop "#$PR is not an agent pull request; its author fixes it."
         CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
         MERGEABLE=$(jq -r '.mergeable' <<< "$PRJSON")
 
