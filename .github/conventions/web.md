@@ -26,8 +26,8 @@ wrong.
   date logic, so the logic is tested without rendering.
 - Every screen state the design shows (loading, empty, error, disabled) is a
   state the component can be put in, and a test puts it there.
-- Routing uses React Router, with one route module per screen under
-  `apps/web/src/routes/`.
+- Routing uses React Router: every screen is one entry in
+  `apps/web/src/routes.tsx`, and its component lives in its feature folder.
 
 ## Forms
 

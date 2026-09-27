@@ -65,5 +65,30 @@ if [ "$BEFORE" != "$AFTER" ] && ! grep -qx 'docs/architecture.md' <<<"$CHANGED";
   FAILED=1
 fi
 
+# --- Documents point at things that exist ------------------------------------
+# chain/principles.md: a document that names a path that does not exist has
+# drifted. Checked: repository paths in backticks, and relative links. Patterns
+# (`*`, `<feature>`, `…`) and URLs are not paths.
+DOCS=$( { find .github/conventions docs -name '*.md' 2>/dev/null; } | sort)
+MISSING=""
+for DOC in $DOCS; do
+  while IFS=: read -r LINE TEXT; do
+    for P in $(grep -oE '`(apps|packages|docs|design|\.github)/[^` ]*`' <<<"$TEXT" | tr -d '`'); do
+      case "$P" in *'*'*|*'<'*|*'>'*|*'…'*|*'{'*) continue ;; esac
+      P="${P%%#*}"; P="${P%[.,;:)]}"
+      [ -e "$P" ] || MISSING+="    $DOC:$LINE: \`$P\`"$'\n'
+    done
+    for L in $(grep -oE '\]\([^)#: ]+(#[^)]*)?\)' <<<"$TEXT" | sed -E 's/^\]\(([^)#]+).*/\1/'); do
+      [ -e "$(dirname "$DOC")/$L" ] || MISSING+="    $DOC:$LINE: link $L"$'\n'
+    done
+  done < <(grep -n -E '`(apps|packages|docs|design|\.github)/|\]\([^)#: ]+' "$DOC" || true)
+done
+if [ -n "$MISSING" ]; then
+  echo "✗ Documents point at things that exist: these do not:"
+  printf '%s' "$MISSING"
+  echo "  Correct the path, or delete the sentence if the thing is gone."
+  FAILED=1
+fi
+
 [ "$FAILED" -eq 0 ] && echo "✓ conventions met"
 exit "$FAILED"
