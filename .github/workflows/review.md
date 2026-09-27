@@ -147,8 +147,18 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           SHA: ${{ github.event.pull_request.head.sha }}
           APP: gh-aw-spike-reviewer
+          # From the event, not a label lookup: on #113 `gh api …/labels | grep`
+          # failed inside an `if`, which bash treats as "no", so an agent
+          # pull request with a red verdict summoned nobody.
+          AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           set -euo pipefail
+          # Fail closed: if any read or label write here errors, send the pull
+          # request to a person and fail this step visibly. A routing step that
+          # fails quietly leaves a blocked pull request that looks like it is
+          # waiting.
+          trap 'echo "::error::routing failed at line $LINENO; labelling needs-human"
+                gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-human" --silent || true' ERR
           # Both verdicts must be about THIS commit, not an older review.
           CHECK=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
             --jq "[.check_runs[] | select(.name == \"Agent review\" and .app.slug == \"$APP\")]
@@ -194,7 +204,7 @@ jobs:
             block)
               # Only agent work is sent back to an agent. On a person's pull
               # request the review and the red check stand, and they fix it.
-              if gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name' | grep -qx agent; then
+              if [ "$AUTHOR" = "gh-aw-spike-implementer[bot]" ]; then
                 gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
                 echo "-> needs-rework"
               else
