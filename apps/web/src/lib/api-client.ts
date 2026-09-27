@@ -14,7 +14,9 @@ export class ApiClientError extends Error {
 
 /**
  * The only place the web app calls the API (web.md, "Data comes through one
- * client"). Every response is parsed with its schema from @tempo/shared.
+ * client"). Every response is parsed with its schema from @tempo/shared, and
+ * every failure, including a response that does not match it, is an
+ * ApiClientError.
  */
 export async function api<T extends z.ZodType>(
   path: string,
@@ -37,5 +39,15 @@ export async function api<T extends z.ZodType>(
         )
       : new ApiClientError(response.status, 'unknown', 'Something went wrong.');
   }
-  return schema.parse(body);
+  // A success that is not what the contract says is the API's fault, not the
+  // caller's: it fails as an ApiClientError like any other failed call.
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) {
+    throw new ApiClientError(
+      response.status,
+      'bad_response',
+      'The server sent an unexpected response.',
+    );
+  }
+  return parsed.data;
 }

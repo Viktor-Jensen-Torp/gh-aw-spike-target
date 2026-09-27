@@ -15,5 +15,8 @@ export default defineConfig({
     // A fresh database for every run of the suite.
     env: { DATABASE_URL: ':memory:' },
     timeout: 60_000,
+    // Show the app's own output, so a server that does not start says why.
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
