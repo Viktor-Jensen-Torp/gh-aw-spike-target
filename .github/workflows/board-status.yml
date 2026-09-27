@@ -22,6 +22,11 @@ name: Board status
 # (gh-aw reference/auth-projects.mdx); the App has org Projects read/write.
 
 on:
+  # After every workflow that changes an issue's stage, since their GITHUB_TOKEN
+  # label writes start nothing themselves. The schedule is a backstop.
+  workflow_run:
+    workflows: [Refine, Implement, Review, Rework, Merged, Back to refinement, Sweeper]
+    types: [completed]
   schedule:
     - cron: "7,37 * * * *"
   issues:
@@ -37,6 +42,7 @@ permissions:
 
 jobs:
   sync:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v3
