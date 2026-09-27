@@ -286,7 +286,8 @@ against `.github/ISSUE_TEMPLATE/epic.md` instead of `work-item.md`, rewrite it
 into that shape or ask its author, and **never mark an epic `ready`**.
 
 Use `gh` and the repository's files read-only to understand what an issue is
-asking for — read `src/` and `test/` to see what already exists, so you do not
+asking for — read `docs/architecture.md` and the code it points to, to see what
+already exists, so you do not
 ask for something that is already there or describe it in the wrong terms.
 
 ## Step 2: For each candidate, do exactly one of these

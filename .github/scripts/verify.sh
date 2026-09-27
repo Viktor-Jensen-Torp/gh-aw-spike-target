@@ -3,7 +3,8 @@
 #
 # Called from two places, so they cannot disagree:
 #   1. CI — each required check runs one step (`--only test`, `--only
-#      conventions`, `--only lint`), so the gate is exactly this list;
+#      conventions`, `--only lint`), so the gate is exactly this list; `test`
+#      is typecheck, unit and component tests, and browser tests;
 #   2. the agent, before its work leaves the run — .github/pi/postconditions.cjs
 #      runs all steps when an implement/rework/unblock agent calls
 #      create_pull_request or push_to_pull_request_branch, and refuses the call
@@ -25,6 +26,11 @@ if [ "${1:-}" = "--only" ]; then
 fi
 BASE="${1:-origin/develop}"
 
+# Playwright's browser lives inside node_modules, so the agent's container,
+# which shares the workspace but cannot download anything, finds the one the
+# runner installed before the agent started (shared/node-runtime.md).
+export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-0}"
+
 STEPS=(test conventions lint)
 case "$ONLY" in
   "") ;;
@@ -38,16 +44,30 @@ esac
 # this before its package.json knows about lint. Where the script exists, the
 # tools are installed if missing (the agent's checkout and a fresh CI runner
 # start without node_modules).
+has_script() { node -e "process.exit(require('./package.json').scripts?.['$1'] ? 0 : 1)" 2>/dev/null; }
+
+# Dependencies, if this checkout has none yet (a fresh CI runner; the agent's
+# checkout when the pre-agent install failed). --ignore-scripts, as gh-aw does
+# for its own installs: no dependency's install script runs, anywhere.
+# Only when there are none: `npm ci` empties node_modules, and with it the
+# Playwright browser the runner put there, which an agent cannot download again.
+ensure_deps() {
+  [ -d node_modules/.bin ] && return 0
+  npm ci --ignore-scripts --no-audit --no-fund --loglevel=error >/dev/null || { echo "npm ci failed"; return 1; }
+}
+
+# Typecheck, unit and component tests, and browser tests: package.json's `test`.
+test_step() {
+  ensure_deps || return 1
+  npm test
+}
+
 lint_step() {
-  if ! node -e 'process.exit(require("./package.json").scripts?.lint ? 0 : 1)' 2>/dev/null; then
+  if ! has_script lint; then
     echo "no \`lint\` script in package.json on this branch — skipped"
     return 0
   fi
-  if [ ! -x node_modules/.bin/eslint ] || [ ! -x node_modules/.bin/prettier ]; then
-    # --ignore-scripts, as gh-aw does for its own installs: no dependency's
-    # install script runs, inside the agent's container or on CI.
-    npm ci --ignore-scripts --no-audit --no-fund --loglevel=error >/dev/null || { echo "npm ci failed"; return 1; }
-  fi
+  ensure_deps || return 1
   if ! npm run --silent lint; then
     echo "Formatting problems fix themselves with: npm run format"
     return 1
@@ -56,7 +76,7 @@ lint_step() {
 
 run_step() {
   case "$1" in
-    test)        npm test ;;
+    test)        test_step ;;
     conventions) bash "$HERE/check-conventions.sh" "$BASE" ;;
     lint)        lint_step ;;
   esac

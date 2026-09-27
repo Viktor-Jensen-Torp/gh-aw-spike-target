@@ -13,7 +13,7 @@ import-schema:
 
 # verify.sh compares against origin/develop. A pull-request checkout does not
 # fetch it, and without it the conventions check reported a function "added" to
-# src/index.js on a pull request that added none (review run 36143201406), which
+# a breach on a pull request that had none (review run 36143201406), which
 # would refuse every rework push. gh-aw's own `fetch` adds it after checkout
 # (reference/checkout.md, "Fetching Additional Refs").
 checkout:

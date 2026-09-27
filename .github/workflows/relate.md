@@ -279,7 +279,8 @@ it has already run. Your question is about the **set**.
   says `Depends on #N`, and those were linked for you before this run).
   **Anything already recorded there is done. Do not propose it again.**
 
-Read `src/` and `test/` if you need to know what exists today.
+Read `docs/architecture.md`, and the code it points to, if you need to know what
+exists today.
 
 ## Step 2: Find the dependencies that are real
 
