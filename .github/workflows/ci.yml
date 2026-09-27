@@ -15,11 +15,26 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # The browser inside node_modules, as for the agents (shared/node-runtime.md).
+      PLAYWRIGHT_BROWSERS_PATH: '0'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
+        if: hashFiles('package-lock.json') != ''
         with:
           node-version: '24'
+          cache: npm
+      - uses: actions/setup-node@v5
+        if: hashFiles('package-lock.json') == ''
+        with:
+          node-version: '24'
+      # Chromium and its system libraries for the browser tests, where this
+      # branch has them (main gets the workspace only with a release).
+      - if: hashFiles('package-lock.json') != ''
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --loglevel=error
+          npx playwright install --with-deps chromium
       # One definition of the checks, shared with the agents' pre-push hook
       # (.github/scripts/verify.sh). Never inline the command here.
       - run: bash .github/scripts/verify.sh --only test

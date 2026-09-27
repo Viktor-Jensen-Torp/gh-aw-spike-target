@@ -125,7 +125,7 @@ safe-outputs:
     signed-commits: false
     # No `allowed-files`, and that is forced rather than chosen. The allowlist is
     # evaluated against the WHOLE patch, and a merge patch legitimately contains
-    # everything the base branch changed — so `[src/**, test/**]` rejected a
+    # everything the base branch changed — so an allowlist of source paths rejected a
     # correct resolution that had touched nothing else (run 35800087449
     # resolved both files and passed all 25 tests, then could not push).
     # `allowed-files` and merging are incompatible; this is not configurable

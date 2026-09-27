@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+
+/* The design's variables (design/tempo.pen), as theme tokens: `bg-surface`,
+   `text-muted`, `border-border`… Components use tokens, never these values
+   (web.md, "Styling"). */
+@theme {
+  --color-bg: #f6f6f4;
+  --color-surface: #ffffff;
+  --color-border: #e4e3df;
+  --color-text: #191917;
+  --color-muted: #6f6e69;
+  --color-faint: #a3a29b;
+  --color-accent: #2f5d3a;
+  --color-accent-soft: #e8f0e9;
+  --color-danger: #b3261e;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
