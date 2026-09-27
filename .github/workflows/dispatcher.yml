@@ -22,6 +22,13 @@ name: Dispatcher
 # GITHUB_TOKEN write cannot, and implement.md allows this App by name.
 
 on:
+  # As soon as something may have become startable or a slot may have freed:
+  # an issue made ready, a link changed, a run finished, a pull request merged.
+  # The schedule is only a backstop: GitHub delays and drops scheduled runs
+  # (the 30-minute sweeper ran at 12:22, 16:37, 19:36 on 2026-09-26).
+  workflow_run:
+    workflows: [Refine, Relate, Implement, Merged]
+    types: [completed]
   schedule:
     - cron: "17,47 * * * *"
   workflow_dispatch:
@@ -41,6 +48,9 @@ permissions:
 
 jobs:
   dispatch:
+    # Every issue label change starts Implement, which then skips; those
+    # completions change nothing.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v3
