@@ -21,6 +21,9 @@ wrong.
 
 ## Components
 
+- Screens are built from the shared components (`components.md`): reuse one,
+  never rebuild it inside a feature. A part the design repeats that has no
+  shared component yet is a `Component` issue first.
 - A feature's screen state lives in a hook next to it (`use-tasks.ts`); the
   component renders what the hook returns. Keep components free of API and
   date logic, so the logic is tested without rendering.

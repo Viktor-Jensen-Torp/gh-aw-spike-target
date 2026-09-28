@@ -32,5 +32,21 @@ playwright-cli snapshot
 - If the app does not start, say so in your output (the pull request or review
   body) with the last lines of `/tmp/app.log`. Never skip this silently.
 - Before running `verify.sh` and before you finish: `playwright-cli close`, then
-  `pkill -f 'concurrently|vite|tsx watch' || true`. A server left running
-  changes what the browser tests start.
+  `pkill -f 'concurrently|vite|tsx watch|storybook' || true`. A server left
+  running changes what the browser tests start.
+
+**A shared component** (`src/components/`) is looked at in Storybook, one story
+at a time, instead of in the app:
+
+```bash
+npm run storybook > /tmp/storybook.log 2>&1 &
+curl --fail --silent --retry 30 --retry-connrefused --retry-all-errors \
+  --retry-max-time 90 http://127.0.0.1:6006/ >/dev/null \
+  || { echo "STORYBOOK DID NOT START"; tail -n 40 /tmp/storybook.log; }
+playwright-cli open --browser=chromium "http://127.0.0.1:6006/iframe.html?id=<story-id>&viewMode=story"
+playwright-cli snapshot
+```
+
+A story's id is its title and name in kebab case, joined by `--`
+(`components-button--with-icon`); the list is at
+`http://127.0.0.1:6006/index.json`.
