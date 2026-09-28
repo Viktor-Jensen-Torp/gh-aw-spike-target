@@ -1,8 +1,8 @@
 ---
 description: >
-  Node access, version and dev dependencies for the three roles that write
-  code (implement, rework, unblock). Byte-identical in all three before this
-  import existed, so no `import-schema` parameter is needed.
+  Node access, version and dev dependencies for the roles that write code
+  (implement, rework, unblock) and for review, which runs the app to look at it
+  (shared/browser.md). No `import-schema` parameter is needed.
 
 network:
   allowed:

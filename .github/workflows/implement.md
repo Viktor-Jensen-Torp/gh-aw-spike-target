@@ -20,6 +20,7 @@ imports:
       role: implement
   - shared/design-context.md
   - shared/issue-context.md
+  - shared/browser.md
 
 on:
   label_command:
