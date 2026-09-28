@@ -19,6 +19,7 @@ imports:
   - shared/threat-detection.md
   - shared/graders.md
   - shared/node-runtime.md
+  - shared/browser.md
   - uses: shared/github-app.md
     with:
       app_prefix: IMPLEMENTER
