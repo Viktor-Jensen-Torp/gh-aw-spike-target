@@ -1,18 +1,20 @@
 ---
 name: Work item
-about: Something you want built or changed. Rough is fine — the refiner fills in the gaps overnight.
+about: Something you want built or changed. Rough is fine — add needs-refinement and the refiner fills in the gaps overnight.
 title: ""
 labels: []
 ---
 
 <!--
-This is the shape of a ready issue. Write as much or as little as you like:
-leave headings empty and the refiner will fill them in, or add the `draft`
-label if this is a reminder you intend to finish yourself later.
+This is the shape of a refined issue. Write as much or as little as you like.
+Without a stage label an issue is a draft, and nothing touches it. Add
+`needs-refinement` when you want the refiner to fill in the gaps; it marks the
+issue `refined`, and you set `ready` once you agree. `paused` stops it wherever
+it is.
 
-The refiner reads THIS FILE to know what a ready issue looks like, so these
-headings are the single definition of "ready". Change them here and the refiner
-follows.
+The refiner reads THIS FILE to know what a refined issue looks like, so these
+headings are the single definition of "refined". Change them here and the
+refiner follows.
 -->
 
 ## What

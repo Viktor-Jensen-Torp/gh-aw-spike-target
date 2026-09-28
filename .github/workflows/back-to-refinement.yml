@@ -1,10 +1,11 @@
 name: Back to refinement
 
-# `ready` means "refined, and nothing it rests on has changed since". Whatever
-# changes one of those things takes `ready` away, the moment it happens, with a
-# one-line comment saying what changed. The refiner already works on every
-# issue that is not ready, so it picks these up on its next run: it puts `ready`
-# back if the issue still holds, or rewrites it, or asks.
+# `refined` and `ready` mean "and nothing it rests on has changed since".
+# Whatever changes one of those things takes both away and puts
+# `needs-refinement` on, the moment it happens, with a one-line comment saying
+# what changed. The refiner picks it up on its next run: it marks it `refined`
+# again if the issue still holds, or rewrites it, or asks; a person then
+# confirms `ready` again.
 #
 # What counts as a change:
 #   - a person edits the issue, or comments on it;
@@ -17,8 +18,9 @@ name: Back to refinement
 #
 # GITHUB_TOKEN on purpose. Its writes start no workflow, so neither this job's
 # comments nor the refiner's own edits (also GITHUB_TOKEN) come back here as a
-# change. Only issues that are `ready` are touched, which also makes a second
-# trigger for the same change (a sync merge re-pushing a source) a no-op.
+# change. Only issues that are `refined` or `ready` are touched, which also
+# makes a second trigger for the same change (a sync merge re-pushing a source)
+# a no-op.
 
 on:
   issues:
@@ -42,7 +44,7 @@ jobs:
         if: github.event_name == 'push'
         with:
           sparse-checkout: .github/scripts
-      - name: Take `ready` away from what this change made stale
+      - name: Send what this change made stale back to refinement
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -57,14 +59,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          # unready <issue> <reason>: only an open, `ready` issue is touched.
+          # unready <issue> <reason>: only an open, `refined` or `ready` issue
+          # is touched.
           unready() {
             local n="$1" why="$2" info
-            info=$(gh api "repos/$REPO/issues/$n" --jq '{state, ready: ([.labels[].name] | index("ready") != null)}')
-            if [ "$(jq -r '.state' <<<"$info")" != "open" ] || [ "$(jq -r '.ready' <<<"$info")" != "true" ]; then
-              echo "#$n: not open and ready; left alone"; return 0
+            info=$(gh api "repos/$REPO/issues/$n" --jq '{state, staged: ([.labels[].name] | any(. == "ready" or . == "refined"))}')
+            if [ "$(jq -r '.state' <<<"$info")" != "open" ] || [ "$(jq -r '.staged' <<<"$info")" != "true" ]; then
+              echo "#$n: not open and refined or ready; left alone"; return 0
             fi
-            gh api -X DELETE "repos/$REPO/issues/$n/labels/ready" --silent
+            gh api -X DELETE "repos/$REPO/issues/$n/labels/ready" --silent 2>/dev/null || true
+            gh api -X DELETE "repos/$REPO/issues/$n/labels/refined" --silent 2>/dev/null || true
+            gh api -X POST "repos/$REPO/issues/$n/labels" -f "labels[]=needs-refinement" --silent
             gh api -X POST "repos/$REPO/issues/$n/comments" --silent \
               -f body="Back to refinement: $why"
             echo "#$n: back to refinement ($why)"

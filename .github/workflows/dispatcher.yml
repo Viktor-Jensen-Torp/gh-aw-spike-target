@@ -6,8 +6,10 @@ name: Dispatcher
 # Every 30 minutes, while fewer than MAX_OPEN agent pull requests are open (or
 # being written), it labels the next issues `implement`:
 #   - in the current sprint: the open milestone with the earliest due date;
-#   - `ready`, and not an Epic or a Spike, and not labelled `human` (people
-#     do those themselves; the assignee is who is responsible, not who works);
+#   - `ready` (set by a person, after the refiner marked it `refined`), and not
+#     an Epic or a Spike, and not labelled `human` (people do those themselves;
+#     the assignee is who is responsible, not who works) or `paused` (a person
+#     stopped it for now, without taking it out of the sprint);
 #   - unblocked: every "blocked by" issue is closed, or `merged` (its code is
 #     on develop already, so dependent work can build on it);
 #   - not already being worked: no open pull request fixes it, and no
@@ -119,7 +121,7 @@ jobs:
                    waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})
               | map(select(.sprint == $sprint
                            and (.type != "Epic" and .type != "Spike")
-                           and ([.labels[] | select(. == "implement" or . == "needs-human" or . == "merged" or . == "human")] | length == 0)
+                           and ([.labels[] | select(. == "implement" or . == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)
                            and (.number as $n | $fixing | index($n) | not)
                            and (.waiting | length == 0)))
               | sort_by([({"High": 0, "Medium": 1, "Low": 2}[.priority] // 3), .createdAt])')
