@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Db } from './db/client.ts';
 import { registerErrorHandling } from './lib/errors.ts';
+import { registerHealthRoutes } from './features/health/routes.ts';
 
 export interface AppOptions {
   db: Db;
@@ -15,6 +16,7 @@ export async function buildApp({
   const app = Fastify({ logger });
   app.decorate('db', db);
   registerErrorHandling(app);
+  app.register(registerHealthRoutes, { prefix: '/api' });
   // Features register their routes here: app.register(tasksRoutes, { prefix: "/api" }).
   return app;
 }
