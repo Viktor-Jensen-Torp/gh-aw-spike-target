@@ -32,5 +32,11 @@ the paths you will touch.
 | `apps/api/**` | [api.md](api.md) |
 | `packages/shared/**` | [shared.md](shared.md) |
 
+## Writing issues
+
+| Read | For |
+|---|---|
+| [chain/issues.md](chain/issues.md) | How an issue is filled in: Done when, boundaries, design claims, dependencies, type, effort, priority. Read by the refiner and `/decompose` |
+
 `chain/` is the same in every project that uses this pipeline and is updated with
 it; the other documents are this project's own.
