@@ -119,8 +119,10 @@ jobs:
             LABELS=$(_ '[.labels[].name] | join(",")')
             echo "--- PR #$PR sha=${SHA:0:8} mergeable=$MERGEABLE labels=$LABELS"
 
-            # A pull request a person is already holding is not ours to touch.
-            case ",$LABELS," in *,needs-human,*) n_skipped=$((n_skipped+1)); continue;; esac
+            # A pull request a person is already holding, or has paused, is not
+            # ours to touch. When `paused` comes off, the next sweep picks it up
+            # again: that is how a paused pull request resumes.
+            case ",$LABELS," in *,needs-human,*|*,paused,*) n_skipped=$((n_skipped+1)); continue;; esac
 
             # 1. Conflicted. A conflict's first responder is unblock.md, sent
             #    by unblock-detect.yml on the push that caused it. This is the

@@ -1,7 +1,7 @@
 ---
 emoji: "✏️"
-description: Moves open issues toward ready — clear enough to start without asking a question, small enough to review.
-intent: Let a person write an issue the way they think, and have it be implementable by morning, without a person rewriting it.
+description: Refines the issues a person marked `needs-refinement` until they are clear enough to start and small enough to review, and marks them `refined` for a person to confirm as `ready`.
+intent: Let a person write an issue the way they think, ask for it to be refined, and find it implementable by morning, without a person rewriting it.
 
 
 inlined-imports: true
@@ -71,9 +71,9 @@ pre-agent-steps:
       # thrown away with no error anywhere.
       MAX_ISSUES: "15"
       # Leave an issue alone until its author has stopped typing. Rewriting a
-      # body someone is still working on is worse than leaving it rough, and a
-      # settling period buys that without asking anyone to remember a label —
-      # an issue nobody remembers to mark would simply never be refined.
+      # body someone is still working on is worse than leaving it rough; an
+      # edit puts `needs-refinement` back on (back-to-refinement.yml) while the
+      # person may still be mid-thought.
       SETTLE_HOURS: ${{ inputs.settle_hours || '4' }}
       TRIGGERING_ISSUE: ${{ github.event.issue.number }}
     run: |
@@ -98,19 +98,19 @@ pre-agent-steps:
                        milestone: (.milestone.title // \"\")}"; }
 
       # Asked for by name: refine exactly that issue, and skip every filter.
-      # The settling period, `draft` and `ready` all exist to decide what to
-      # touch UNASKED. A person applying the label has already decided.
+      # The settling period and the stage labels exist to decide what to touch
+      # on a schedule. A person applying the label has already decided.
       #
       # Asked for on an epic: refine the epic's pieces, which is what "refine
       # this epic" means (an epic itself is never ready). The epic comes first,
-      # as their context. Pieces already ready, merged or being worked are
+      # as their context. Pieces already refined, ready, merged, paused or being worked are
       # left alone; the cap still holds, so a larger epic needs a second run.
       if [ -n "${TRIGGERING_ISSUE:-}" ] && [ "$TRIGGERING_ISSUE" != "0" ]; then
         if [ "$(jq -r --arg n "$TRIGGERING_ISSUE" '.[$n] // ""' /tmp/gh-aw/agent/issue-types.json)" = "Epic" ]; then
           PIECES=$(gh api --paginate "repos/$REPO/issues/$TRIGGERING_ISSUE/sub_issues" \
             --jq '.[] | select(.state == "open")
-                  | select([.labels[].name] | any(. == "ready" or . == "merged" or . == "implement"
-                      or . == "agent" or . == "needs-human") | not) | .number' | head -n $((MAX_ISSUES - 1)))
+                  | select([.labels[].name] | any(. == "ready" or . == "refined" or . == "merged" or . == "implement"
+                      or . == "agent" or . == "needs-human" or . == "paused") | not) | .number' | head -n $((MAX_ISSUES - 1)))
           { one "$TRIGGERING_ISSUE"; for N in $PIECES; do one "$N"; done; } | jq -s '.' \
             | add_types > /tmp/gh-aw/agent/refine-candidates.json
           echo "asked by label on epic #$TRIGGERING_ISSUE: the epic and $(printf '%s\n' $PIECES | grep -c . || true) piece(s)"
@@ -123,26 +123,20 @@ pre-agent-steps:
       fi
 
       CUTOFF=$(date -u -d "-${SETTLE_HOURS} hours" +%Y-%m-%dT%H:%M:%SZ)
-      # Skip anything a person or an agent is already working from, anything a
-      # previous night judged ready, anything parked on a human decision, and
-      # gh-aw's own bookkeeping issues — a failure report is not backlog.
-      # `merged` is work already on `develop`, waiting for its release.
-      #
-      # `draft` is the author's own opt-out: a half-written reminder they intend
-      # to finish later. It is opt-OUT rather than an opt-IN "ready to refine"
-      # label on purpose — with opt-in, an issue nobody remembers to mark is an
-      # issue that is never refined, and silent starvation is this pipeline's
-      # recurring failure shape. The settling period covers the author who is
-      # still typing; `draft` covers the one who has deliberately stopped.
+      # Only what a person asked for: `needs-refinement`, put on by them or by
+      # back-to-refinement.yml when something the issue rests on changed. An
+      # issue with no stage label is a draft and is left alone. Opt-in on
+      # purpose (2026-09-28): people decide what is worth refining and confirm
+      # `ready` themselves; the board's "Draft" column shows what nobody has
+      # asked for yet, so nothing starves unseen. The settling period covers the
+      # author who is still typing. `paused` is a person's stop button.
       # The current sprint's issues first (people committed to those), then the
       # rest, newest first within each.
-      gh issue list --repo "$REPO" --state open --limit 100 \
+      gh issue list --repo "$REPO" --state open --limit 100 --label needs-refinement \
         --json number,title,body,labels,createdAt,updatedAt,comments,milestone \
         --jq "[ .[]
-                | select([.labels[].name] | any(. == \"ready\" or . == \"implement\"
-                    or . == \"agent\" or . == \"needs-human\" or . == \"needs-split\"
-                    or . == \"needs-shape\" or . == \"agentic-workflows\"
-                    or . == \"draft\" or . == \"merged\") | not)
+                | select([.labels[].name] | any(. == \"implement\" or . == \"agent\"
+                    or . == \"needs-human\" or . == \"merged\" or . == \"paused\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],
@@ -197,7 +191,13 @@ safe-outputs:
     # A scheduled run has no triggering issue, so the default `triggering`
     # target would have nothing to act on.
     target: "*"
-    allowed: [ready, needs-shape, needs-split, bug, enhancement, documentation]
+    # Never `ready`: that is a person's confirmation of `refined`.
+    allowed: [refined, needs-shape, needs-split, bug, enhancement, documentation]
+  # The request is answered once the issue is refined, questioned or split.
+  remove-labels:
+    max: 15
+    target: "*"
+    allowed: [needs-refinement]
   # What kind of work this is. The org defines Task, Bug and Feature; an issue
   # type is a typed field, unlike a label, so it is the better home for a
   # classification the pipeline may later read.
@@ -240,16 +240,16 @@ timeout-minutes: 25
 You are preparing this repository's backlog so that an implementing agent can
 start on an issue tomorrow without asking anyone a question.
 
-**Ready** means two things at once:
+**Refined** means two things at once:
 
 - **Clear** — someone could start without asking a question. The behaviour
   wanted is stated, including what should happen at the edges, and it says how
   anyone would know it works.
 - **Small** — one pull request's worth, reviewable in one sitting.
 
-**The shape of a ready issue is defined in `.github/ISSUE_TEMPLATE/work-item.md`
+**The shape of a refined issue is defined in `.github/ISSUE_TEMPLATE/work-item.md`
 — read that file first and use exactly its headings.** It is the single
-definition of ready; do not invent your own structure, and if it changes, follow
+definition of refined; do not invent your own structure, and if it changes, follow
 it. Keep a heading the author left empty only if you genuinely cannot fill it,
 and say why under it.
 
@@ -270,20 +270,20 @@ boundary and the code does not settle it, that is a question for the author
 already filtered, capped, and ordered: the current sprint's issues come first.
 Each has its `type` and `milestone`. Nothing outside that file is your business.
 
-**An issue that was ready before** has a comment starting "Back to refinement:"
-naming what changed (an edit, a changed source file, a closed spike). Read that
-change first and judge the issue against it. If the issue still holds, it is
-already ready. If the change follows clearly from the sources (a rename, a
+**An issue that was refined or ready before** has a comment starting "Back to
+refinement:" naming what changed (an edit, a changed source file, a closed
+spike). Read that change first and judge the issue against it. If the issue
+still holds, it is already refined. If the change follows clearly from the sources (a rename, a
 decision the spike made), rewrite the issue to match. If the direction itself
 changed and the issue may no longer be wanted, it needs a person.
 
 **When the run was asked for on an epic,** the candidates are that epic and its
-pieces that are not ready yet. Read the epic first: its goal, sources and "Out
+pieces that are not refined or ready yet. Read the epic first: its goal, sources and "Out
 of scope" apply to every piece.
 
 **An issue of type `Epic`** is never built itself; its sub-issues are. Check it
 against `.github/ISSUE_TEMPLATE/epic.md` instead of `work-item.md`, rewrite it
-into that shape or ask its author, and **never mark an epic `ready`**.
+into that shape or ask its author, and **never mark an epic `refined`**.
 
 Use `gh` and the repository's files read-only to understand what an issue is
 asking for — read `docs/architecture.md` and the code it points to, to see what
@@ -292,9 +292,9 @@ ask for something that is already there or describe it in the wrong terms.
 
 ## Step 2: For each candidate, do exactly one of these
 
-**Make it ready.** If the issue is nearly there and you can close the gap from
+**Make it refined.** If the issue is nearly there and you can close the gap from
 what is already in the repository, rewrite it into the template's shape with
-`update_issue` and add `ready` with `add_labels`. **Replace the body — do not
+`update_issue` and add `refined` with `add_labels`. **Replace the body — do not
 append to it:** pass `"operation": "replace"` in the `update_issue` payload.
 gh-aw appends when it is missing, and the pipeline refuses a body without it.
 The new body is the whole issue, in the template's headings,
@@ -315,8 +315,8 @@ a design change finds this issue. Add or change one only when the author or a
 `Depends on #N — why`. Do not link issues yourself: the linker reads these lines
 and records the link.
 
-**It is already ready.** Add `ready` and change nothing. This is a common and
-correct outcome.
+**It is already refined.** Add `refined` and change nothing. This is a common
+and correct outcome.
 
 **It needs a person to decide something.** Add `needs-shape` and one comment
 **addressed to the author, whose body is the question itself**. Use this when
@@ -337,9 +337,13 @@ to the author.
 Noticing that an issue is too big is much easier than dividing it well, and
 dividing it is the author's call.
 
+**Whichever of these you do, remove `needs-refinement`** with `remove_labels`:
+the person's request is answered, by a refined issue, a question or a proposed
+split.
+
 ## Step 3: Classify what you touched
 
-For every issue you mark `ready`, also:
+For every issue you mark `refined`, also:
 
 - **Set its type** with `set_issue_type`: `Bug` for something behaving wrongly,
   `Feature` for new behaviour, `Task` for everything else. One of the three
@@ -361,22 +365,23 @@ For every issue you mark `ready`, also:
 ## Step 4: Record what you decided
 
 Emit one `data` record per issue you considered, with `issue_number`, `outcome`
-— exactly one of `ready`, `rewritten`, `question`, `too-big` — and a one-line
+— exactly one of `refined`, `rewritten`, `question`, `too-big` — and a one-line
 `reason`. Name the outcome you actually took; a record that disagrees with what
 you did is worse than no record.
 
 ## Step 5: A quiet night writes nothing
 
-If every candidate is already ready and correctly labelled, or there are no
+If every candidate is already refined and correctly labelled, or there are no
 candidates, call `noop` with a one-line reason. An agent asked to improve a
 clean backlog will improve it anyway, and that churn lands in the edit history
 that is this role's only audit trail.
 
 ## What you must never do
 
-- **Never label an issue `implement`.** That label starts an implementing agent.
-  Deciding that work should begin is a person's call, and this role does not
-  make it. (You could not do it if you tried: your labels are restricted, and
+- **Never label an issue `ready` or `implement`.** `ready` is a person's
+  confirmation that a refined issue can be started, and `implement` starts an
+  implementing agent. Both are a person's call, and this role does not make
+  them. (You could not do it if you tried: your labels are restricted, and
   your writes cannot start a workflow.)
 - Never close an issue, never edit code, never touch a pull request.
 - Never edit an issue that is not in the candidates file.
