@@ -9,3 +9,6 @@ node_modules/
 apps/api/data/
 test-results/
 playwright-report/
+
+# Storybook's static build.
+storybook-static/
