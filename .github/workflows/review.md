@@ -61,6 +61,10 @@ on:
   # action the allowlist IS consulted, unlike the guard above.
   bots: [gh-aw-spike-implementer]
 
+# A paused pull request is left exactly where it is. When `paused` comes off,
+# the sweeper's no-verdict check sends the review again.
+if: "!contains(github.event.pull_request.labels.*.name, 'paused')"
+
 # gh-aw's default PR concurrency group is one group per PR number, shared by
 # every pull_request action, cancel-in-progress: true (reference/concurrency.md:
 # "new commits cancel outdated runs"). That is right for opened/synchronize/

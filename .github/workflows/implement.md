@@ -33,6 +33,9 @@ on:
 concurrency:
   job-discriminator: ${{ github.run_id }}
 
+# A paused issue is not started, even when someone adds `implement` by hand.
+if: "!contains(github.event.issue.labels.*.name, 'paused')"
+
 permissions:
   contents: read
   issues: read

@@ -19,8 +19,8 @@
 #     ]
 #   }
 #
-# type: Feature, Task or Bug. priority: High, Medium or Low, set only when the
-# person decided it. Each dependency becomes a native "blocked by" link and a
+# type: Feature, Task, Bug or Component. priority: High, Medium or Low, set only
+# when the person decided it. Every issue is created with `needs-refinement`. Each dependency becomes a native "blocked by" link and a
 # `Depends on #N — why` line under the issue's "## Details". Issues are created
 # blockers first, each complete in one `gh issue create` (--type, --parent,
 # --blocked-by), so nothing is patched afterwards.
@@ -47,9 +47,9 @@ DUP=$(jq -r '[.issues[].key] | group_by(.) | map(select(length > 1)[0]) | .[]' "
 BAD=$(jq -r '[.issues[].key] as $k | .issues[] | .key as $me | (.depends_on // [])[]
              | select(.key and ((.key as $d | $k | index($d)) == null) or .key == $me) | "\($me) -> \(.key)"' "$PLAN")
 [ -z "$BAD" ] || { echo "plan: dependencies on unknown keys or on themselves: $BAD"; exit 1; }
-BADV=$(jq -r '.issues[] | select(((.type // "Task") as $t | ["Feature","Task","Bug"] | index($t)) == null
+BADV=$(jq -r '.issues[] | select(((.type // "Task") as $t | ["Feature","Task","Bug","Component"] | index($t)) == null
                              or (.priority and ((.priority as $p | ["High","Medium","Low"] | index($p)) == null))) | .key' "$PLAN")
-[ -z "$BADV" ] || { echo "plan: type must be Feature/Task/Bug and priority High/Medium/Low: $BADV"; exit 1; }
+[ -z "$BADV" ] || { echo "plan: type must be Feature/Task/Bug/Component and priority High/Medium/Low: $BADV"; exit 1; }
 # No cycles: peel off issues whose in-plan dependencies are all peeled, until
 # none are left. The peeling order is also the creation order: blockers first,
 # so every issue is created with its links already pointing at real numbers.
@@ -153,7 +153,9 @@ for K in $ORDER; do
     LINES+="Depends on #$B — $(jq -r '.why' <<<"$DEP")"$'\n'
   done < <(jq -c '(.depends_on // [])[]' <<<"$ITEM")
   WHO=$(jq -r --arg d "$(jq -r '.assignee // empty' "$PLAN")" '.assignee // $d' <<<"$ITEM")
-  LABELS=$(jq -r '(.labels // []) | join(",")' <<<"$ITEM")
+  # Every issue asks for refinement: the person approved the plan, so the
+  # refiner may shape it; they confirm `ready` afterwards.
+  LABELS=$(jq -r '(.labels // []) + ["needs-refinement"] | unique | join(",")' <<<"$ITEM")
   N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")" \
         --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"} \
         ${WHO:+--assignee "$WHO"} ${LABELS:+--label "$LABELS"})

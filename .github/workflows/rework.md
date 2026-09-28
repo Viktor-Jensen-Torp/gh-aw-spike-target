@@ -99,6 +99,12 @@ on:
           remove_label needs-rework
           stop "needs-human is on #$PR; a person owns it."
         fi
+        # A person paused it. No strike is spent; when `paused` comes off, the
+        # sweeper finds the red verdict and sends rework again.
+        if grep -qx paused <<< "$LABELS"; then
+          remove_label needs-rework
+          stop "paused is on #$PR; it resumes when the label comes off."
+        fi
         # Unreachable in practice (a conflicted pull request runs no workflows),
         # but if it happens the fix is unblock.md, not a rework round.
         [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."

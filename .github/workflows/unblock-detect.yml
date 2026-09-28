@@ -51,6 +51,7 @@ jobs:
             --json number,labels \
             --jq '[.[] | select([.labels[].name] | index("agent"))
                        | select([.labels[].name] | index("needs-human") | not)
+                       | select([.labels[].name] | index("paused") | not)
                        | .number]')
           echo "open agent pull requests: $(jq -r 'join(", ") // "none"' <<<"$PRS")"
 

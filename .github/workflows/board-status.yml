@@ -8,11 +8,13 @@ name: Board status
 #
 #   closed                      -> Done
 #   merged                      -> Merged
+#   paused                      -> Paused
 #   an open PR fixes it         -> In progress
 #   ready                       -> Ready
+#   refined                     -> Refined (waiting for a person's `ready`)
 #   needs-split / needs-shape   -> Needs split / Needs shape
-#   draft                       -> Draft
-#   anything else               -> To refine
+#   needs-refinement            -> To refine
+#   anything else               -> Draft (nobody has asked for it yet)
 #
 # Most label changes come from the pipeline itself with GITHUB_TOKEN, and those
 # start no workflow. So this reconciles every item on a schedule, and also runs
@@ -92,12 +94,14 @@ jobs:
             | . + {want: (
                 if .state == "CLOSED" then "Done"
                 elif (.labels | index("merged")) then "Merged"
+                elif (.labels | index("paused")) then "Paused"
                 elif (.number as $n | $wip | index($n)) then "In progress"
                 elif (.labels | index("ready")) then "Ready"
+                elif (.labels | index("refined")) then "Refined"
                 elif (.labels | index("needs-split")) then "Needs split"
                 elif (.labels | index("needs-shape")) then "Needs shape"
-                elif (.labels | index("draft")) then "Draft"
-                else "To refine" end)}
+                elif (.labels | index("needs-refinement")) then "To refine"
+                else "Draft" end)}
             | select(.want != .status)' <<<"$ITEMS")
           [ -n "$CHANGES" ] || { echo "Every card already shows its stage."; exit 0; }
 

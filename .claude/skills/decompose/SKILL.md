@@ -82,9 +82,9 @@ The script sets types, priorities, sub-issue links and "blocked by" links,
 writes each dependency as a `Depends on #N — why` line, and renders every
 claimed design part into an image attached under its claim. Images need the
 pen.dev CLI logged in (`pen status`) and gh 2.99 or later; without them the
-issues are created without images, and the script warns. It leaves `ready` and
-the sprint alone: the refiner judges ready overnight, and sprints are decided at
-planning.
+issues are created without images, and the script warns. Every issue gets
+`needs-refinement`, so the refiner shapes it overnight and marks it `refined`;
+the person sets `ready`, and sprints are decided at planning.
 
 Done when the script has printed a number for the epic and for every sub-issue,
 you have given the person the epic's link, and you have passed on any warning
