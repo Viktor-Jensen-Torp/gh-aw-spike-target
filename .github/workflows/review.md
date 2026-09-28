@@ -138,7 +138,7 @@ safe-outputs:
           required: [id, status, evidence]
           properties:
             id: { type: string, minLength: 2, maxLength: 4 }
-            status: { type: string, enum: [met, unmet, unproven] }
+            status: { type: string, enum: [met, unmet, unproven, n/a] }
             evidence: { type: string, minLength: 3, maxLength: 1000 }
 
 # The rework loop is driven from the review that was actually posted, not from
@@ -216,13 +216,26 @@ jobs:
             fi
             N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1)
             TYPE=$(gh api "repos/$REPO/issues/$N" --jq '.type.name // ""' | tr '[:upper:]' '[:lower:]')
-            IDS=$(gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_REF" --jq .content \
-                    | base64 -d | sed -nE 's/^\| *([A-Z][0-9]+) *\|.*/\1/p')
+            REQ=$(gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_REF" --jq .content | base64 -d)
+            IDS=$(sed -nE 's/^\| *([A-Z][0-9]+) *\|.*/\1/p' <<<"$REQ")
+            # Rows whose last column says `yes` may be answered `n/a` (the issue
+            # names no boundaries, claims no design); on any other row n/a blocks.
+            NA_OK=$(sed -nE 's/^\| *([A-Z][0-9]+) *\|.*\| *yes *\|$/\1/p' <<<"$REQ")
             [ -n "$IDS" ] || { echo "::error::no requirement rows for #$N (type '$TYPE')"; false; }
+            # A `met` must name a file this pull request changed, by its full
+            # path; a line is optional. On #118 "architecture.md updated" passed
+            # as proof. C1 is exempt: its proof of "no defect" is "none found".
+            FILES=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename')
             for ID in C1 $IDS; do
               S=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .status // "missing"' <<<"$DATA")
+              E=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .evidence // ""' <<<"$DATA")
+              if [ "$S" = met ] && [ "$ID" != C1 ]; then
+                NAMED=$(grep -oE '[A-Za-z0-9_.@-]+(/[A-Za-z0-9_.@-]+)+' <<<"$E" | sed -E 's/[.:]+$//' | sort -u || true)
+                grep -qxFf <(printf '%s\n' "$FILES") <<<"$NAMED" || S="met-without-a-changed-file"
+              fi
+              [ "$S" = "n/a" ] && ! grep -qx "$ID" <<<"$NA_OK" && S="n/a-not-allowed"
               echo "  $ID: $S"
-              [ "$S" = met ] || ROWS_FAILED+="$ID:$S "
+              [ "$S" = met ] || [ "$S" = "n/a" ] || ROWS_FAILED+="$ID:$S "
             done
             [ -z "$ROWS_FAILED" ] || echo "requirements not met: $ROWS_FAILED"
           fi
@@ -363,9 +376,13 @@ request:
 
 decide one status:
 
-- `met` — you found the proof the row asks for. Give it as file and line.
+- `met` — you found the proof the row asks for. Name each file by its full path
+  from the diff, with lines where they help: `apps/api/src/app.ts:12`,
+  `docs/architecture.md`. A `met` that names no changed file counts as unproven.
 - `unmet` — the diff shows the row is not satisfied. Say where.
 - `unproven` — you could not find the proof. Say what you looked for.
+- `n/a` — only on rows marked `yes` under "n/a allowed", when the issue gives the
+  row nothing to check (no boundaries named, no design claimed). Say why.
 
 Proof must point at the diff or at a file in this checkout; the pull request's
 own claims are not proof. When in doubt between `met` and `unproven`, it is
