@@ -11,7 +11,9 @@ repository's GitHub issues. The person decides; you find the facts, draft, and
 write.
 
 The shapes are fixed: the epic follows `.github/ISSUE_TEMPLATE/epic.md`, every
-sub-issue follows `.github/ISSUE_TEMPLATE/work-item.md`. A sub-issue is one pull
+sub-issue follows `.github/ISSUE_TEMPLATE/work-item.md`. How to fill them in is
+`.github/conventions/chain/issues.md`, the same rules the refiner follows, so
+an issue from here and one from the refiner read alike. A sub-issue is one pull
 request's worth, reviewable in one sitting.
 
 ## 1. Read
@@ -54,12 +56,10 @@ step 2. What the source leaves out goes under the epic's "Out of scope". The
 epic's "Sources" lists the source paths, so a change to them sends its
 sub-issues back to refinement.
 
-Every piece built from a design names the parts it builds under "## Design",
-as `path#id` and the part's name, from the claims list; together the pieces
-claim every new frame.
-
-Record a dependency only where one piece cannot finish without the other, with
-a one-line why. Type each piece `Feature` (new behaviour), `Bug` or `Task`.
+Write each piece as `issues.md` says: its "Done when", design claims,
+dependencies (in the plan's `depends_on`, which the script turns into the
+`Depends on #N — why` lines), type and effort. Together the pieces claim every
+new frame from the claims list.
 
 Write the plan as JSON to a temporary file outside the repository, in the
 format `bash .claude/skills/decompose/create-issues.sh --help` prints. To add to
@@ -72,7 +72,18 @@ Done when every new behaviour from step 1 sits in exactly one sub-issue or in
 
 Show the person the tree from
 `bash .claude/skills/decompose/create-issues.sh --dry-run <plan>`, and change the
-plan until they approve it. Then create it:
+plan until they approve it. The dry run also checks every body against its
+template.
+
+Then ask the person the stage of each issue, and put it in the plan as `stage`:
+
+- `ready`: they have read it and it can start as it is. Its body must pass the
+  template check, or the script refuses the plan.
+- `needs-refinement` (the default): the refiner shapes it overnight and marks it
+  `refined`; they set `ready` after.
+- `draft`: no stage label; nothing touches it until they add one.
+
+Then create it:
 
 ```bash
 bash .claude/skills/decompose/create-issues.sh <plan>
@@ -82,9 +93,8 @@ The script sets types, priorities, sub-issue links and "blocked by" links,
 writes each dependency as a `Depends on #N — why` line, and renders every
 claimed design part into an image attached under its claim. Images need the
 pen.dev CLI logged in (`pen status`) and gh 2.99 or later; without them the
-issues are created without images, and the script warns. Every issue gets
-`needs-refinement`, so the refiner shapes it overnight and marks it `refined`;
-the person sets `ready`, and sprints are decided at planning.
+issues are created without images, and the script warns. Each issue gets the
+stage label the person chose. Sprints are decided at planning.
 
 Done when the script has printed a number for the epic and for every sub-issue,
 you have given the person the epic's link, and you have passed on any warning

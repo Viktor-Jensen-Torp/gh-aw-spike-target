@@ -13,6 +13,7 @@
 #     "issues": [                                                   # may be empty: an epic for a later wave
 #       { "key": "store", "title": "...", "body": "## What\n...",
 #         "type": "Task", "priority": "High",                      # both optional
+#         "stage": "needs-refinement",                              # optional: ready | needs-refinement | draft
 #         "labels": ["human"], "assignee": "someone",                # optional
 #         "depends_on": [ { "key": "other", "why": "needs its store" },
 #                         { "number": 12, "why": "..." } ] }        # optional
@@ -20,7 +21,11 @@
 #   }
 #
 # type: Feature, Task, Bug or Component. priority: High, Medium or Low, set only
-# when the person decided it. Every issue is created with `needs-refinement`. Each dependency becomes a native "blocked by" link and a
+# when the person decided it. stage, chosen by the person per issue: `ready`
+# (they confirm it can start; its body must pass .github/scripts/check-issue.sh),
+# `needs-refinement` (the default: the refiner shapes it) or `draft` (no stage
+# label; nothing touches it). Every body is checked against its template before
+# anything is written. Each dependency becomes a native "blocked by" link and a
 # `Depends on #N — why` line under the issue's "## Details". Issues are created
 # blockers first, each complete in one `gh issue create` (--type, --parent,
 # --blocked-by), so nothing is patched afterwards.
@@ -50,6 +55,22 @@ BAD=$(jq -r '[.issues[].key] as $k | .issues[] | .key as $me | (.depends_on // [
 BADV=$(jq -r '.issues[] | select(((.type // "Task") as $t | ["Feature","Task","Bug","Component"] | index($t)) == null
                              or (.priority and ((.priority as $p | ["High","Medium","Low"] | index($p)) == null))) | .key' "$PLAN")
 [ -z "$BADV" ] || { echo "plan: type must be Feature/Task/Bug/Component and priority High/Medium/Low: $BADV"; exit 1; }
+BADS=$(jq -r '.issues[] | select(((.stage // "needs-refinement") as $s | ["ready","needs-refinement","draft"] | index($s)) == null) | .key' "$PLAN")
+[ -z "$BADS" ] || { echo "plan: stage must be ready, needs-refinement or draft: $BADS"; exit 1; }
+# The same shape check the refiner is held to (.github/conventions/chain/issues.md).
+# A `ready` issue must pass it; a rough one headed for refinement only warns.
+CHECK="$(git rev-parse --show-toplevel)/.github/scripts/check-issue.sh"
+SHAPE=0
+if jq -e '.epic.body' "$PLAN" >/dev/null; then
+  OUT=$(jq -r '.epic.body' "$PLAN" | bash "$CHECK" --epic) || { echo "plan: the epic's body:"; sed 's/^/  /' <<<"$OUT"; SHAPE=1; }
+fi
+for K in $(jq -r '.issues[].key' "$PLAN"); do
+  STAGE=$(jq -r --arg k "$K" '.issues[] | select(.key == $k) | .stage // "needs-refinement"' "$PLAN")
+  OUT=$(jq -r --arg k "$K" '.issues[] | select(.key == $k) | .body' "$PLAN" | bash "$CHECK") && continue
+  if [ "$STAGE" = ready ]; then echo "plan: [$K] is ready, but its body:"; sed 's/^/  /' <<<"$OUT"; SHAPE=1
+  else echo "  note: [$K] ($STAGE) does not have the template's shape yet:"; sed 's/^/    /' <<<"$OUT"; fi
+done
+[ "$SHAPE" = 0 ] || exit 1
 # No cycles: peel off issues whose in-plan dependencies are all peeled, until
 # none are left. The peeling order is also the creation order: blockers first,
 # so every issue is created with its links already pointing at real numbers.
@@ -66,7 +87,7 @@ done
 if [ "$DRY" = 1 ]; then
   echo "Would create in $REPO:"
   jq -r 'if .epic.number then "  epic: existing #\(.epic.number)" else "  epic: \(.epic.title)" end' "$PLAN"
-  jq -r '.issues[] | "    - [\(.key)] \(.title)  (\(.type // "Task")\(if .priority then ", \(.priority)" else "" end)\(if .labels then ", " + (.labels | join(",")) else "" end))"
+  jq -r '.issues[] | "    - [\(.key)] \(.title)  (\(.type // "Task")\(if .priority then ", \(.priority)" else "" end), \(.stage // "needs-refinement")\(if .labels then ", " + (.labels | join(",")) else "" end))"
                      + ((.depends_on // []) | map("\n        blocked by " + (if .key then "[\(.key)]" else "#\(.number)" end) + " — \(.why)") | join(""))' "$PLAN"
   exit 0
 fi
@@ -153,9 +174,8 @@ for K in $ORDER; do
     LINES+="Depends on #$B — $(jq -r '.why' <<<"$DEP")"$'\n'
   done < <(jq -c '(.depends_on // [])[]' <<<"$ITEM")
   WHO=$(jq -r --arg d "$(jq -r '.assignee // empty' "$PLAN")" '.assignee // $d' <<<"$ITEM")
-  # Every issue asks for refinement: the person approved the plan, so the
-  # refiner may shape it; they confirm `ready` afterwards.
-  LABELS=$(jq -r '(.labels // []) + ["needs-refinement"] | unique | join(",")' <<<"$ITEM")
+  # The stage the person chose: its label, or none for a draft.
+  LABELS=$(jq -r '(.labels // []) + ((.stage // "needs-refinement") | if . == "draft" then [] else [.] end) | unique | join(",")' <<<"$ITEM")
   N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")" \
         --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"} \
         ${WHO:+--assignee "$WHO"} ${LABELS:+--label "$LABELS"})
