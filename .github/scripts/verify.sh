@@ -29,7 +29,12 @@ BASE="${1:-origin/develop}"
 # Playwright's browser lives inside node_modules, so the agent's container,
 # which shares the workspace but cannot download anything, finds the one the
 # runner installed before the agent started (shared/node-runtime.md).
-export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-0}"
+# Always this one, whatever the caller set: gh-aw's browser tool sets its own
+# PLAYWRIGHT_BROWSERS_PATH for the agent step, which holds a different build,
+# and the tests then found no browser (implement run 36461849454: "Executable
+# doesn't exist … chromium_headless_shell-1243"). The export stays inside this
+# script, so the agent's browser tool keeps its own.
+export PLAYWRIGHT_BROWSERS_PATH=0
 
 STEPS=(test conventions lint)
 case "$ONLY" in
