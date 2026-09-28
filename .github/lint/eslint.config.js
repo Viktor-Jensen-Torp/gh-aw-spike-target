@@ -47,7 +47,7 @@ export default tseslint.config(
   {
     files: [
       "**/vite.config.ts", "**/vitest.config.ts", "**/playwright.config.ts", "**/drizzle.config.ts",
-      "**/*.stories.tsx", "**/.storybook/*.ts",
+      "**/*.stories.tsx", "**/.storybook/*.{ts,tsx}",
     ],
     rules: { "import-x/no-default-export": "off" },
   },
