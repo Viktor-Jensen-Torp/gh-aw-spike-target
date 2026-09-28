@@ -26,6 +26,7 @@ after the case, so a reader can tick the issue off against the test names.
 | A table row (`Given` → `Expect`) about a rule, a route or a function | a unit or API test per row | next to the module it tests |
 | A table row about what a component shows | a component test per row | next to the component |
 | A scenario (`Given / When / Then`) | a browser test per scenario, named after its first line | the web app's `e2e/<feature>` |
+| A row or scenario of a `Component` issue (a shared component) | a story per case, named after it, whose `play` function checks it; the story is the test | next to the component |
 
 ## How tests are written
 

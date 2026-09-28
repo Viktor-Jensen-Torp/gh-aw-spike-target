@@ -43,13 +43,15 @@ features() { # tree-ish or "WORKTREE" -> one "workspace/feature" per line
 
 # --- Code comes with tests ------------------------------------------------------
 # chain/structure.md: a change to source files changes or adds a test that proves it.
-SOURCE=$(grep -E '^(apps|packages)/[^/]+/src/.+\.(ts|tsx)$' <<<"$CHANGED" | grep -vE '\.test\.(ts|tsx)$' || true)
-TESTS=$(grep -E '^(apps|packages)/[^/]+/(src/.+\.test\.(ts|tsx)|e2e/.+\.spec\.ts)$' <<<"$CHANGED" || true)
+SOURCE=$(grep -E '^(apps|packages)/[^/]+/src/.+\.(ts|tsx)$' <<<"$CHANGED" | grep -vE '\.(test\.(ts|tsx)|stories\.tsx)$' || true)
+# A story is a test too: every story runs as one, in a real browser (components.md).
+TESTS=$(grep -E '^(apps|packages)/[^/]+/(src/.+\.(test\.(ts|tsx)|stories\.tsx)|e2e/.+\.spec\.ts)$' <<<"$CHANGED" || true)
 if [ -n "$SOURCE" ] && [ -z "$TESTS" ]; then
   echo "✗ Code comes with tests: these source files changed and no test did:"
   sed 's/^/    /' <<<"$SOURCE"
   echo "  Add or change the test that proves the change, next to the module"
-  echo "  (*.test.ts / *.test.tsx) or as a browser test in apps/web/e2e/."
+  echo "  (*.test.ts / *.test.tsx; *.stories.tsx for a shared component) or as a"
+  echo "  browser test in apps/web/e2e/."
   echo "  Which test for which case: .github/conventions/chain/testing.md."
   FAILED=1
 fi
