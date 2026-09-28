@@ -176,7 +176,11 @@ jobs:
           # pull request with a red verdict summoned nobody.
           AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_BODY: ${{ github.event.pull_request.body }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # The base BRANCH, not base.sha: on a synchronize event base.sha is
+          # an older develop commit (b822ba3 on run 36337277509, from before the
+          # requirements files existed), while the reviewer reads .github from
+          # the base branch's current snapshot. Both must read the same file.
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           set -euo pipefail
           # Fail closed: if any read or label write here errors, send the pull
@@ -212,7 +216,7 @@ jobs:
             fi
             N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1)
             TYPE=$(gh api "repos/$REPO/issues/$N" --jq '.type.name // ""' | tr '[:upper:]' '[:lower:]')
-            IDS=$(gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_SHA" --jq .content \
+            IDS=$(gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_REF" --jq .content \
                     | base64 -d | sed -nE 's/^\| *([A-Z][0-9]+) *\|.*/\1/p')
             [ -n "$IDS" ] || { echo "::error::no requirement rows for #$N (type '$TYPE')"; false; }
             for ID in C1 $IDS; do
