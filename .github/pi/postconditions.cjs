@@ -56,6 +56,8 @@ const CALLED_LOG = `${STATE_DIR}/called`;
 // tree's: the agent's own edits to the script must not decide whether it passes.
 const VERIFY = process.env.PI_VERIFY_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/verify.sh";
 const MAX_VERIFY_BLOCKS = 3;
+// The issue-shape check, also the base-branch copy (shared/postconditions.md).
+const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/check-issue.sh";
 
 /**
  * required: each inner array is "any of these".
@@ -63,6 +65,7 @@ const MAX_VERIFY_BLOCKS = 3;
  *           second call; `onlyWith` applies the rule only when that field is sent.
  * verify:   run verify.sh before create_pull_request / push_to_pull_request_branch.
  * decideEach: every issue in `candidates` must end the run with one of `labels`.
+ * checkIssue: run check-issue.sh on the body of every update_issue that sets one.
  */
 const ROLES = {
   review: {
@@ -95,10 +98,15 @@ const ROLES = {
     // Every candidate gets a stage. On #64 the refiner set a type, a label and
     // Effort, then called noop without `ready` (run 36266779049), so the
     // dispatcher never saw it. Each candidate is a decision it must record.
+    // `refined`, not `ready`: since the stage labels changed (2026-09-28) the
+    // refiner cannot add `ready`, which is a person's confirmation.
     decideEach: {
       candidates: process.env.PI_REFINE_CANDIDATES || "/tmp/gh-aw/agent/refine-candidates.json",
-      labels: ["ready", "needs-shape", "needs-split"],
+      labels: ["refined", "needs-shape", "needs-split"],
     },
+    // The same shape check /decompose runs before it creates an issue, so the
+    // two cannot write issues of different shapes.
+    checkIssue: true,
   },
   // Finding nothing to link is the usual answer over a settled backlog, so
   // `noop` counts; finishing with nothing at all does not.
@@ -145,8 +153,10 @@ function log(msg) {
  * @param {Record<string, {field: string, allowed: string[], upper: boolean, once?: boolean, onlyWith?: string}>} checks
  * @param {boolean} [verify] run verify.sh before the agent's push-equivalent calls
  * @param {string} [giveUp] what to do once the checks have failed MAX_VERIFY_BLOCKS times
+ * @param {boolean} [checkIssue] run check-issue.sh on an update_issue body
+ * @param {string} [candidates] candidates file, to tell an epic from a work item
  */
-function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails") {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "") {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -229,11 +239,29 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
       fi ;;`
     : "";
 
+  // The issue-shape check. Fail open when the script is missing, like verify.
+  const issueCheck = checkIssue
+    ? `
+  if [ "$1" = update_issue ] || [ "$1" = update-issue ]; then
+    __body=$(printf '%s' "$__payload" | jq -r '.body // empty' 2>/dev/null); [ -z "$__body" ] && __body=$(__pc_flag body "$@")
+    if [ -n "$__body" ] && [ -f "${CHECK_ISSUE}" ]; then
+      __num=$(printf '%s' "$__payload" | jq -r '.issue_number // .item_number // empty' 2>/dev/null); [ -z "$__num" ] && __num=$(__pc_flag issue_number "$@")
+      __epic=""
+      if [ -n "$__num" ] && [ "$(jq -r --arg n "$__num" '.[] | select((.number | tostring) == $n) | .type' "${candidates}" 2>/dev/null)" = Epic ]; then __epic=--epic; fi
+      if ! __cout=$(printf '%s' "$__body" | CHECK_ISSUE_ROOT="\${GITHUB_WORKSPACE:-$(pwd)}" bash "${CHECK_ISSUE}" $__epic 2>&1); then
+        echo "BLOCKED by the pipeline: the new body does not have the template's shape (.github/conventions/chain/issues.md). Nothing was submitted. Fix it and call update_issue again:" >&2
+        printf '%s\\n' "$__cout" >&2
+        return 2
+      fi
+    fi
+  fi`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
-  if [ "$2" = "." ]; then __payload=$(cat); fi
+  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -320,7 +348,10 @@ function postconditions(pi) {
     return;
   }
   const verify = spec.verify === true;
-  const guard = Object.keys(spec.checks).length > 0 || verify ? buildGuard(spec.checks, verify, spec.giveUp) : "";
+  const checkIssue = /** @type {any} */ (spec).checkIssue === true;
+  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue
+    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "")
+    : "";
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
 

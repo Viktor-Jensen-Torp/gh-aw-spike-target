@@ -33,7 +33,7 @@ pre-agent-steps:
       cp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js
       # The pre-push check's scripts, also from the base branch: the agent's own
       # edits to them must not decide whether its work passes.
-      cp .github/scripts/verify.sh .github/scripts/check-conventions.sh /tmp/gh-aw/pi-agent-dir/verify/
+      cp .github/scripts/verify.sh .github/scripts/check-conventions.sh .github/scripts/check-issue.sh /tmp/gh-aw/pi-agent-dir/verify/
       echo "installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE, verify=$(ls /tmp/gh-aw/pi-agent-dir/verify | tr '\n' ' ')"
     env:
       PI_ROLE: ${{ github.aw.import-inputs.role }}

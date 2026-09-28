@@ -198,13 +198,13 @@ safe-outputs:
     max: 15
     target: "*"
     allowed: [needs-refinement]
-  # What kind of work this is. The org defines Task, Bug and Feature; an issue
+  # What kind of work this is. The org defines Task, Bug, Feature and Component; an issue
   # type is a typed field, unlike a label, so it is the better home for a
   # classification the pipeline may later read.
   set-issue-type:
     max: 15
     target: "*"
-    allowed: [Task, Bug, Feature]
+    allowed: [Task, Bug, Feature, Component]
   # Priority and Effort are org-level issue FIELDS — typed, and set on the issue
   # itself rather than on a board. That is the whole reason no part of this
   # pipeline needs Projects access: a Project is a view over issues, so a field
@@ -240,29 +240,13 @@ timeout-minutes: 25
 You are preparing this repository's backlog so that an implementing agent can
 start on an issue tomorrow without asking anyone a question.
 
-**Refined** means two things at once:
-
-- **Clear** — someone could start without asking a question. The behaviour
-  wanted is stated, including what should happen at the edges, and it says how
-  anyone would know it works.
-- **Small** — one pull request's worth, reviewable in one sitting.
-
-**The shape of a refined issue is defined in `.github/ISSUE_TEMPLATE/work-item.md`
-— read that file first and use exactly its headings.** It is the single
-definition of refined; do not invent your own structure, and if it changes, follow
-it. Keep a heading the author left empty only if you genuinely cannot fill it,
-and say why under it.
-
-**Under "Done when", choose the shape the template describes**: a table of
-inputs and expectations for a function, scenarios for a journey through a
-screen. Never both, and never a scenario for a pure function — it is longer and
-says less.
-
-**Write only cases you can derive from the issue or from the code.** An
-acceptance case you invented reads exactly like one the author asked for, and an
-implementer will build to it. If the issue does not say what should happen at a
-boundary and the code does not settle it, that is a question for the author
-(`needs-shape`), not a case for you to make up.
+**Read `.github/conventions/chain/issues.md` first.** It says what refined
+means and how every heading of an issue is filled in: "Done when", boundaries,
+design claims, dependencies, type, effort and priority. The headings themselves
+are in `.github/ISSUE_TEMPLATE/work-item.md` (`epic.md` for an epic). The same
+rules are used by `/decompose`, so follow them rather than your own. When
+nothing settles a boundary, that is a question for the author (`needs-shape`),
+not a case to make up.
 
 ## Step 1: Read the candidates
 
@@ -297,23 +281,13 @@ what is already in the repository, rewrite it into the template's shape with
 `update_issue` and add `refined` with `add_labels`. **Replace the body — do not
 append to it:** pass `"operation": "replace"` in the `update_issue` payload.
 gh-aw appends when it is missing, and the pipeline refuses a body without it.
-The new body is the whole issue, in the template's headings,
-with the author's own words carried into them. Leaving the original text above
-your version doubles the issue and makes an implementer read two specifications
-and guess which one counts. The edit history keeps what was there before. Keep the author's intent and their words where you
-can; you are filling in what an implementer would otherwise have to ask, not
-rewriting their request into your own. State the behaviour wanted, what happens
-at the boundaries, and how anyone would know it works. Do not invent a
-requirement the author did not ask for — if a decision is genuinely the
-author's, that is the next case, not a guess.
-
-**Carry the `## Design` claims over exactly** (`path#id` lines): they are how
-a design change finds this issue. Add or change one only when the author or a
-"Back to refinement" comment says the design moved.
-
-**If it needs another issue done first**, say so under **Details** as a line
-`Depends on #N — why`. Do not link issues yourself: the linker reads these lines
-and records the link.
+The new body is the whole issue, written as `issues.md` says. Leaving the
+original text above your version doubles the issue and makes an implementer
+read two specifications and guess which one counts; the edit history keeps what
+was there before. The body must pass `.github/scripts/check-issue.sh`; the
+pipeline refuses an `update_issue` whose body does not, and tells you why.
+Do not link issues yourself: the linker reads the `Depends on #N — why` lines
+and records the links.
 
 **It is already refined.** Add `refined` and change nothing. This is a common
 and correct outcome.
@@ -343,24 +317,11 @@ split.
 
 ## Step 3: Classify what you touched
 
-For every issue you mark `refined`, also:
-
-- **Set its type** with `set_issue_type`: `Bug` for something behaving wrongly,
-  `Feature` for new behaviour, `Task` for everything else. One of the three
-  always applies; this is not a judgement call to agonise over.
-- **Add at most one topic label** — `bug`, `enhancement` or `documentation` —
-  and only when it is obvious. A label nobody filters on is noise.
-- **Never set a milestone.** Milestones are sprints, and what goes in a sprint
-  is decided by people at planning.
-- **Set `Effort`** with `set_issue_field` — `Low` for a change of a few lines in
-  one file, `Medium` for one file's worth of real work, `High` for anything you
-  would have called `needs-split` if it were any bigger. This is a size
-  estimate, not a promise.
-- **Set `Priority`** only when the issue itself says so — it calls something
-  broken, or names a deadline, or the author said it is urgent. **If the issue
-  gives you no evidence, leave Priority unset.** Priority is the author's
-  judgement about what matters, and a backlog where an agent guessed every
-  priority is a backlog where the field means nothing.
+For every issue you mark `refined`, also set its type with `set_issue_type`
+and its `Effort` (and `Priority`, only with evidence) with `set_issue_field`,
+as `issues.md` says. Add at most one topic label — `bug`, `enhancement` or
+`documentation` — and only when it is obvious; a label nobody filters on is
+noise.
 
 ## Step 4: Record what you decided
 

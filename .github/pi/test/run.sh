@@ -36,7 +36,7 @@ FAKE
 case_() {
   local label="$1" want="$2" cmd="$3" wrapped err rc before after ok
   cmd="${cmd//\/tmp\/gh-aw/$ROOT/gh-aw}"
-  wrapped=$(PI_ROLE="${ROLE:-review}" PI_VERIFY_SCRIPT="$ROOT/verify.sh" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
+  wrapped=$(PI_ROLE="${ROLE:-review}" PI_VERIFY_SCRIPT="$ROOT/verify.sh" PI_CHECK_ISSUE_SCRIPT="${CHECK_ISSUE:-$ROOT/none.sh}" PI_REFINE_CANDIDATES="$ROOT/cands.json" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
     const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
     const ev = { toolName: "bash", input: { command: process.env.CMD } };
     h.tool_call(ev).then(() => process.stdout.write(ev.input.command));' "$EXT" 2>/dev/null)
@@ -85,6 +85,36 @@ ROLE=refine case_ "body with operation replace"               pass  'echo "{\"is
 ROLE=refine case_ "second issue in the same run"              pass  'echo "{\"issue_number\":2,\"body\":\"y\",\"operation\":\"replace\"}" | safeoutputs update_issue .'
 ROLE=refine case_ "title only needs no operation"             pass  'echo "{\"issue_number\":3,\"title\":\"t\"}" | safeoutputs update_issue .'
 ROLE=refine case_ "--body with --operation replace"           pass  'safeoutputs update_issue --issue_number 4 --body x --operation replace'
+
+echo "== refine writes bodies in the template's shape (check-issue.sh)"
+REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
+GOOD=$(jq -Rs . <<'B'
+## What
+x
+## Why
+y
+## Details
+z
+## Done when
+| Given | Expect |
+|---|---|
+| a | b |
+B
+)
+BAD=$(jq -Rs . <<'B'
+## What
+x
+## Done when
+it works
+B
+)
+new_root; printf '[{"number":7,"type":"Task"},{"number":81,"type":"Epic"}]' > "$ROOT/cands.json"
+export GITHUB_WORKSPACE="$REPO_ROOT"
+CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "work item in the template's shape"   pass  "echo '{\"issue_number\":7,\"operation\":\"replace\",\"body\":'\"\$(printf '%s' '$GOOD')\"'}' | safeoutputs update_issue ."
+CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "work item missing Why, Details, a table" block "echo '{\"issue_number\":7,\"operation\":\"replace\",\"body\":'\"\$(printf '%s' '$BAD')\"'}' | safeoutputs update_issue ."
+CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "an epic is checked against epic.md"   block "echo '{\"issue_number\":81,\"operation\":\"replace\",\"body\":'\"\$(printf '%s' '$GOOD')\"'}' | safeoutputs update_issue ."
+CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "title only is not checked"            pass  'echo "{\"issue_number\":7,\"title\":\"t\"}" | safeoutputs update_issue .'
+unset GITHUB_WORKSPACE
 
 echo "== pass-through"
 new_root
@@ -176,12 +206,14 @@ out=$(refine_end '[{"number":64}]' '{"type":"set_issue_type","issue_number":64}
 {"type":"add_labels","labels":["bug"]}
 {"type":"noop","message":"done"}')
 [ "$out" = "a stage for #64" ] && echo "PASS  refine: run 36266779049 replayed (type, bug, noop, no stage) is nudged" || { echo "FAIL  refine #64 replay: '$out'"; fails=$((fails + 1)); }
-out=$(refine_end '[{"number":64}]' '{"type":"add_labels","labels":["bug","ready"]}')
-[ "$out" = "none" ] && echo "PASS  refine: one candidate, ready without a number counts" || { echo "FAIL  refine single ready: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[{"number":64}]' '{"type":"add_labels","labels":["bug","refined"]}')
+[ "$out" = "none" ] && echo "PASS  refine: one candidate, refined without a number counts" || { echo "FAIL  refine single refined: '$out'"; fails=$((fails + 1)); }
+out=$(refine_end '[{"number":64}]' '{"type":"add_labels","item_number":64,"labels":["ready"]}')
+[ "$out" = "a stage for #64" ] && echo "PASS  refine: ready is a person's label and decides nothing" || { echo "FAIL  refine ready: '$out'"; fails=$((fails + 1)); }
 out=$(refine_end '[{"number":1},{"number":2}]' '{"type":"add_labels","item_number":1,"labels":["needs-shape"]}
-{"type":"add_labels","labels":["ready"]}')
+{"type":"add_labels","labels":["refined"]}')
 [ "$out" = "a stage for #2" ] && echo "PASS  refine: two candidates, an unnumbered label decides neither" || { echo "FAIL  refine two: '$out'"; fails=$((fails + 1)); }
-out=$(refine_end '[{"number":81,"type":"Epic"},{"number":82,"type":"Task"}]' '{"type":"add_labels","item_number":82,"labels":["ready"]}')
+out=$(refine_end '[{"number":81,"type":"Epic"},{"number":82,"type":"Task"}]' '{"type":"add_labels","item_number":82,"labels":["refined"]}')
 [ "$out" = "none" ] && echo "PASS  refine: an epic needs no stage" || { echo "FAIL  refine epic: '$out'"; fails=$((fails + 1)); }
 out=$(refine_end '[]' '{"type":"noop","message":"quiet night"}')
 [ "$out" = "none" ] && echo "PASS  refine: no candidates, noop is enough" || { echo "FAIL  refine quiet: '$out'"; fails=$((fails + 1)); }
