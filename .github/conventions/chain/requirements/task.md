@@ -9,10 +9,12 @@ tags: [review, requirements, chain]
 
 Each row is met only when the proof is given: the file and line that show it.
 Without proof a row is unproven, and an unproven row blocks like an unmet one.
+A row marked `yes` under "n/a allowed" may be answered n/a when the issue
+gives it nothing to check.
 
-| ID | Requirement | Proof |
-|---|---|---|
-| T1 | Every case under the issue's "Done when" has its own test, named after the case, of the kind `.github/conventions/chain/testing.md` maps it to | For each case: the test's name, file and line |
-| T2 | Each of those tests asserts the case's Expect (or Then) through the interface, not how the code produces it | For each case: the assertion's file and line |
-| T3 | Every boundary named under "Details" is handled in the code | For each boundary: file and line |
-| T4 | The change does what "What" describes and touches nothing listed under "Out of scope" | Every changed file accounted for |
+| ID | Requirement | Proof | n/a allowed |
+|---|---|---|---|
+| T1 | Every case under the issue's "Done when" has its own test, named after the case, of the kind `.github/conventions/chain/testing.md` maps it to | For each case: the test's name, file and line |  |
+| T2 | Each of those tests asserts the case's Expect (or Then) through the interface, not how the code produces it | For each case: the assertion's file and line |  |
+| T3 | Every boundary named under "Details" is handled in the code | For each boundary: file and line | yes |
+| T4 | The change does what "What" describes and touches nothing listed under "Out of scope" | Every changed file accounted for |  |
