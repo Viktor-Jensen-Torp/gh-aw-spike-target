@@ -29,6 +29,7 @@ the paths you will touch.
 | You touch | Read |
 |---|---|
 | `apps/web/**` | [web.md](web.md), and [chain/design.md](chain/design.md) when the issue claims design parts |
+| `apps/web/src/components/**` | [components.md](components.md) |
 | `apps/api/**` | [api.md](api.md) |
 | `packages/shared/**` | [shared.md](shared.md) |
 

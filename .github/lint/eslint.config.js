@@ -41,9 +41,14 @@ export default tseslint.config(
       "local/no-barrel-files": "error",
     },
   },
-  // Framework entry and config files that must default-export.
+  // Framework entry and config files that must default-export. Storybook's
+  // stories (Component Story Format) and its config are read by their default
+  // export too.
   {
-    files: ["**/vite.config.ts", "**/vitest.config.ts", "**/playwright.config.ts", "**/drizzle.config.ts"],
+    files: [
+      "**/vite.config.ts", "**/vitest.config.ts", "**/playwright.config.ts", "**/drizzle.config.ts",
+      "**/*.stories.tsx", "**/.storybook/*.{ts,tsx}",
+    ],
     rules: { "import-x/no-default-export": "off" },
   },
   // Web: React, accessibility, one API client, colours through tokens (web.md).
