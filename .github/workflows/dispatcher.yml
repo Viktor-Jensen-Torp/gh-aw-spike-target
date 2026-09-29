@@ -5,7 +5,8 @@ name: Dispatcher
 #
 # Every 30 minutes, while fewer than MAX_OPEN agent pull requests are open (or
 # being written), it dispatches implement for the next issues:
-#   - in the current sprint: the open milestone with the earliest due date;
+#   - in the current sprint: the Project's `Sprint` iteration that covers
+#     today (.github/scripts/current-sprint.sh; not a milestone);
 #   - `ready` (set by a person, after the refiner marked it `refined`), and not
 #     an Epic or a Spike, and not labelled `human` (people do those themselves;
 #     the assignee is who is responsible, not who works) or `paused` (a person
@@ -72,6 +73,7 @@ jobs:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
           ACTIONS_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          PROJECT: "2"
           MAX_OPEN: "2"
           MAX_PER_DAY: "10"
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
@@ -79,9 +81,10 @@ jobs:
           set -euo pipefail
           say() { echo "$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; }
 
-          SPRINT=$(gh api "repos/$REPO/milestones?state=open&sort=due_on&direction=asc" \
-                     --jq '[.[] | select(.due_on != null)][0].title // ""')
-          [ -n "$SPRINT" ] || { say "No current sprint (no open milestone with a due date); nothing to start."; exit 0; }
+          # The reviewer App can read the organisation's projects; GITHUB_TOKEN cannot.
+          CUR=$(bash .github/scripts/current-sprint.sh "${REPO%/*}" "$PROJECT")
+          SPRINT=$(jq -r .title <<<"$CUR"); IN_SPRINT=$(jq -c .issues <<<"$CUR")
+          [ -n "$SPRINT" ] || { say "No current sprint (no Sprint iteration covers today); nothing to start."; exit 0; }
 
           # A run whose gate stopped it (agent job skipped) is not work; a run
           # still deciding counts as real, which errs towards starting less.
@@ -116,18 +119,18 @@ jobs:
               issues(states: OPEN, labels: ["ready"], first: 100, after: $endCursor) {
                 pageInfo { hasNextPage endCursor }
                 nodes { number title createdAt
-                  milestone { title } issueType { name }
+                  issueType { name }
                   labels(first: 30) { nodes { name } }
                   issueFieldValues(first: 10) { nodes { ... on IssueFieldSingleSelectValue {
                     name field { ... on IssueFieldSingleSelect { name } } } } }
                   blockedBy(first: 50) { nodes { number state labels(first: 30) { nodes { name } } } } } } } }' \
-            --jq '.data.repository.issues.nodes[]' | jq -s -c --arg sprint "$SPRINT" --argjson fixing "$FIXING" '
+            --jq '.data.repository.issues.nodes[]' | jq -s -c --argjson sprint "$IN_SPRINT" --argjson fixing "$FIXING" '
               map({number, title, createdAt,
-                   sprint: (.milestone.title // ""), type: (.issueType.name // ""),
+                   type: (.issueType.name // ""),
                    labels: [.labels.nodes[].name],
                    priority: ([.issueFieldValues.nodes[] | select(.field.name? == "Priority") | .name][0] // ""),
                    waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})
-              | map(select(.sprint == $sprint
+              | map(select((.number as $n | $sprint | index($n))
                            and (.type != "Epic" and .type != "Spike")
                            and ([.labels[] | select(. == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)
                            and (.number as $n | $fixing | index($n) | not)

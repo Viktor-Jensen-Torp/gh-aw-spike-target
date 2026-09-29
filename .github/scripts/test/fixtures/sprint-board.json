@@ -1,0 +1,6 @@
+{"iterations": [
+  {"id": "s1", "title": "Sprint 1", "startDate": "2026-09-28", "duration": 14},
+  {"id": "s2", "title": "Sprint 2", "startDate": "2026-10-12", "duration": 14}],
+ "items": [
+  {"number": 125, "iterationId": "s1"}, {"number": 83, "iterationId": "s1"},
+  {"number": 126, "iterationId": "s2"}]}

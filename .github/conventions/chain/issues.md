@@ -65,5 +65,5 @@ The "blocked by" link follows from the line.
   something broken, names a deadline, or the author said it is urgent — or a
   person decided it. Otherwise leave it unset: a priority an agent guessed makes
   the field mean nothing.
-- **Never set a milestone.** Milestones are sprints, decided by people at
-  planning.
+- **Never set the sprint or a milestone.** The sprint is the Project's `Sprint`
+  field, decided by people at planning; milestones are releases.
