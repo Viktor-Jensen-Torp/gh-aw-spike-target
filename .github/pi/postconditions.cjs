@@ -42,6 +42,14 @@
  *    report_incomplete (owner's call, 2026-09-25: nothing red reaches review).
  *    This is an efficiency layer; the required checks remain the gate.
  *
+ * 4. NO KILL BY NAME (tool_call, every role). `pkill`, `killall` and `pgrep`
+ *    match a pattern against every process's full command line, and the
+ *    command gh-aw launches the agent with contains words like `npm`. On review
+ *    run 36465779257 the agent stopped Storybook with `pkill -f
+ *    'vite|storybook|npm'` and killed its own agent (exit 143), so no review
+ *    was posted. The command is refused before it runs; shared/browser.md says
+ *    to stop a server by the process id saved when it was started.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -56,6 +64,11 @@ const CALLED_LOG = `${STATE_DIR}/called`;
 // tree's: the agent's own edits to the script must not decide whether it passes.
 const VERIFY = process.env.PI_VERIFY_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/verify.sh";
 const MAX_VERIFY_BLOCKS = 3;
+// A process-matching command in command position: at the start, or after a
+// separator, a pipe, a subshell or `sudo`.
+const KILL_BY_NAME = /(^|[;&|(`\n]|\$\()\s*(sudo\s+)?(pkill|killall|pgrep)\b/;
+const KILL_BY_NAME_REASON =
+  "BLOCKED by the pipeline: pkill, killall and pgrep match processes by name, and your own agent process matches too (it ended review run 36465779257). Stop a process you started by the id you saved when starting it: kill \"$(cat /tmp/app.pid)\" (see the \"Seeing the app\" instructions). Nothing was run.";
 // The issue-shape check, also the base-branch copy (shared/postconditions.md).
 const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/check-issue.sh";
 
@@ -355,13 +368,15 @@ function postconditions(pi) {
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
 
-  if (guard) {
-    pi.on("tool_call", async (/** @type {any} */ event) => {
-      if (event.toolName !== "bash" || typeof event.input?.command !== "string") return;
-      if (!/\bsafeoutputs\b/.test(event.input.command)) return;
-      event.input.command = `${guard}\n${event.input.command}`;
-    });
-  }
+  pi.on("tool_call", async (/** @type {any} */ event) => {
+    if (event.toolName !== "bash" || typeof event.input?.command !== "string") return;
+    if (KILL_BY_NAME.test(event.input.command)) {
+      log(`refused a kill-by-name command: ${event.input.command.slice(0, 120)}`);
+      return { block: true, reason: KILL_BY_NAME_REASON };
+    }
+    if (!guard || !/\bsafeoutputs\b/.test(event.input.command)) return;
+    event.input.command = `${guard}\n${event.input.command}`;
+  });
 
   pi.on("agent_end", async () => {
     const called = calledTools();
@@ -397,3 +412,4 @@ module.exports = postconditions;
 module.exports.buildGuard = buildGuard;
 module.exports.ROLES = ROLES;
 module.exports.undecided = undecided;
+module.exports.KILL_BY_NAME = KILL_BY_NAME;
