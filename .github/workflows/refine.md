@@ -52,6 +52,40 @@ permissions:
   contents: read
   issues: read
 
+# The current sprint lives on the Project (`Sprint` iteration field), which
+# GITHUB_TOKEN cannot read. This job reads it with a token limited to reading
+# projects and hands on only the issue numbers, so no App credential reaches the
+# agent's job and the refiner still cannot start anything ("No github-app"
+# below). The agent job waits for custom jobs.
+jobs:
+  sprint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      issues: ${{ steps.sprint.outputs.issues }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - uses: actions/create-github-app-token@v3
+        id: token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+          permission-organization-projects: read
+      - name: The current sprint's issues
+        id: sprint
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          CUR=$(bash .github/scripts/current-sprint.sh "${REPO%/*}" 2)
+          echo "current sprint: $(jq -c . <<<"$CUR")"
+          echo "issues=$(jq -c .issues <<<"$CUR")" >> "$GITHUB_OUTPUT"
+
 engine:
   id: pi
   env:
@@ -65,6 +99,8 @@ pre-agent-steps:
   - name: Choose the candidates
     env:
       GH_TOKEN: ${{ github.token }}
+      # The current sprint's issue numbers, from the `sprint` job below.
+      IN_SPRINT: ${{ needs.sprint.outputs.issues }}
       REPO: ${{ github.repository }}
       # Must stay equal to the safe-output `max` values below. gh-aw drops
       # output beyond `max` silently (established for review comments), so a
@@ -85,18 +121,15 @@ pre-agent-steps:
       gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
         --jq '.[] | select(has("pull_request") | not) | {(.number | tostring): (.type.name // "")}' \
         | jq -s 'add // {}' > /tmp/gh-aw/agent/issue-types.json
-      # The current sprint is the open milestone with the earliest due date.
-      SPRINT=$(gh api "repos/$REPO/milestones?state=open&sort=due_on&direction=asc" \
-                 --jq '[.[] | select(.due_on != null)][0].title // ""')
-      echo "current sprint: ${SPRINT:-none}"
-      add_types() { jq --slurpfile t /tmp/gh-aw/agent/issue-types.json \
-                      'map(. + {type: ($t[0][(.number | tostring)] // "")})'; }
+      IN_SPRINT="${IN_SPRINT:-[]}"
+      echo "current sprint's issues: $IN_SPRINT"
+      add_types() { jq --slurpfile t /tmp/gh-aw/agent/issue-types.json --argjson s "$IN_SPRINT" \
+                      'map(. + {type: ($t[0][(.number | tostring)] // ""), sprint: (.number as $n | $s | index($n) != null)})'; }
 
       one() { gh issue view "$1" --repo "$REPO" \
-                --json number,title,body,labels,createdAt,comments,milestone \
+                --json number,title,body,labels,createdAt,comments \
                 --jq "{number, title, body: (.body // \"\")[0:4000],
-                       labels: [.labels[].name], createdAt, comments,
-                       milestone: (.milestone.title // \"\")}"; }
+                       labels: [.labels[].name], createdAt, comments}"; }
 
       # Asked for by name: refine exactly that issue, and skip every filter.
       # The settling period and the stage labels exist to decide what to touch
@@ -134,21 +167,21 @@ pre-agent-steps:
       # The current sprint's issues first (people committed to those), then the
       # rest, newest first within each.
       gh issue list --repo "$REPO" --state open --limit 100 --label needs-refinement \
-        --json number,title,body,labels,createdAt,updatedAt,comments,milestone \
+        --json number,title,body,labels,createdAt,updatedAt,comments \
         --jq "[ .[]
                 | select([.labels[].name] | any(. == \"agent\"
                     or . == \"needs-human\" or . == \"merged\" or . == \"paused\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
                 | {number, title, body: (.body // \"\")[0:4000],
-                   labels: [.labels[].name], createdAt, comments,
-                   milestone: (.milestone.title // \"\")} ]
-              | (map(select(.milestone == \"$SPRINT\" and \"$SPRINT\" != \"\")) | sort_by(.createdAt) | reverse)
-                + (map(select((.milestone == \"$SPRINT\" and \"$SPRINT\" != \"\") | not)) | sort_by(.createdAt) | reverse)
-              | .[0:${MAX_ISSUES}]" \
-        | add_types > /tmp/gh-aw/agent/refine-candidates.json
+                   labels: [.labels[].name], createdAt, comments} ]" \
+        | add_types \
+        | jq --argjson max "$MAX_ISSUES" \
+            '(map(select(.sprint)) | sort_by(.createdAt) | reverse)
+             + (map(select(.sprint | not)) | sort_by(.createdAt) | reverse) | .[0:$max]' \
+        > /tmp/gh-aw/agent/refine-candidates.json
       echo "candidates (settled before $CUTOFF): $(jq 'length' /tmp/gh-aw/agent/refine-candidates.json)"
-      jq -r '.[] | "  #\(.number) \(.title)\(if .type != "" then " [\(.type)]" else "" end)\(if .milestone != "" then " (\(.milestone))" else "" end)"' \
+      jq -r '.[] | "  #\(.number) \(.title)\(if .type != "" then " [\(.type)]" else "" end)\(if .sprint then " (sprint)" else "" end)"' \
         /tmp/gh-aw/agent/refine-candidates.json
 
 tools:
@@ -251,8 +284,8 @@ not a case to make up.
 
 `/tmp/gh-aw/agent/refine-candidates.json` holds the issues to consider this run,
 already filtered, capped, and ordered: the current sprint's issues come first.
-Each has its body, labels, comments, `type` and `milestone`, so there is nothing
-to fetch again. Nothing outside that file is your business.
+Each has its body, labels, comments, `type` and `sprint` (whether it is in the
+current sprint), so there is nothing to fetch again. Nothing outside that file is your business.
 
 **An issue that was refined or ready before** has a comment starting "Back to
 refinement:" naming what changed (an edit, a changed source file, a closed

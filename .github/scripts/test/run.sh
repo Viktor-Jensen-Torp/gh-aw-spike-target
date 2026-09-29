@@ -192,6 +192,14 @@ check "agent-inputs.sh maps every role" "" "$MAPOK"
 check "the map names review's pre-fetched diff" "1" \
   "$(bash "$SCRIPTS/agent-inputs.sh" review | grep -c 'pr-diff.patch')"
 
+# --- current-sprint.sh: the sprint is the Project's Sprint iteration ---------------
+sprint() { SPRINT_DATA="$FIX/sprint-board.json" SPRINT_TODAY="$1" bash "$SCRIPTS/current-sprint.sh" org 2 | jq -c '[.title, .issues]'; }
+check "the first day of a sprint belongs to it"   '["Sprint 1",[83,125]]' "$(sprint 2026-09-28)"
+check "its last day too (14 days: to Oct 11)"     '["Sprint 1",[83,125]]' "$(sprint 2026-10-11)"
+check "the next Monday starts the next sprint"    '["Sprint 2",[126]]'    "$(sprint 2026-10-12)"
+check "before the first sprint: none"             '["",[]]'               "$(sprint 2026-09-27)"
+check "after the last planned sprint: none"       '["",[]]'               "$(sprint 2026-10-26)"
+
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its
 # conclusion there is `failure` (review run 36472313007).
