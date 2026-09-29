@@ -66,9 +66,8 @@ for PR in $MEMBERS; do
       esac ;;
     review)
       SHA=$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)
-      VERDICT=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-        --jq '[.check_runs[] | select(.name == "Agent review")]
-              | sort_by(.completed_at) | last | .conclusion // "none"')
+      VERDICT=$(bash "$(dirname "$0")/check-runs.sh" latest "$SHA" "Agent review")
+      VERDICT="${VERDICT:-none}"
       if [ "$VERDICT" = "success" ]; then
         echo "#$PR: reviewed and passed on ${SHA:0:8}"
       else

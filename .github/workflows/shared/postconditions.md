@@ -16,7 +16,12 @@ import-schema:
 # a breach on a pull request that had none (review run 36143201406), which
 # would refuse every rework push. gh-aw's own `fetch` adds it after checkout
 # (reference/checkout.md, "Fetching Additional Refs").
+# Full history, for both: with the default depth 1 a pull request forked from
+# an older develop has no merge base in the checkout, and the check refused
+# both rework pushes on #136 (runs 36473378915, 36500339583). The extra fetch
+# takes the same depth (checkout_step_generator.go).
 checkout:
+  fetch-depth: 0
   fetch: [develop]
 
 pre-agent-steps:
