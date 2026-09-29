@@ -45,14 +45,15 @@ pre-agent-steps:
       # The paths the change touches, for the conventions: a pull request's
       # changed files, or for a new change the paths its issue names.
       conventions() { # <issue body>
+        TMP=$(mktemp -d)
         if [ -n "${PR:-}" ]; then
-          gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$DIR/paths.txt"
+          gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$TMP/paths.txt"
         else
-          printf '%s' "$1" | grep -oE '`(apps|packages|docs)/[^` ]+`' | tr -d '`' | sort -u > "$DIR/paths.txt" || true
+          printf '%s' "$1" | grep -oE '`(apps|packages|docs)/[^` ]+`' | tr -d '`' | sort -u > "$TMP/paths.txt" || true
         fi
-        printf '%s' "$1" > "$DIR/issue-body.md"
-        bash .github/scripts/agent-context.sh "$DIR/paths.txt" "$DIR/issue-body.md" "$DIR/conventions.md"
-        rm -f "$DIR/paths.txt" "$DIR/issue-body.md"
+        printf '%s' "$1" > "$TMP/issue-body.md"
+        bash .github/scripts/agent-context.sh "$TMP/paths.txt" "$TMP/issue-body.md" "$DIR/conventions.md"
+        rm -rf "$TMP"
       }
       if [ -z "$N" ]; then
         if [ "$REQUIRED" = "false" ]; then

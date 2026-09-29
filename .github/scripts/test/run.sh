@@ -181,6 +181,17 @@ check "no paths: the Always documents only" "$ALWAYS" "$(ctx "" "")"
 check "each document's text is included, without its frontmatter" "0 1" \
   "$(grep -c '^okf_version:' "$WORK/ctx.md") $(grep -c '^<!-- docs/architecture.md -->' "$WORK/ctx.md")"
 
+# --- agent-inputs.sh: the map of what each role is given -------------------------
+MAPOK=""
+for R in implement review rework refine relate unblock release-review; do
+  OUT=$(bash "$SCRIPTS/agent-inputs.sh" "$R" 2>&1) || { MAPOK+="$R(failed) "; continue; }
+  for H in "## 1." "## 2." "## 3." "## 4." "## 5."; do grep -qF "$H" <<<"$OUT" || MAPOK+="$R(no $H) "; done
+  grep -qE '^\| # ' <<<"$OUT" || MAPOK+="$R(no task section) "
+done
+check "agent-inputs.sh maps every role" "" "$MAPOK"
+check "the map names review's pre-fetched diff" "1" \
+  "$(bash "$SCRIPTS/agent-inputs.sh" review | grep -c 'pr-diff.patch')"
+
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its
 # conclusion there is `failure` (review run 36472313007).
