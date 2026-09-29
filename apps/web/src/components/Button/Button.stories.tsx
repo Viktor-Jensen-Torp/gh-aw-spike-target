@@ -33,7 +33,7 @@ export const PlainButton: Story = {
 export const WithIcon: Story = {
   args: {
     children: 'New task',
-    icon: 'Plus',
+    icon: 'plus',
     variant: 'medium',
   },
   play: async ({ canvasElement }) => {

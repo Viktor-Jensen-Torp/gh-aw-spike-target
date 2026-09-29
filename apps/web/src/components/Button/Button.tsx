@@ -14,7 +14,7 @@ const iconMap: Record<string, ComponentType<LucideProps>> = {
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Optional leading icon name from lucide-react. The icon is decorative. */
-  icon?: keyof typeof iconMap;
+  icon?: string;
   /** Font weight variant: 'default' (600) or 'medium' (500). Defaults to 'default'. */
   variant?: 'default' | 'medium';
 }
@@ -28,8 +28,13 @@ export const Button = forwardRef<
   HTMLButtonElement,
   PropsWithChildren<ButtonProps>
 >(({ children, icon, variant = 'default', className, ...props }, ref) => {
-  // Get the icon component if specified
-  const IconComponent = icon ? iconMap[icon] : null;
+  // Get the icon component if specified, normalizing lowercase input to capitalized key
+  const normalizedIcon = icon
+    ? icon.charAt(0).toUpperCase() + icon.slice(1)
+    : null;
+  const IconComponent = normalizedIcon
+    ? iconMap[normalizedIcon as keyof typeof iconMap]
+    : null;
 
   return (
     <button
@@ -41,8 +46,8 @@ export const Button = forwardRef<
         'rounded-lg',
         // Flex layout for icon + label with 8px gap (design: gap 8, which is gap-2 in Tailwind)
         'flex items-center justify-center gap-2',
-        // Padding: design specifies padding [9, 12] (v/h), approximate with py-2 px-3
-        'px-3 py-2',
+        // Padding: design specifies padding [9, 12] (v/h), using arbitrary value py-[9px] px-3 for exact match
+        'px-3 py-[9px]',
         // Typography: 14px, weight varies by variant (from design: fontSize 14, color white)
         'text-sm text-white',
         // Font weight: 'default' uses 600 (font-semibold), 'medium' uses 500 (font-medium)
