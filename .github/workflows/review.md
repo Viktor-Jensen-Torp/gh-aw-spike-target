@@ -195,6 +195,13 @@ jobs:
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
           private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+          # Only what routing calls: it reads the PR, its reviews, files, check
+          # runs, the issue's type and a requirements file, and sets PR labels.
+          # Unscoped, the token gets everything the App has (zizmor github-app).
+          permission-contents: read
+          permission-pull-requests: read
+          permission-checks: read
+          permission-issues: write
       # Route on the CHECK RUN, not the review state. On run 35598277469 the
       # agent wrote "REQUEST_CHANGES" in the review text and posted a red
       # check, but called submit_pull_request_review without an `event`

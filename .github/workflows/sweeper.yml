@@ -42,6 +42,8 @@ jobs:
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
           private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+          # Only adds `needs-human` to a pull request (label_as_app).
+          permission-issues: write
       # The implementer App, for arming auto-merge: the merge queue runs its
       # checks only for an entry queued by an identity whose events start
       # workflows. Armed with GITHUB_TOKEN, #136 sat in the queue with no
@@ -51,6 +53,9 @@ jobs:
         with:
           client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
           private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
+          # Only arms auto-merge (enablePullRequestAutoMerge).
+          permission-contents: write
+          permission-pull-requests: write
 
       # The check-run reader shared with review.md (.github/scripts/check-runs.sh).
       - uses: actions/checkout@v5
