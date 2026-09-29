@@ -166,6 +166,10 @@ safe-outputs:
 #
 # conclusion runs after safe_outputs, so by here the review exists.
 jobs:
+  # The gate's decision, read by the `if:` above.
+  pre-activation:
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
   conclusion:
     # The routing step dispatches rework with GITHUB_TOKEN: neither App has the
     # Actions permission (org installations API, 2026-09-29), and gh-aw merges
