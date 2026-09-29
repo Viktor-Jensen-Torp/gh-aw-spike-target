@@ -1,13 +1,14 @@
 ---
 description: >
-  Gives the agent its issue, and the requirements for the issue's type, as
-  files. gh-aw's `steps.sanitized.outputs.text` is blank when the actor lacks
-  write permission (compute_text.cjs), which is every run the dispatcher starts
-  as the reviewer App: on #113 the implementer got "" and built from the title
-  alone. `github.event.issue.body` is not an allowed prompt expression, so the
-  issue is fetched here instead, the way gh-aw's own guides pre-fetch data
-  (DataOps). A missing issue, body or requirements file stops the run, visibly,
-  before any agent time is spent.
+  Gives the agent, as files: its issue, the requirements for the issue's type,
+  and the conventions that apply to the change.
+  The issue is fetched here because gh-aw's `steps.sanitized.outputs.text` is
+  blank when the actor lacks write permission (compute_text.cjs): on #113 the
+  implementer got "" and built from the title alone. The conventions are picked
+  by .github/scripts/agent-context.sh: left to follow conventions/index.md
+  itself, the reviewer on run 36602126236 skipped the four documents it lists
+  under "Always". A missing issue, body or requirements file stops the run,
+  visibly, before any agent time is spent.
 
 import-schema:
   required:
@@ -19,7 +20,7 @@ import-schema:
       then reviewed without requirements.
 
 pre-agent-steps:
-  - name: Write the issue and its requirements to files
+  - name: Write the issue, its requirements and the conventions to files
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
@@ -41,8 +42,23 @@ pre-agent-steps:
       if [ -z "$N" ]; then
         N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1 || true)
       fi
+      # The paths the change touches, for the conventions: a pull request's
+      # changed files, or for a new change the paths its issue names.
+      conventions() { # <issue body>
+        if [ -n "${PR:-}" ]; then
+          gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$DIR/paths.txt"
+        else
+          printf '%s' "$1" | grep -oE '`(apps|packages|docs)/[^` ]+`' | tr -d '`' | sort -u > "$DIR/paths.txt" || true
+        fi
+        printf '%s' "$1" > "$DIR/issue-body.md"
+        bash .github/scripts/agent-context.sh "$DIR/paths.txt" "$DIR/issue-body.md" "$DIR/conventions.md"
+        rm -f "$DIR/paths.txt" "$DIR/issue-body.md"
+      }
       if [ -z "$N" ]; then
-        [ "$REQUIRED" = "false" ] && { echo "No linked issue; reviewing without requirements."; exit 0; }
+        if [ "$REQUIRED" = "false" ]; then
+          conventions ""
+          echo "No linked issue; reviewing without requirements."; exit 0
+        fi
         echo "::error::No issue: not an issue event, and the pull request names none with 'Fixes #N'."; exit 1
       fi
       gh api "repos/$REPO/issues/$N" \
@@ -59,4 +75,5 @@ pre-agent-steps:
       cp "$REQ" "$DIR/requirements.md"
       jq -r '"#\(.number) (\(.type)): \(.title) — \(.body | length) characters"' "$DIR/issue.json"
       echo "requirements: $REQ ($(grep -cE '^\| *[A-Z][0-9]+ *\|' "$REQ") rows)"
+      conventions "$(jq -r .body "$DIR/issue.json")"
 ---
