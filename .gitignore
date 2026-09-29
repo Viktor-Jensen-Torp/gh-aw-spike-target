@@ -10,6 +10,9 @@ apps/api/data/
 test-results/
 playwright-report/
 
+# Storybook's static build.
+storybook-static/
+
 # Written into the checkout by gh-aw's agent setup, never ours to commit: a
 # Chromium install under a folder literally named `${RUNNER_TEMP}`, and gh-aw's
 # Playwright skill. `git add -A` swept both into rework run 36601234520's

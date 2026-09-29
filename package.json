@@ -15,11 +15,14 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test --config apps/web/playwright.config.ts",
     "lint": "eslint --config .github/lint/eslint.config.js --max-warnings 0 apps packages && prettier --config .github/lint/prettier.json --check apps packages",
-    "format": "prettier --config .github/lint/prettier.json --write apps packages && eslint --config .github/lint/eslint.config.js --fix apps packages"
+    "format": "prettier --config .github/lint/prettier.json --write apps packages && eslint --config .github/lint/eslint.config.js --fix apps packages",
+    "storybook": "npm run storybook -w @tempo/web"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
+    "@vitest/browser": "^4.1.11",
+    "@vitest/browser-playwright": "^4.1.11",
     "concurrently": "^10.0.5",
     "eslint": "^10.11.0",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -30,6 +33,6 @@
     "prettier": "^3.9.9",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.70.1",
-    "vitest": "^5.0.2"
+    "vitest": "^4.1.11"
   }
 }

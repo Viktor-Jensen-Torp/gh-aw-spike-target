@@ -23,7 +23,7 @@ project. The design is `design/tempo.pen`.
 
 | Feature | Web | API | Shared |
 |---|---|---|---|
-| home | `apps/web/src/features/home/`: the start page, until sign-in replaces it | none | none |
+| home | `apps/web/src/features/home/`: the start page, until sign-in replaces it | `apps/api/src/features/health/`: GET /api/health | `packages/shared/src/health.ts`: HealthResponse |
 | errors | none | `apps/api/src/lib/errors.ts`: the one error shape | `packages/shared/src/errors.ts` |
 
 Add a row when a feature folder is added, and change it when one moves or goes.
@@ -46,8 +46,14 @@ screen (features/<f>/*.tsx)
 |---|---|---|
 | Unit and API tests | Vitest (API through Fastify `inject`) | `npm test` |
 | Component tests | Vitest + Testing Library (jsdom) | `npm test` |
+| Shared components | Storybook stories, each run as a test in Chromium with the accessibility check (Vitest's Storybook addon) | `npm test` |
 | Browser tests | Playwright (Chromium) against the running app | `npm test` |
 
 `bash .github/scripts/verify.sh` runs typecheck, lint, all tests and the
 conventions check. `npm run dev` starts the web app and the API together; the web
-app proxies `/api` to the API.
+app proxies `/api` to the API. `npm run storybook` serves the stories on
+<http://127.0.0.1:6006>.
+
+UI libraries: Radix (`radix-ui`) for interactive patterns, `class-variance-authority`
+and the `cn` helper (`apps/web/src/lib/utils.ts`) for variants, `lucide-react` for
+icons, in the shadcn/ui style (`.github/conventions/components.md`).
