@@ -4,10 +4,10 @@ description: >
   (implement, rework, unblock) and for review, which runs the app to look at it
   (shared/browser.md). No `import-schema` parameter is needed.
 
-network:
-  allowed:
-    - defaults
-    - node
+  No `network` here, on purpose: `runtimes: node` already opens the npm
+  registry, and an imported `network` makes gh-aw drop the importing
+  workflow's `network.blocked` (v0.88.7, pkg/workflow/imports.go
+  MergeNetworkPermissions keeps only `allowed`), which Review relies on.
 
 runtimes:
   node:

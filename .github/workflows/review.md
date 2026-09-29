@@ -6,6 +6,16 @@ intent: Give an agent-authored pull request a review a maintainer would trust, w
 
 inlined-imports: true
 
+# No npm registry for the reviewer: it runs the app from the dependencies
+# installed before it starts (shared/node-runtime.md) and never adds a package.
+# `runtimes: node` opens the registry by itself, so it is blocked here. This
+# works only while no import declares `network` (see shared/node-runtime.md).
+network:
+  allowed:
+    - defaults
+  blocked:
+    - node
+
 imports:
   - shared/model.md
   - shared/budget.md
