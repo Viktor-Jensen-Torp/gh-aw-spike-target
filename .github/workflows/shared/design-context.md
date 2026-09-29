@@ -12,13 +12,19 @@ pre-agent-steps:
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
-      ISSUE: ${{ github.event.issue.number }}
+      # From the event, or from the dispatch (.github/scripts/dispatch.sh).
+      ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+      PR: ${{ github.event.pull_request.number || github.event.inputs.pr }}
       PR_BODY: ${{ github.event.pull_request.body }}
     run: |
       set -euo pipefail
       OUT=/tmp/gh-aw/agent/design
       # The issue: the triggering one, or the one a pull request fixes.
       N="${ISSUE:-}"
+      # A dispatched run has the pull request's number but not its body.
+      if [ -z "$N" ] && [ -z "${PR_BODY:-}" ] && [ -n "${PR:-}" ]; then
+        PR_BODY=$(gh api "repos/$REPO/pulls/$PR" --jq '.body // ""')
+      fi
       if [ -z "$N" ]; then
         N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1 || true)
       fi
