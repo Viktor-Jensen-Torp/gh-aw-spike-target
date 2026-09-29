@@ -67,6 +67,10 @@ jobs:
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
           private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+          # Reads only: the sprint (Project), open PRs, ready issues.
+          permission-organization-projects: read
+          permission-issues: read
+          permission-pull-requests: read
 
       - name: Start the next ready issues
         env:

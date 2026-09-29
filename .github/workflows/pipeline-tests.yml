@@ -32,3 +32,19 @@ jobs:
         run: bash .github/scripts/test/run.sh
       - name: Pi postconditions extension
         run: bash .github/pi/test/run.sh
+      # gh-aw's own checks: compile plus the zizmor, actionlint and poutine
+      # security linters. Fails on a High or Critical zizmor finding; the rest
+      # is printed (pkg/cli/zizmor.go). Not --strict: it fails on every
+      # finding, including the ~300 in gh-aw's own generated code. Not
+      # `gh aw validate`: in v0.88.7 it skips every linter, since they are
+      # gated on files being written (pkg/cli/compile_pipeline.go). The files
+      # written here are discarded. zizmor and poutine run in Docker, which
+      # the runner has. Pinned to the version the locks are compiled with.
+      - name: Install gh-aw
+        uses: github/gh-aw-actions/setup-cli@5e508589e03a7757a7e05b26e834292f5445bfb6 # v0.88.7
+        with:
+          version: v0.88.7
+      - name: gh-aw security linters
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh aw compile --zizmor --actionlint --poutine --no-check-update
