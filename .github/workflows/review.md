@@ -301,7 +301,7 @@ jobs:
             pass)
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
               for L in $(gh api "repos/$REPO/issues/$PR/labels" \
-                           --jq '.[].name | select(startswith("strike:") or startswith("conflict:"))'); do
+                           --jq '.[].name | select(startswith("strike:"))'); do
                 gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent || true
                 echo "-> cleared $L"
               done ;;

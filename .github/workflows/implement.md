@@ -121,7 +121,7 @@ safe-outputs:
   create-pull-request:
     draft: false
     title-prefix: "[implementer] "
-    labels: [agent, needs-review]
+    labels: [agent]
     # Agent work targets `develop`, not `main`. Without this the base is
     # `github.ref_name`, which on an `issues` event is the default branch.
     base-branch: develop
