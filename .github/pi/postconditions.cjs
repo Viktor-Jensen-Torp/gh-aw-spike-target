@@ -71,6 +71,21 @@
  *    from the base; the push failed on its size. The refusal names the files
  *    and the exact reset that undoes the commits.
  *
+ * 8. FIXED RULES (system prompt, every role). gh-aw pipes the task into Pi as
+ *    the first user message (the lock's `cat prompt.txt | pi --print`), which
+ *    compaction can summarise; the system prompt is sent on every turn. So the
+ *    few rules that must never be lost are appended to it at start-up
+ *    (before_agent_start), with where the full task is kept.
+ *
+ * 9. JUST-IN-TIME ADVICE (tool_result). Advice that matters only at one moment
+ *    is added to that tool's result instead of the prompt: after verify.sh
+ *    fails, and after a safe-output call is refused for its fields (refine run
+ *    36561914371 sent `field` and `item_number` to set_issue_field).
+ *
+ * 10. NO SWEEPING ADDS (implement, rework). `git add -A`, `git add .` and
+ *    `git commit -a` are refused before they run, with the alternative (rework
+ *    run 36601234520; item 7 is the backstop at push time).
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -178,6 +193,60 @@ const ROLES = {
     checks: {},
   },
 };
+
+/**
+ * The rules appended to the system prompt, per role (item 8). Few and short:
+ * each costs tokens on every turn. The guard enforces most of them anyway; here
+ * they are stated up front so the agent does not learn them by being refused.
+ */
+const TASK_FILE = "/tmp/gh-aw/aw-prompts/prompt.txt";
+const CODE_RULES = [
+  "Commit only the files you changed, by path (`git add apps/...`); never `git add -A` or `git add .`. Only `apps/`, `packages/` and `docs/architecture.md` may change.",
+  "Run `bash .github/scripts/verify.sh` until it passes before you open or update the pull request.",
+];
+const SYSTEM_RULES = {
+  implement: [...CODE_RULES, "The pull request body ends with `Fixes #<issue>`."],
+  rework: CODE_RULES,
+  review: [
+    "Every `met` row's evidence names a changed file by its full path, e.g. `apps/web/src/components/Button/Button.tsx:12`.",
+    "Submit one review with `event` and `data`, then one `create_check_run` whose conclusion agrees (REQUEST_CHANGES with failure, COMMENT with success).",
+  ],
+  refine: ["`/tmp/gh-aw/agent/refine-candidates.json` already holds each candidate's body, labels, type and milestone; do not fetch them again."],
+  unblock: [],
+  relate: [],
+  release: [],
+};
+const ALL_RULES = [
+  `Your task is the first message; the whole of it is also in \`${TASK_FILE}\`. Re-read it there if you lose track of it.`,
+  "Stop a process you started by its saved id (`kill \"$(cat /tmp/app.pid)\"`); never with pkill, killall or pgrep.",
+];
+
+/** @param {string} role */
+function systemRules(role) {
+  const lines = [...ALL_RULES, ...(SYSTEM_RULES[/** @type {keyof typeof SYSTEM_RULES} */ (role)] || [])];
+  return `\n\n## Pipeline rules (always apply)\n\n${lines.map(l => `- ${l}`).join("\n")}\n`;
+}
+
+// Item 10: a sweeping add, in command position.
+const SWEEPING_ADD = /(^|[;&|(`\n]|\$\()\s*git\s+(add\s+(-A|--all|\.)(\s|$|;|&)|commit\s+(.*\s)?(-(?!-)[A-Za-z]*a[A-Za-z]*|--all)(\s|$))/;
+const SWEEPING_ADD_REASON =
+  "BLOCKED by the pipeline: add only the files you changed, by path (git add apps/web/src/... ). A sweeping add also commits what gh-aw left in the checkout (a browser install, restored .github/ files), and on rework run 36601234520 that made the push fail. Nothing was run.";
+
+/**
+ * Item 9: advice for one moment, appended to that tool's result.
+ * @param {string} command
+ * @param {string} output
+ * @returns {string} advice, or "" when there is none
+ */
+function adviceFor(command, output) {
+  if (/verify\.sh/.test(command)) {
+    return "\n[pipeline] verify.sh failed. Fix what it names, run it again until it passes, then commit only the files you changed (by path) before you push.";
+  }
+  if (/\bsafeoutputs\b/.test(command) && /unknown parameters|Invalid arguments|is required|must be/i.test(output)) {
+    return "\n[pipeline] The call was refused for its fields. Run `safeoutputs <tool> --help` once to see the exact field names, then call it again.";
+  }
+  return "";
+}
 
 /** Why each required output matters, in the agent's terms. */
 const WHY = {
@@ -472,11 +541,30 @@ function postconditions(pi) {
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
 
+  pi.on("before_agent_start", async (/** @type {any} */ event) => {
+    log(`system rules appended for role=${role}`);
+    return { systemPrompt: `${event.systemPrompt || ""}${systemRules(role)}` };
+  });
+
+  pi.on("tool_result", async (/** @type {any} */ event) => {
+    if (event.toolName !== "bash" || !event.isError) return;
+    const command = String(event.input?.command || "");
+    const output = (event.content || []).map((/** @type {any} */ c) => c.text || "").join("\n");
+    const advice = adviceFor(command, output);
+    if (!advice) return;
+    log(`advice appended after: ${command.slice(0, 80)}`);
+    return { content: [...(event.content || []), { type: "text", text: advice }] };
+  });
+
   pi.on("tool_call", async (/** @type {any} */ event) => {
     if (event.toolName !== "bash" || typeof event.input?.command !== "string") return;
     if (KILL_BY_NAME.test(event.input.command)) {
       log(`refused a kill-by-name command: ${event.input.command.slice(0, 120)}`);
       return { block: true, reason: KILL_BY_NAME_REASON };
+    }
+    if (/** @type {any} */ (spec).allowedPaths && SWEEPING_ADD.test(event.input.command)) {
+      log(`refused a sweeping add: ${event.input.command.slice(0, 120)}`);
+      return { block: true, reason: SWEEPING_ADD_REASON };
     }
     if (!guard || !/\bsafeoutputs\b/.test(event.input.command)) return;
     event.input.command = `${guard}\n${event.input.command}`;
@@ -517,3 +605,6 @@ module.exports.buildGuard = buildGuard;
 module.exports.ROLES = ROLES;
 module.exports.undecided = undecided;
 module.exports.KILL_BY_NAME = KILL_BY_NAME;
+module.exports.SWEEPING_ADD = SWEEPING_ADD;
+module.exports.systemRules = systemRules;
+module.exports.adviceFor = adviceFor;
