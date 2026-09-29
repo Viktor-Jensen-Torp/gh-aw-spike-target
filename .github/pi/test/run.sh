@@ -36,7 +36,7 @@ FAKE
 case_() {
   local label="$1" want="$2" cmd="$3" wrapped err rc before after ok
   cmd="${cmd//\/tmp\/gh-aw/$ROOT/gh-aw}"
-  wrapped=$(PI_ROLE="${ROLE:-review}" PI_VERIFY_SCRIPT="$ROOT/verify.sh" PI_CHECK_ISSUE_SCRIPT="${CHECK_ISSUE:-$ROOT/none.sh}" PI_REFINE_CANDIDATES="$ROOT/cands.json" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
+  wrapped=$(PI_ROLE="${ROLE:-review}" PI_VERIFY_SCRIPT="$ROOT/verify.sh" PI_CHECK_ISSUE_SCRIPT="${CHECK_ISSUE:-$ROOT/none.sh}" PI_REVIEW_ROWS_SCRIPT="${ROWS_SCRIPT:-$ROOT/none.sh}" PI_REQUIREMENTS="${REQS:-$ROOT/none.md}" PI_PR_META="${META:-$ROOT/none.json}" PI_REFINE_CANDIDATES="$ROOT/cands.json" PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" CMD="$cmd" node -e '
     const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
     const ev = { toolName: "bash", input: { command: process.env.CMD } };
     h.tool_call(ev).then(() => process.stdout.write(ev.input.command));' "$EXT" 2>/dev/null)
@@ -189,6 +189,22 @@ new_root; fake_verify
 PI_ISSUE=125 ROLE=implement case_ "closes #125, any case"                 pass  "$(link 'closes #125.')"
 PI_ISSUE=""  ROLE=implement case_ "no PI_ISSUE (a person's run): not checked" pass "$(link 'x')"
 PI_ISSUE=125 ROLE=rework    case_ "rework pushes are not checked"         pass  "$PUSH"
+
+echo "== review rows are refused in the form the routing would refuse them"
+REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
+export ROWS_SCRIPT="$REPO_ROOT/.github/scripts/review-rows.sh" REQS="$REPO_ROOT/.github/conventions/chain/requirements/component.md" META="$FIX/pr-meta-136.json"
+submit() { printf 'echo %q | safeoutputs submit_pull_request_review .' "{\"event\":\"$1\",\"body\":\"b\",\"data\":$2}"; }
+# Replay: review run 36598205345 on #136 cited "Button.stories.tsx" for U1-U3.
+REPLAY=$(cat "$FIX/review-136-55930b3.json")
+new_root; case_ "replay #136: U1-U3 without a full path refused" block "$(submit REQUEST_CHANGES "$REPLAY")"
+grep -q "U1: met-without-a-changed-file" "$ROOT/last_err" && echo "PASS  the agent is told which rows" || { echo "FAIL  the agent is not told which rows"; fails=$((fails+1)); }
+FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3") then .evidence = "apps/web/src/components/Button/Button.stories.tsx:16" else . end)' <<<"$REPLAY")
+new_root; case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
+new_root; case_ "no data at all is refused"                  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
+new_root; case_ "a row left out is refused"                  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(select(.id != "U2"))' <<<"$FIXED")")"
+new_root; case_ "n/a on a row that does not allow it"        block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(if .id == "U1" then .status = "n/a" else . end)' <<<"$FIXED")")"
+new_root; REQS="$ROOT/none.md" case_ "no requirements file (a person's PR): not checked" pass 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
+unset ROWS_SCRIPT REQS META
 
 echo "== agent_end nudge"
 new_root

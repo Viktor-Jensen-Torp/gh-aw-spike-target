@@ -435,7 +435,10 @@ Call `submit_pull_request_review` once, with the verdicts as `data`:
 ```
 
 One entry per row, C1 included. A review without `data` sends the pull request
-to a person, because the pipeline cannot read a verdict from prose.
+to a person, because the pipeline cannot read a verdict from prose. A `met`
+row's evidence names a changed file (or its folder) by its full path, such as
+`apps/web/src/components/Button/Button.stories.tsx:16`; the pipeline refuses the
+submission otherwise and tells you which rows to fix.
 
 Use **REQUEST_CHANGES** when any row is `unmet` or `unproven`, or when three or
 more separate maintainability findings point at the same weakness. Use
