@@ -56,6 +56,14 @@
  *    all find the issue through that line, so create_pull_request is refused
  *    without it. PI_ISSUE is the dispatched issue number.
  *
+ * 6. REVIEW ROWS (review). The routing step blocks a `met` row whose evidence
+ *    names no changed file by its full path, an `n/a` on a row that does not
+ *    allow it, and a missing row (.github/scripts/review-rows.sh). On #136
+ *    (review run 36598205345) three correct rows cited "Button.stories.tsx"
+ *    and cost a rework round. The same script runs here on the submitted
+ *    `data`, so the reviewer fixes the wording before anything is posted.
+ *    Verdicts (unmet, unproven) are never refused, only form.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -77,6 +85,12 @@ const KILL_BY_NAME_REASON =
   "BLOCKED by the pipeline: pkill, killall and pgrep match processes by name, and your own agent process matches too (it ended review run 36465779257). Stop a process you started by the id you saved when starting it: kill \"$(cat /tmp/app.pid)\" (see the \"Seeing the app\" instructions). Nothing was run.";
 // The issue-shape check, also the base-branch copy (shared/postconditions.md).
 const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/check-issue.sh";
+// The routing's row check, also the base-branch copy, and what it reads: the
+// requirements for the issue's type and the pull request's changed files, both
+// written by pre-agent steps (shared/issue-context.md, shared/pr-context.md).
+const REVIEW_ROWS = process.env.PI_REVIEW_ROWS_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/review-rows.sh";
+const REQUIREMENTS = process.env.PI_REQUIREMENTS || "/tmp/gh-aw/agent/requirements.md";
+const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
 
 /**
  * required: each inner array is "any of these".
@@ -86,6 +100,7 @@ const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-di
  * decideEach: every issue in `candidates` must end the run with one of `labels`.
  * checkIssue: run check-issue.sh on the body of every update_issue that sets one.
  * linkIssue: create_pull_request's body must say "Fixes #$PI_ISSUE".
+ * checkRows: submit_pull_request_review's `data` must pass review-rows.sh's form rules.
  */
 const ROLES = {
   review: {
@@ -94,6 +109,7 @@ const ROLES = {
       submit_pull_request_review: { field: "event", allowed: ["COMMENT", "REQUEST_CHANGES"], upper: true, once: true },
       create_check_run: { field: "conclusion", allowed: ["success", "failure"], upper: false, once: true },
     },
+    checkRows: true,
   },
   implement: {
     required: [["create_pull_request", "noop", "report_incomplete", "missing_tool", "missing_data"]],
@@ -177,8 +193,9 @@ function log(msg) {
  * @param {boolean} [checkIssue] run check-issue.sh on an update_issue body
  * @param {string} [candidates] candidates file, to tell an epic from a work item
  * @param {boolean} [linkIssue] create_pull_request must name $PI_ISSUE with a closing keyword
+ * @param {boolean} [checkRows] submit_pull_request_review's rows must pass review-rows.sh's form rules
  */
-function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false) {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false, checkRows = false) {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -294,11 +311,41 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   fi`
     : "";
 
+  // Checked before the event rules and the `once` record, so a refused review
+  // can be submitted again. Fails open when a file is missing: a person's pull
+  // request may link no issue, and then there are no rows to check.
+  const rowsCheck = checkRows
+    ? `
+  if [ "$1" = submit_pull_request_review ] || [ "$1" = submit-pull-request-review ]; then
+    if [ -f "${REVIEW_ROWS}" ] && [ -f "${REQUIREMENTS}" ] && [ -f "${PR_META}" ]; then
+      __data=$(printf '%s' "$__payload" | jq -c '.data // empty' 2>/dev/null); [ -z "$__data" ] && __data=$(__pc_flag data "$@")
+      if [ -z "$__data" ]; then
+        echo "BLOCKED by the pipeline: the review has no data. Submit it with {\\"requirements\\": [...]}, one entry per row, C1 included (Step 5). Nothing was submitted." >&2
+        return 2
+      fi
+      __rd="${STATE_DIR}/rows-data.json"; __rf="${STATE_DIR}/rows-files.txt"
+      printf '%s' "$__data" > "$__rd"; jq -r '.files[].path' "${PR_META}" > "$__rf" 2>/dev/null
+      if ! __rows=$(bash "${REVIEW_ROWS}" "$__rd" "${REQUIREMENTS}" "$__rf" 2>&1); then
+        echo "[spike/postconditions] WARNING: review-rows.sh failed; submitting unchecked (routing still checks): $__rows" >&2
+        __rows=""
+      fi
+      __bad=$(printf '%s\n' "$__rows" | grep -E ': (met-without-a-changed-file|n/a-not-allowed|missing)$' || true)
+      if [ -n "$__bad" ]; then
+        echo "BLOCKED by the pipeline: these rows would be refused as written. Nothing was submitted; fix them and call $1 again:" >&2
+        printf '%s\n' "$__bad" | sed 's/^/  /' >&2
+        echo "  met-without-a-changed-file: the evidence must name a changed file (or its folder) by its full path, e.g. apps/web/src/components/Button/Button.stories.tsx:16. The changed files are in /tmp/gh-aw/agent/pr-meta.json." >&2
+        echo "  n/a-not-allowed: only rows marked yes under 'n/a allowed' may be n/a. missing: every row of requirements.md, and C1, needs an entry." >&2
+        return 2
+      fi
+    fi
+  fi`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
-  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}
+  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}${rowsCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -387,8 +434,9 @@ function postconditions(pi) {
   const verify = spec.verify === true;
   const checkIssue = /** @type {any} */ (spec).checkIssue === true;
   const linkIssue = /** @type {any} */ (spec).linkIssue === true;
-  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue
-    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue)
+  const checkRows = /** @type {any} */ (spec).checkRows === true;
+  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue || checkRows
+    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue, checkRows)
     : "";
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
