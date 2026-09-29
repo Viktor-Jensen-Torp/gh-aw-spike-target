@@ -218,6 +218,17 @@ out=$(refine_end '[{"number":81,"type":"Epic"},{"number":82,"type":"Task"}]' '{"
 out=$(refine_end '[]' '{"type":"noop","message":"quiet night"}')
 [ "$out" = "none" ] && echo "PASS  refine: no candidates, noop is enough" || { echo "FAIL  refine quiet: '$out'"; fails=$((fails + 1)); }
 
+# Kill by name is refused in every role, before it runs (review run 36465779257).
+blocked() { PI_ROLE="$1" PI_POSTCONDITIONS_STATE_DIR="$BASE/k" CMD="$2" node -e '
+  const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
+  h.tool_call({ toolName: "bash", input: { command: process.env.CMD } }).then(r => console.log(r && r.block ? "blocked" : "allowed"));' "$EXT" 2>/dev/null; }
+for role in review implement rework refine unblock; do
+  [ "$(blocked $role "pkill -f 'vite|storybook|npm' || true")" = blocked ] \
+    && echo "PASS  $role: the run-36465779257 command is refused" || { echo "FAIL  $role: pkill allowed"; fails=$((fails + 1)); }
+done
+[ "$(blocked review 'kill "$(cat /tmp/app.pid)"')" = allowed ] && echo "PASS  kill by saved pid is allowed" || { echo "FAIL  kill by pid blocked"; fails=$((fails + 1)); }
+[ "$(blocked review 'kill $(pgrep -f vite)')" = blocked ] && echo "PASS  kill \$(pgrep ...) is refused" || { echo "FAIL  pgrep allowed"; fails=$((fails + 1)); }
+
 out=$(GH_AW_PHASE=evals PI_ROLE=review node -e 'let n=0; require(process.argv[1])({ on: () => n++ }); console.log(n)' "$EXT" 2>/dev/null)
 [ "$out" = "0" ] && echo "PASS  does nothing in the evals phase" || { echo "FAIL  evals registered $out handlers"; fails=$((fails + 1)); }
 
