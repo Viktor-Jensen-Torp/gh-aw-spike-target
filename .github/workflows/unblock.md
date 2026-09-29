@@ -159,19 +159,40 @@ safe-outputs:
     # repeated here anyway.
     check-branch-protection: false
   add-labels:
-    max: 2
+    max: 1
     target: "*"
-    # `recheck` asks the reviewer to look again. It is needed because the push
-    # this role makes can never trigger a review by itself: a merge commit
-    # forces the unsigned push path, which authenticates as github-actions[bot],
-    # and gh-aw denies a `synchronize` whose actor is a bot that did not open
-    # the pull request. A `labeled` event is exempt by design.
-    allowed: [needs-human, recheck]
+    allowed: [needs-human]
   add-comment:
     max: 1
     target: "*"
   noop:
     report-as-issue: false
+
+# The review after a conflict fix is sent here, not by the agent: the push
+# cannot start one by itself (a merge commit forces gh-aw's unsigned push path,
+# which runs as github-actions[bot], and gh-aw denies a `synchronize` by a bot
+# that did not open the pull request). conclusion runs after safe_outputs, so
+# the pushed commit is known. GITHUB_TOKEN dispatches: neither App has the
+# Actions permission.
+jobs:
+  conclusion:
+    permissions:
+      actions: write
+    pre-steps:
+      - uses: actions/checkout@v5
+        if: needs.safe_outputs.outputs.push_commit_sha != ''
+        with:
+          ref: develop
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - name: Send the review for the resolved branch
+        if: needs.safe_outputs.outputs.push_commit_sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.inputs.pr }}
+          SHA: ${{ needs.safe_outputs.outputs.push_commit_sha }}
+        run: bash .github/scripts/dispatch.sh review.lock.yml pr "$PR" sha="$SHA"
 
 timeout-minutes: 20
 
@@ -198,8 +219,8 @@ You are on the pull request's branch with the merge in progress. `git status`,
 `git diff` and reading the files all work normally.
 
 **If the state is `clean`**, the branch merged with no conflicts. Call
-`push_to_pull_request_branch` with `pull_request_number` ${{ inputs.pr }}, then
-`add_labels` with `recheck`, and stop. Nothing needs deciding.
+`push_to_pull_request_branch` with `pull_request_number` ${{ inputs.pr }}, and
+stop. Nothing needs deciding; the pipeline sends the review.
 
 ## Step 2: Resolve, keeping both sides' intent
 
@@ -273,10 +294,8 @@ it answers **"BLOCKED by the pipeline"**, nothing was pushed: fix what it names,
 commit, and push again. If it tells you to stop, go to Step 4.
 
 Then call `push_to_pull_request_branch` with `pull_request_number`
-${{ inputs.pr }}, **and then `add_labels` with `recheck`** on the same pull
-request. The push alone will not get this reviewed — a review cannot be
-triggered by a push from this role — and the label is what asks for one. A
-resolution nobody reviews cannot merge, so both calls are required.
+${{ inputs.pr }}. The pipeline sends the review of the resolved branch after
+your run.
 
 ## Step 4: When you cannot
 

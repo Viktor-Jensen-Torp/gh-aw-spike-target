@@ -16,9 +16,11 @@ max-ai-credits: 100
 #
 # Note it is ACTIVE by default, contrary to the glossary and one section of
 # cost-management.md; the spec §9.4 and the compiled locks agree that it is.
-# Note also §9.8: label-command runs and plain workflow_dispatch runs bypass it,
-# so `implement`, label-triggered `refine` and dispatched `unblock` are not
-# covered. The sweeper sends `unblock` once per commit for that reason.
+# It applies only to event and scheduled runs: every workflow_dispatch run skips
+# it (check_daily_aic_workflow_guardrail.cjs:105-122; the spec's §9.8 says
+# otherwise, the code decides). Implement, rework and unblock are dispatched,
+# so their bounds are the dispatcher's 10 a day, rework's three strikes and
+# the sweeper's once per commit.
 max-daily-ai-credits: 500
 
 # gh-aw's default is 500 chat iterations per run, effectively unbounded here.

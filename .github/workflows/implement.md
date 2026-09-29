@@ -1,6 +1,6 @@
 ---
 emoji: 🛠️
-description: Implements a labelled issue as a pull request with tests.
+description: Implements a dispatched issue as a pull request with tests.
 intent: Turn an accepted issue into a reviewable pull request that passes the repository's checks, without a person writing the code.
 
 
@@ -22,19 +22,63 @@ imports:
   - shared/issue-context.md
   - shared/browser.md
 
+# Started by dispatch, never by a label: the dispatcher sends the next ready
+# issue (.github/scripts/dispatch.sh), and a person can use "Run workflow".
 on:
-  label_command:
-    name: implement
-    events: [issues]
-  # The dispatcher applies the label as the reviewer App, and a bot actor has
-  # no repository role (same grant as rework.md).
-  bots: [gh-aw-spike-reviewer]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Number of the issue to implement"
+        required: true
+        type: string
+  # The gate below makes gh-aw check the actor's role (a `steps:` key is not one
+  # of its safe triggers, role_checks.go). The dispatcher dispatches with
+  # GITHUB_TOKEN, which runs as github-actions[bot] and has no role.
+  bots: [github-actions]
+  permissions:
+    issues: read
+    pull-requests: read
+  # Whether this issue should be started at all, decided before any agent time
+  # is spent. A dispatch carries no issue labels, so this reads them.
+  steps:
+    - name: Decide whether to start
+      id: gate
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        ISSUE: ${{ github.event.inputs.issue }}
+      run: |
+        set -euo pipefail
+        stop() { echo "$1"; echo "proceed=false" >> "$GITHUB_OUTPUT"; exit 0; }
+        J=$(gh api "repos/$REPO/issues/$ISSUE" --jq '{state, pr: (.pull_request != null), labels: [.labels[].name]}')
+        [ "$(jq -r .pr <<<"$J")" = false ] || stop "#$ISSUE is a pull request, not an issue."
+        [ "$(jq -r .state <<<"$J")" = open ] || stop "#$ISSUE is closed."
+        for L in paused needs-human merged; do
+          jq -e --arg l "$L" '.labels | index($l)' <<<"$J" >/dev/null && stop "#$ISSUE is labelled $L."
+        done
+        # One pull request per issue: a second dispatch of the same issue stops.
+        OPEN=$(gh pr list --repo "$REPO" --state open --limit 200 --json number,body \
+          --jq "[.[] | select((.body // \"\") | test(\"(?i)(fixes|closes|resolves) #$ISSUE([^0-9]|$)\")) | .number] | first // empty")
+        [ -z "$OPEN" ] || stop "#$OPEN already fixes #$ISSUE."
+        echo "proceed=true" >> "$GITHUB_OUTPUT"
 
+run-name: "Implement #${{ github.event.inputs.issue }}"
+
+jobs:
+  pre-activation:
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
+
+if: needs.pre_activation.outputs.proceed == 'true'
+
+# One run per issue at a time; different issues run side by side (the
+# dispatcher's limit of two open agent pull requests decides how many).
 concurrency:
-  job-discriminator: ${{ github.run_id }}
-
-# A paused issue is not started, even when someone adds `implement` by hand.
-if: "!contains(github.event.issue.labels.*.name, 'paused')"
+  group: "gh-aw-${{ github.workflow }}-${{ github.event.inputs.issue }}"
+  cancel-in-progress: false
+  # The compiler gives dispatched runs' agent and conclusion jobs one shared
+  # slot unless told apart (reference/concurrency.md, job-discriminator).
+  job-discriminator: ${{ github.event.inputs.issue }}
 
 permissions:
   contents: read
@@ -60,6 +104,8 @@ engine:
   # Role for .github/pi/postconditions.cjs (installed by a pre-agent step).
   env:
     PI_ROLE: implement
+    # The issue its pull request must name with "Fixes #N" (postconditions.cjs).
+    PI_ISSUE: ${{ github.event.inputs.issue }}
 
 tools:
   cli-proxy: true
@@ -120,10 +166,10 @@ evals:
 
 ## Task
 
-Objective: turn the labelled issue into one pull request that satisfies it and
+Objective: turn the issue into one pull request that satisfies it and
 passes the repository's checks.
 
-The triggering issue is #${{ github.event.issue.number }} in
+The issue is #${{ github.event.inputs.issue }} in
 ${{ github.repository }}. Its title, type, labels and body are in
 `/tmp/gh-aw/agent/issue.json`; read the body with `jq -r .body` before anything
 else. It is the specification: its "Done when" is what you build and test. It
@@ -153,7 +199,9 @@ Work in this order:
    nothing; fixing it later costs three runs.
 5. Commit your changes.
 6. Open one pull request with `create_pull_request`. The body states what the
-   issue asked for, what you changed, and that `verify.sh` passes.
+   issue asked for, what you changed, and that `verify.sh` passes, and ends
+   with the line `Fixes #${{ github.event.inputs.issue }}`: the review, the
+   rework and the release find the issue through it.
    **Do not set a base branch.** This workflow already targets `develop`, the
    branch agent work merges into; `main` is the release branch and a pull
    request against it will be refused.
