@@ -277,6 +277,40 @@ done
 [ "$(blocked review 'kill "$(cat /tmp/app.pid)"')" = allowed ] && echo "PASS  kill by saved pid is allowed" || { echo "FAIL  kill by pid blocked"; fails=$((fails + 1)); }
 [ "$(blocked review 'kill $(pgrep -f vite)')" = blocked ] && echo "PASS  kill \$(pgrep ...) is refused" || { echo "FAIL  pgrep allowed"; fails=$((fails + 1)); }
 
+# Sweeping adds are refused for the code-writing roles (rework run 36601234520).
+for c in "git add -A" "git add . && git commit -m x" "cd /w && git add --all" "git commit -am x" "git commit -m x --all"; do
+  [ "$(blocked rework "$c")" = blocked ] && echo "PASS  rework refuses: $c" || { echo "FAIL  rework allowed: $c"; fails=$((fails + 1)); }
+done
+for c in "git add apps/web/a.ts" "git add ./apps/web" "git commit -m 'fix a thing'" "git commit --amend --no-edit"; do
+  [ "$(blocked rework "$c")" = allowed ] && echo "PASS  rework allows: $c" || { echo "FAIL  rework refused: $c"; fails=$((fails + 1)); }
+done
+[ "$(blocked review "git add -A")" = allowed ] && echo "PASS  review: a sweeping add is not its business" || { echo "FAIL  review refused git add -A"; fails=$((fails + 1)); }
+
+# The fixed rules reach the system prompt, for every role, after what Pi has.
+sysprompt() { PI_ROLE="$1" PI_POSTCONDITIONS_STATE_DIR="$BASE/k" node -e '
+  const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
+  h.before_agent_start({ systemPrompt: "PI-BASE" }).then(r => console.log(r.systemPrompt));' "$EXT" 2>/dev/null; }
+for role in implement rework review refine unblock relate release; do
+  S=$(sysprompt $role)
+  { [[ "$S" == PI-BASE* ]] && grep -q "aw-prompts/prompt.txt" <<<"$S" && grep -q "Pipeline rules" <<<"$S"; } \
+    && echo "PASS  $role: rules appended to the system prompt" || { echo "FAIL  $role system prompt: ${S:0:80}"; fails=$((fails + 1)); }
+done
+grep -q "never \`git add -A\`" <<<"$(sysprompt rework)" && echo "PASS  rework is told how to commit" || { echo "FAIL  rework rule missing"; fails=$((fails + 1)); }
+grep -q "full path" <<<"$(sysprompt review)" && echo "PASS  review is told the evidence rule" || { echo "FAIL  review rule missing"; fails=$((fails + 1)); }
+
+# Advice is added to a failing tool's result at that moment, and nowhere else.
+advised() { PI_ROLE="$1" PI_POSTCONDITIONS_STATE_DIR="$BASE/k" CMD="$2" OUT="$3" ERR="$4" node -e '
+  const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
+  h.tool_result({ toolName: "bash", input: { command: process.env.CMD }, isError: process.env.ERR === "1",
+                  content: [{ type: "text", text: process.env.OUT }] })
+   .then(r => console.log(r ? r.content.map(c => c.text).join("|") : "unchanged"));' "$EXT" 2>/dev/null; }
+grep -q "verify.sh failed" <<<"$(advised rework "bash .github/scripts/verify.sh" "✗ test" 1)" && echo "PASS  advice after a failed verify.sh" || { echo "FAIL  no advice after verify"; fails=$((fails + 1)); }
+# Replay: refine run 36561914371, set_issue_field with the wrong fields.
+grep -q "safeoutputs <tool> --help" <<<"$(advised refine 'cat <<EOF | safeoutputs set_issue_field .' "Invalid arguments: unknown parameters 'field', 'item_number' (closest: 'issue_number', 'field_name')" 1)" \
+  && echo "PASS  replay refine 36561914371: advice after refused fields" || { echo "FAIL  no advice after refused fields"; fails=$((fails + 1)); }
+[ "$(advised rework "bash .github/scripts/verify.sh" "✓ all passed" 0)" = unchanged ] && echo "PASS  a passing verify.sh gets no advice" || { echo "FAIL  advice on success"; fails=$((fails + 1)); }
+[ "$(advised rework "ls /nope" "No such file" 1)" = unchanged ] && echo "PASS  other failures get no advice" || { echo "FAIL  advice on unrelated failure"; fails=$((fails + 1)); }
+
 out=$(GH_AW_PHASE=evals PI_ROLE=review node -e 'let n=0; require(process.argv[1])({ on: () => n++ }); console.log(n)' "$EXT" 2>/dev/null)
 [ "$out" = "0" ] && echo "PASS  does nothing in the evals phase" || { echo "FAIL  evals registered $out handlers"; fails=$((fails + 1)); }
 

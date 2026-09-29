@@ -23,7 +23,13 @@ map() {
 
   echo "# $ROLE"
   echo
-  echo "## 1. At the start: the prompt (first user message; compaction can summarise it)"
+  echo "## 1. At the start: the system prompt (sent on every turn; survives compaction)"
+  echo
+  echo "Pi's own system prompt, then these rules from .github/pi/postconditions.cjs:"
+  node -e 'process.stdout.write(require(process.argv[1]).systemRules(process.argv[2].replace(/^release-review$/, "release")))' \
+    "$ROOT/.github/pi/postconditions.cjs" "$ROLE" | sed '1,/^## /d'
+  echo
+  echo "## 1b. At the start: the prompt (first user message; compaction can summarise it)"
   echo
   echo "gh-aw's fixed text (security, safe-output and GitHub-context rules) comes first; then ours:"
   echo
@@ -72,12 +78,17 @@ map() {
     const s = m.ROLES[role.replace(/^release-review$/, "release")];
     const out = [];
     out.push("- Every bash call: refused if it stops processes by name (pkill, killall, pgrep).");
+    out.push("- A failing bash call gets advice appended to its result: after verify.sh fails, and after a safe-output call is refused for its fields.");
     if (!s) { out.push("- No role configured: nothing else is checked."); console.log(out.join("\n")); process.exit(0); }
     for (const [tool, r] of Object.entries(s.checks)) out.push(`- \`${tool}\`: refused unless \`${r.field}\` is one of ${r.allowed.join(", ")}${r.once ? "; a second call is refused" : ""}${r.onlyWith ? ` (when \`${r.onlyWith}\` is sent)` : ""}.`);
     if (s.checks.submit_pull_request_review && s.checks.create_check_run) out.push("- Review event and check conclusion must agree, whichever comes first.");
     if (s.verify) out.push("- `create_pull_request` / `push_to_pull_request_branch`: runs verify.sh first and refuses with the failures; after 3 refusals, tells the agent to stop.");
     if (s.linkIssue) out.push("- `create_pull_request`: refused unless the body says `Fixes #<issue>`.");
     if (s.checkRows) out.push("- `submit_pull_request_review`: refused if review-rows.sh would refuse a row (no changed file named, n/a not allowed, missing row, no data).");
+    if (s.allowedPaths) {
+      out.push("- `git add -A`, `git add .`, `git commit -a`: refused before they run.");
+      out.push(`- \`create_pull_request\` / \`push_to_pull_request_branch\`: refused if an unpushed commit touches a file outside \`${s.allowedPaths}\`, with the reset that undoes it.`);
+    }
     if (s.checkIssue) out.push("- `update_issue`: refused unless the new body passes check-issue.sh.");
     console.log(out.join("\n"));
     console.log("\n## 4. When it thinks it is done: nudges (at most 2)\n");
