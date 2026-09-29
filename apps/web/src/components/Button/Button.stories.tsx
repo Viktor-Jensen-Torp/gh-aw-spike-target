@@ -24,6 +24,8 @@ export const PlainButton: Story = {
     await expect(button).toBeVisible();
     await expect(button).toHaveClass('bg-accent');
     await expect(button).toHaveClass('text-white');
+    // Font weight should be 600 (font-semibold) for TCoTB design
+    await expect(button).toHaveClass('font-semibold');
   },
 };
 
@@ -32,6 +34,7 @@ export const WithIcon: Story = {
   args: {
     children: 'New task',
     icon: 'Plus',
+    variant: 'medium',
   },
   play: async ({ canvasElement }) => {
     const page = within(canvasElement);
@@ -41,6 +44,8 @@ export const WithIcon: Story = {
     const icon = button.querySelector('svg');
     // The icon should exist
     await expect(!!icon).toBe(true);
+    // Font weight should be 500 (font-medium) for yg090 design
+    await expect(button).toHaveClass('font-medium');
   },
 };
 

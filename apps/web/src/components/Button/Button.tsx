@@ -15,6 +15,8 @@ const iconMap: Record<string, ComponentType<LucideProps>> = {
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Optional leading icon name from lucide-react. The icon is decorative. */
   icon?: keyof typeof iconMap;
+  /** Font weight variant: 'default' (600) or 'medium' (500). Defaults to 'default'. */
+  variant?: 'default' | 'medium';
 }
 
 /**
@@ -25,7 +27,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<
   HTMLButtonElement,
   PropsWithChildren<ButtonProps>
->(({ children, icon, className, ...props }, ref) => {
+>(({ children, icon, variant = 'default', className, ...props }, ref) => {
   // Get the icon component if specified
   const IconComponent = icon ? iconMap[icon] : null;
 
@@ -41,8 +43,10 @@ export const Button = forwardRef<
         'flex items-center justify-center gap-2',
         // Padding: design specifies padding [9, 12] (v/h), approximate with py-2 px-3
         'px-3 py-2',
-        // Typography: 14px, weight 600 (from design: fontSize 14, fontWeight 600, color white)
-        'text-sm font-semibold text-white',
+        // Typography: 14px, weight varies by variant (from design: fontSize 14, color white)
+        'text-sm text-white',
+        // Font weight: 'default' uses 600 (font-semibold), 'medium' uses 500 (font-medium)
+        variant === 'medium' ? 'font-medium' : 'font-semibold',
         // Interactive states for accessibility
         'hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed',
         // Focus state for accessibility
