@@ -1,0 +1,39 @@
+{
+  "requirements": [
+    {
+      "evidence": "apps/web/src/components/Button/Button.tsx line 45: font weight is hardcoded as font-semibold (600) for all buttons, but yg090 design specifies fontWeight 500. WithIcon story (yg090 variant) produces incorrect visual output that does not match the design.",
+      "id": "C1",
+      "status": "unmet"
+    },
+    {
+      "evidence": "PlainButton (line 14), WithIcon (line 29), SubmitInForm (line 48) — apps/web/src/components/Button/Button.stories.tsx",
+      "id": "U1",
+      "status": "met"
+    },
+    {
+      "evidence": "PlainButton and WithIcon cover both design variants — apps/web/src/components/Button/Button.stories.tsx lines 14, 29",
+      "id": "U2",
+      "status": "met"
+    },
+    {
+      "evidence": "No a11y override in stories file",
+      "id": "U3",
+      "status": "met"
+    },
+    {
+      "evidence": "yg090.json specifies fontWeight 500 but line 45 uses font-semibold (600). Component needs variant to support both design specs.",
+      "id": "U4",
+      "status": "unmet"
+    },
+    {
+      "evidence": "Primary component, no reuse requirement",
+      "id": "U5",
+      "status": "n/a"
+    },
+    {
+      "evidence": "apps/web/src/components/Button/, passes native props, no API/state",
+      "id": "U6",
+      "status": "met"
+    }
+  ]
+}

@@ -8,7 +8,7 @@
 # cases, each through the rewritten command against a fake `safeoutputs` that
 # records what reached it. The agent_end nudge is exercised with a fake Pi API.
 #
-# Not a CI test on purpose: `node --test` in this repo is the product's suite,
+# Run in CI by pipeline-tests.yml, not by `node --test`: that is the product's suite,
 # and this file is pipeline tooling.
 
 set -u
