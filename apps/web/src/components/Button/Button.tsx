@@ -46,12 +46,12 @@ export const Button = forwardRef<
         'rounded-lg',
         // Flex layout for icon + label with 8px gap (design: gap 8, which is gap-2 in Tailwind)
         'flex items-center justify-center gap-2',
-        // Padding: design specifies padding [9, 12] (v/h), using arbitrary value py-[9px] px-3 for exact match
-        'px-3 py-[9px]',
         // Typography: 14px, weight varies by variant (from design: fontSize 14, color white)
         'text-sm text-white',
-        // Font weight: 'default' uses 600 (font-semibold), 'medium' uses 500 (font-medium)
-        variant === 'medium' ? 'font-medium' : 'font-semibold',
+        // Padding and font weight vary by variant:
+        // - 'default' (TCoTB): no padding, font-weight 600 (font-semibold)
+        // - 'medium' (yg090): padding [9, 12] (py-[9px] px-3), font-weight 500 (font-medium)
+        variant === 'medium' ? 'px-3 py-[9px] font-medium' : 'font-semibold',
         // Interactive states for accessibility
         'hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed',
         // Focus state for accessibility
