@@ -37,6 +37,12 @@ on:
   # The release pull request is opened by release.yml as the reviewer App.
   bots: [gh-aw-spike-reviewer]
 
+# Only the release pull request, whose branch is `develop`. Pipeline changes also
+# go into `main` by pull request, are merged within minutes, and then fail the
+# read's checkout (runs 36459184189, 36608927532, failure issues #132, #148),
+# costing a model call for nothing.
+if: github.event.pull_request.head.ref == 'develop'
+
 permissions:
   contents: read
   pull-requests: read
