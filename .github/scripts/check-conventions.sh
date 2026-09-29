@@ -14,7 +14,8 @@
 #
 # Usage: check-conventions.sh [base-ref]   (default: origin/develop)
 # Exit 0 = conventions met. Exit 1 = a breach, described on stdout.
-# Exit 2 = the base cannot be read, so nothing could be checked.
+# Exit 2 = the base cannot be read, or shares no history with HEAD, so nothing
+# could be checked.
 set -uo pipefail
 
 BASE="${1:-origin/develop}"
@@ -31,7 +32,15 @@ fi
 
 # What this change touches: committed and uncommitted, against where it forked
 # from the base, plus files not yet added. Deleting code needs no new test.
-MB=$(git merge-base "$BASE" HEAD)
+# A shallow checkout has no fork point, and comparing against nothing reported
+# the base's own feature folders as added by the change: it refused both rework
+# pushes on #136 (runs 36473378915, 36500339583). Checkouts take full history
+# (shared/postconditions.md); this says so if one does not.
+if ! MB=$(git merge-base "$BASE" HEAD 2>/dev/null) || [ -z "$MB" ]; then
+  echo "✗ cannot check conventions: no common history with $BASE in this checkout."
+  echo "  The clone is too shallow to find where this change forked. Nothing was checked."
+  exit 2
+fi
 CHANGED=$( { git diff --name-only --diff-filter=ACMR "$MB"; git ls-files --others --exclude-standard; } | sort -u)
 features() { # tree-ish or "WORKTREE" -> one "workspace/feature" per line
   if [ "$1" = WORKTREE ]; then

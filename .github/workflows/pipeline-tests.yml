@@ -1,0 +1,34 @@
+name: Pipeline tests
+
+# Tests the pipeline's own scripts on the pull request that changes them, so a
+# routing bug is caught before merge and not in a live run after (#136 found
+# three that way). Agent behaviour is not covered: that still needs live runs.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - ".github/scripts/**"
+      - ".github/pi/**"
+      - ".github/conventions/chain/requirements/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: read   # the check-run replays read a past commit's checks
+
+jobs:
+  pipeline-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v5
+        with: { node-version: '24' }
+      - name: Scripts (routing, check runs, conventions)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/test/run.sh
+      - name: Pi postconditions extension
+        run: bash .github/pi/test/run.sh
