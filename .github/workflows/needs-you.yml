@@ -1,0 +1,70 @@
+name: What needs you
+
+# Keeps one issue, "What needs you", listing everything that waits on a person:
+# pull requests handed over, issues waiting for `ready`, the refiner's
+# questions, sprint issues that cannot start, pipeline failures, and merged
+# work waiting for a release (.github/scripts/needs-you.sh). gh-aw's maintainer
+# guidance: one human-facing summary, pending actions first, finished entries
+# gone (.github/aw/maintainer.md). Deterministic; no agent.
+#
+# Written with GITHUB_TOKEN, deliberately: editing the issue must start nothing.
+# The reviewer App only reads (the Sprint field lives on the Project, which
+# GITHUB_TOKEN cannot read).
+
+on:
+  schedule:
+    # Hourly; free on a public repository, one short job.
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: needs-you
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - uses: actions/create-github-app-token@v3
+        id: read_token
+        with:
+          client-id: ${{ vars.REVIEWER_CLIENT_ID }}
+          private-key: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
+          permission-organization-projects: read
+          permission-issues: read
+          permission-pull-requests: read
+      - name: Write the summary
+        env:
+          GH_TOKEN: ${{ steps.read_token.outputs.token }}
+          REPO: ${{ github.repository }}
+          PROJECT: "2"
+        run: bash .github/scripts/needs-you.sh > "$RUNNER_TEMP/needs-you.md"
+      - name: Update the issue, or open it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TITLE="What needs you"
+          # The one open issue with this title, opened by this workflow.
+          N=$(gh issue list --repo "$REPO" --state open --author app/github-actions --limit 20 \
+                --search "in:title \"$TITLE\"" --json number,title \
+                --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")
+          if [ -n "$N" ]; then
+            # REST, not `gh issue edit` (GraphQL, which fails on this repository's
+            # Projects (classic) deprecation, as `gh pr edit` does).
+            gh api -X PATCH "repos/$REPO/issues/$N" -F body=@"$RUNNER_TEMP/needs-you.md" --silent
+            echo "updated #$N"
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body-file "$RUNNER_TEMP/needs-you.md"
+          fi
+          cat "$RUNNER_TEMP/needs-you.md" >> "$GITHUB_STEP_SUMMARY"
