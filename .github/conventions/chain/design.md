@@ -13,7 +13,8 @@ An issue names the design parts it builds under "## Design", as
 - `/tmp/gh-aw/agent/design/index.md` lists them;
 - `/tmp/gh-aw/agent/design/<id>.json` holds each part exactly: sizes, spacing,
   colours, text and the elements inside it, each with a `name` that says what it
-  is;
+  is. An element with `"component": {"id", "name"}` is a use of a shared
+  component, shown with this use's own text and settings;
 - `/tmp/gh-aw/agent/design/variables.json` holds the values parts refer to as
   `$name` (for example `$accent`).
 
@@ -29,6 +30,9 @@ same parts, for people.
   `height`, `cornerRadius`. Use the theme's step that matches the value; a value
   with no step is a reason to check the design again, not to invent one.
 - **Text** is copied exactly, punctuation included.
+- **A component is built once.** Where the part uses a component, use the
+  project's existing component for it; what differs between uses (text, colour,
+  a hidden part) becomes that component's props or variants, not a copy.
 - **Build only what the issue claims.** A part the issue lists under "Out of
   scope" is hidden, not built half-way, even when it appears in the design.
 

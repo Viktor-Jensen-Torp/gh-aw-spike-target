@@ -36,7 +36,9 @@ pre-agent-steps:
       for C in $CLAIMS; do
         FILE="${C%%#*}"; ID="${C#*#}"
         [ -f "$FILE" ] || { echo "::warning::#$N claims $C, but $FILE is not in the checkout"; continue; }
-        jq --arg id "$ID" '[.. | objects | select(.id? == $id)][0] // empty' "$FILE" > "$OUT/$ID.json"
+        # With every component instance inside it put in place: a screen holds
+        # only references to its components (.github/scripts/design-part.sh).
+        bash .github/scripts/design-part.sh "$FILE" "$ID" > "$OUT/$ID.json" || true
         [ -s "$OUT/$ID.json" ] || { rm -f "$OUT/$ID.json"; echo "::warning::$C not found in $FILE"; continue; }
         jq '.variables // {}' "$FILE" > "$OUT/variables.json"
         echo "- \`$ID.json\`: $(jq -r '.name // .type' "$OUT/$ID.json") (from \`$FILE\`)" >> "$OUT/index.md"
