@@ -251,7 +251,8 @@ not a case to make up.
 
 `/tmp/gh-aw/agent/refine-candidates.json` holds the issues to consider this run,
 already filtered, capped, and ordered: the current sprint's issues come first.
-Each has its `type` and `milestone`. Nothing outside that file is your business.
+Each has its body, labels, comments, `type` and `milestone`, so there is nothing
+to fetch again. Nothing outside that file is your business.
 
 **An issue that was refined or ready before** has a comment starting "Back to
 refinement:" naming what changed (an edit, a changed source file, a closed
@@ -284,7 +285,8 @@ The new body is the whole issue, written as `issues.md` says. Leaving the
 original text above your version doubles the issue and makes an implementer
 read two specifications and guess which one counts; the edit history keeps what
 was there before. The body must pass `.github/scripts/check-issue.sh`; the
-pipeline refuses an `update_issue` whose body does not, and tells you why.
+pipeline runs it on every `update_issue`, refuses a body that fails, and tells
+you why, so you need not run it yourself.
 Do not link issues yourself: the linker reads the `Depends on #N — why` lines
 and records the links.
 
@@ -319,7 +321,15 @@ split.
 For every issue you mark `refined`, also set its type with `set_issue_type`
 and its `Effort` (and `Priority`, only with evidence) with `set_issue_field`,
 as `issues.md` says. The type says what kind of work it is; add no topic
-labels.
+labels. The field names differ between these tools:
+
+```json
+{"issue_number": 125, "issue_type": "Component"}
+{"issue_number": 125, "field_name": "Effort", "value": "Medium"}
+{"item_number": 125, "labels": ["refined"]}
+```
+
+(`set_issue_type`, `set_issue_field`, `add_labels`, in that order.)
 
 ## Step 4: Record what you decided
 

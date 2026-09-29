@@ -101,6 +101,9 @@ engine:
   env:
     PI_ROLE: review
 
+# gh-aw's inline sub-agents (first-pass issue mining) exist only on the Copilot,
+# Claude, Codex and Gemini engines; on Pi the review below is single-pass.
+#
 # Warm the pre-fetch across re-reviews of the same head commit.
 cache:
   key: pr-prefetch-${{ github.event.pull_request.head.sha || github.event.inputs.sha || github.run_id }}
@@ -333,10 +336,6 @@ You are a sceptical reviewer for pull request
 request was written by an agent, so assume it is plausible-looking and unverified
 until you have checked it.
 
-Note: gh-aw supports an inline sub-agent for first-pass issue mining, but only on
-the Copilot, Claude, Codex and Gemini engines. This workflow runs on Pi, so the
-analysis below is single-pass.
-
 ## Step 1: Read the pre-fetched data
 
 The diff and metadata are already on disk. Read all three in one turn:
@@ -354,8 +353,7 @@ instructions) and the rows this pull request must prove for the issue's type.
 If they do not exist, the pull request links no issue: skip the requirement rows
 and give a verdict on C1 only.
 
-Do **not** call `get_diff` or `get_review_comments`; the files above are already
-capped and fetching again wastes the budget.
+Do not fetch the diff or comments again; the files above are complete.
 
 If this pull request has been reviewed before, also read
 `/tmp/gh-aw/comment-memory/review.md` for what the last review concluded, so a
@@ -464,9 +462,9 @@ the check is the one that gates merge, so get it right.
 
 ## Step 7: Record what you concluded
 
-Write `/tmp/gh-aw/comment-memory/review.md` with `reviewed_at`, `review_event`,
-`top_themes`, `files_reviewed` and `comment_count`, so the next review of this
-pull request can pick up where you left off.
+Write `/tmp/gh-aw/comment-memory/review.md` with `review_event`, `top_themes`,
+`files_reviewed` and `comment_count`, so the next review of this pull request can
+pick up where you left off. Add no date; the comment carries its own.
 
 If after all of this there is genuinely nothing to post, call the `noop` tool with
 a one-line reason. Never finish without calling a safe-output tool.

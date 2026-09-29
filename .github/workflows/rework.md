@@ -255,7 +255,7 @@ came back. Your task this round is **${{ needs.pre_activation.outputs.task }}**
 (round ${{ needs.pre_activation.outputs.round }}).
 
 You are the same implementer that wrote this branch. Do the job in front of you.
-Do not re-read the issue and start again.
+Fix what came back; do not start over from the issue.
 
 ## Step 1: Read what came back
 
