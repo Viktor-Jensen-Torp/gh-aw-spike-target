@@ -200,6 +200,29 @@ check "the next Monday starts the next sprint"    '["Sprint 2",[126]]'    "$(spr
 check "before the first sprint: none"             '["",[]]'               "$(sprint 2026-09-27)"
 check "after the last planned sprint: none"       '["",[]]'               "$(sprint 2026-10-26)"
 
+# --- design-part.sh: a design part with its components in place ---------------------
+# fixtures/design-refs.pen: a Row component holding an Icon Circle component, and
+# a screen using Row plain, with overrides, and with a part replaced.
+part() { bash "$SCRIPTS/design-part.sh" "$FIX/design-refs.pen" "$1"; }
+check "design-part: no ref is left" "0" \
+  "$(part screen | jq '[.. | objects | select(.type == "ref")] | length')"
+check "design-part: a plain instance is the component, marked as one" \
+  '{"id":"plain","name":"Plain Row","gap":8,"component":{"id":"row","name":"Row"},"label":"Default","icon":"check"}' \
+  "$(part screen | jq -c '.children[0] | {id, name, gap, component, label: .children[1].content, icon: .children[0].children[0].icon}')"
+check "design-part: the component's canvas position is not the instance's" "null null" \
+  "$(part screen | jq -r '.children[0] | "\(.x) \(.y)"')"
+check "design-part: a property on the instance overrides the component" '"$bg"' \
+  "$(part screen | jq -c '.children[1].fill')"
+check "design-part: descendants merge by id, and by ID path into a nested component" \
+  '{"label":"Inbox","labelFill":"$text","countEnabled":false,"icon":"inbox"}' \
+  "$(part screen | jq -c '.children[1] | {label: .children[1].content, labelFill: .children[1].fill, countEnabled: .children[2].enabled, icon: .children[0].children[0].icon}')"
+check "design-part: a descendant with a type replaces the part, resolved too" \
+  '{"id":"badge","component":{"id":"icon","name":"Icon Circle"},"glyph":"check"}' \
+  "$(part screen | jq -c '.children[2].children[2] | {id, component, glyph: .children[0].icon}')"
+check "design-part: other instances of the component are untouched" '"Default"' \
+  "$(part screen | jq -c '.children[2].children[1].content')"
+part missing >/dev/null 2>&1; check "design-part: an absent id is an error" "nonzero" "$([ $? -ne 0 ] && echo nonzero || echo zero)"
+
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its
 # conclusion there is `failure` (review run 36472313007).

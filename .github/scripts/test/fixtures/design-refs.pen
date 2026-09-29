@@ -1,0 +1,35 @@
+{
+  "version": "2.19",
+  "children": [
+    {
+      "type": "frame", "id": "icon", "name": "Icon Circle", "reusable": true, "x": 900, "y": 0,
+      "width": 24, "height": 24, "fill": "$accent",
+      "children": [ { "type": "icon", "id": "glyph", "name": "Glyph", "icon": "check" } ]
+    },
+    {
+      "type": "frame", "id": "row", "name": "Row", "reusable": true, "x": 900, "y": 100,
+      "gap": 8,
+      "children": [
+        { "type": "ref", "id": "rowIcon", "ref": "icon", "name": "Row Icon" },
+        { "type": "text", "id": "label", "name": "Label", "content": "Default", "fill": "$text" },
+        { "type": "text", "id": "count", "name": "Count", "content": "0" }
+      ]
+    },
+    {
+      "type": "frame", "id": "screen", "name": "Screen", "x": 0, "y": 0,
+      "children": [
+        { "type": "ref", "id": "plain", "ref": "row", "name": "Plain Row" },
+        { "type": "ref", "id": "custom", "ref": "row", "name": "Custom Row", "fill": "$bg",
+          "descendants": {
+            "label": { "content": "Inbox" },
+            "count": { "enabled": false },
+            "rowIcon/glyph": { "icon": "inbox" }
+          } },
+        { "type": "ref", "id": "swapped", "ref": "row", "name": "Swapped Row",
+          "descendants": {
+            "count": { "type": "ref", "id": "badge", "ref": "icon", "name": "Badge" }
+          } }
+      ]
+    }
+  ]
+}
