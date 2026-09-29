@@ -178,6 +178,18 @@ new_root   # no verify.sh written: the script is missing
 ROLE=implement case_ "missing verify script fails open (CI is the gate)" pass "$PR"
 grep -q "not found; pushing without" "$ROOT/last_err" && echo "PASS  missing script is logged" || { echo "FAIL  missing script not logged"; fails=$((fails + 1)); }
 
+echo "== implement links its issue (dispatched runs get no automatic Fixes #N)"
+new_root; fake_verify
+link() { printf 'echo %q | safeoutputs create_pull_request .' "{\"title\":\"t\",\"branch\":\"x\",\"body\":\"$1\"}"; }
+PI_ISSUE=125 ROLE=implement case_ "no Fixes line: refused before verify"   block "$(link 'Builds the button.')"
+[ ! -f "$ROOT/verify.runs" ] && echo "PASS  refused link cost no verify run" || { echo "FAIL  verify ran for a refused link"; fails=$((fails+1)); }
+PI_ISSUE=125 ROLE=implement case_ "another issue's number: refused"       block "$(link 'Fixes #1250')"
+PI_ISSUE=125 ROLE=implement case_ "Fixes #125 goes through"               pass  "$(link 'Builds it.\n\n- Fixes #125')"
+new_root; fake_verify
+PI_ISSUE=125 ROLE=implement case_ "closes #125, any case"                 pass  "$(link 'closes #125.')"
+PI_ISSUE=""  ROLE=implement case_ "no PI_ISSUE (a person's run): not checked" pass "$(link 'x')"
+PI_ISSUE=125 ROLE=rework    case_ "rework pushes are not checked"         pass  "$PUSH"
+
 echo "== agent_end nudge"
 new_root
 out=$(PI_ROLE=review PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" GH_AW_SAFE_OUTPUTS="$ROOT/outputs.jsonl" node -e '
