@@ -52,6 +52,12 @@ jobs:
           client-id: ${{ vars.IMPLEMENTER_CLIENT_ID }}
           private-key: ${{ secrets.IMPLEMENTER_APP_PRIVATE_KEY }}
 
+      # The check-run reader shared with review.md (.github/scripts/check-runs.sh).
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
       - name: Sweep
         env:
           GH_TOKEN: ${{ github.token }}
@@ -163,8 +169,7 @@ jobs:
             #    errored (confused deputy, E009 lock drift). Nothing re-runs a
             #    review on its own, so the pull request would wait forever on a
             #    required check that will never report.
-            VERDICT=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-              --jq '[.check_runs[] | select(.name == "Agent review")] | sort_by(.completed_at) | last | .conclusion // ""')
+            VERDICT=$(bash .github/scripts/check-runs.sh latest "$SHA" "Agent review")
             if [ -z "$VERDICT" ]; then
               PUSHED=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.committer.date')
               AGE=$(( ( $(date -u +%s) - $(date -u -d "$PUSHED" +%s) ) / 60 ))
@@ -205,9 +210,7 @@ jobs:
             #    or none was started. Re-applying the label as the reviewer App
             #    starts a round; rework's three-strike gate still bounds it.
             #    Once per head commit.
-            RED_CI=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-              --jq '[.check_runs[] | select(.name == "test" or .name == "lint" or .name == "conventions")
-                     | select(.conclusion == "failure")] | length')
+            RED_CI=$(bash .github/scripts/check-runs.sh failing "$SHA" test lint conventions)
             case ",$LABELS," in
               *,needs-rework,*) : ;;
               *)

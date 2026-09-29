@@ -170,6 +170,13 @@ jobs:
       # the review posted as COMMENTED, and rework never fired. The check run
       # is also what a ruleset gates merge on, so one signal drives both.
       #
+      # The routing's scripts, from the base branch as the reviewer read
+      # .github; tested by .github/scripts/test/run.sh.
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
       # Fail safe: if the check and the review disagree, treat it as blocking.
       # Only a green check AND a non-blocking review clear the strike counters.
       - name: Route on the posted verdict
@@ -198,9 +205,7 @@ jobs:
           trap 'echo "::error::routing failed at line $LINENO; labelling needs-human"
                 gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-human" --silent || true' ERR
           # Both verdicts must be about THIS commit, not an older review.
-          CHECK=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-            --jq "[.check_runs[] | select(.name == \"Agent review\" and .app.slug == \"$APP\")]
-                  | sort_by(.completed_at) | last | .conclusion // \"\"")
+          CHECK=$(bash .github/scripts/check-runs.sh latest "$SHA" "Agent review" "$APP")
           STATE=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
             --jq "[.[] | select(.user.login == \"${APP}[bot]\" and .commit_id == \"$SHA\")]
                   | last | .state // \"\"")
@@ -224,27 +229,15 @@ jobs:
             fi
             N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1)
             TYPE=$(gh api "repos/$REPO/issues/$N" --jq '.type.name // ""' | tr '[:upper:]' '[:lower:]')
-            REQ=$(gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_REF" --jq .content | base64 -d)
-            IDS=$(sed -nE 's/^\| *([A-Z][0-9]+) *\|.*/\1/p' <<<"$REQ")
-            # Rows whose last column says `yes` may be answered `n/a` (the issue
-            # names no boundaries, claims no design); on any other row n/a blocks.
-            NA_OK=$(sed -nE 's/^\| *([A-Z][0-9]+) *\|.*\| *yes *\|$/\1/p' <<<"$REQ")
-            [ -n "$IDS" ] || { echo "::error::no requirement rows for #$N (type '$TYPE')"; false; }
-            # A `met` must name a file this pull request changed, by its full
-            # path; a line is optional. On #118 "architecture.md updated" passed
-            # as proof. C1 is exempt: its proof of "no defect" is "none found".
-            FILES=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename')
-            for ID in C1 $IDS; do
-              S=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .status // "missing"' <<<"$DATA")
-              E=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .evidence // ""' <<<"$DATA")
-              if [ "$S" = met ] && [ "$ID" != C1 ]; then
-                NAMED=$(grep -oE '[A-Za-z0-9_.@-]+(/[A-Za-z0-9_.@-]+)+' <<<"$E" | sed -E 's/[.:]+$//' | sort -u || true)
-                grep -qxFf <(printf '%s\n' "$FILES") <<<"$NAMED" || S="met-without-a-changed-file"
-              fi
-              [ "$S" = "n/a" ] && ! grep -qx "$ID" <<<"$NA_OK" && S="n/a-not-allowed"
-              echo "  $ID: $S"
-              [ "$S" = met ] || [ "$S" = "n/a" ] || ROWS_FAILED+="$ID:$S "
-            done
+            T=$(mktemp -d)
+            printf '%s\n' "$DATA" > "$T/data.json"
+            gh api "repos/$REPO/contents/.github/conventions/chain/requirements/$TYPE.md?ref=$BASE_REF" --jq .content | base64 -d > "$T/req.md"
+            gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$T/files.txt"
+            # Every row must be `met` with a changed path as proof, or an allowed
+            # `n/a` (.github/scripts/review-rows.sh).
+            ROWS=$(bash .github/scripts/review-rows.sh "$T/data.json" "$T/req.md" "$T/files.txt")
+            sed 's/^/  /' <<<"$ROWS"
+            ROWS_FAILED=$(awk '$2 != "met" && $2 != "n/a" { printf "%s%s ", $1, $2 }' <<<"$ROWS")
             [ -z "$ROWS_FAILED" ] || echo "requirements not met: $ROWS_FAILED"
           fi
 
@@ -257,9 +250,7 @@ jobs:
           # what to do once it is started.
           # Every required check that verify.sh runs must be named here, or a
           # red one summons nobody: test, conventions, lint.
-          FAILING=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
-            --jq "[.check_runs[] | select(.name == \"test\" or .name == \"conventions\" or .name == \"lint\")
-                   | select(.conclusion == \"failure\")] | length")
+          FAILING=$(bash .github/scripts/check-runs.sh failing "$SHA" test conventions lint)
           [ "${FAILING:-0}" -eq 0 ] || echo "required checks failing on $SHA: $FAILING"
 
           if [ "$CHECK" = "failure" ] || [ "$STATE" = "CHANGES_REQUESTED" ] || [ "${FAILING:-0}" -gt 0 ] || [ -n "$ROWS_FAILED" ]; then
