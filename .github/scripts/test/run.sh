@@ -102,6 +102,65 @@ check "shallow history: says so instead of a false breach" \
   "exit=2 ✗ cannot check conventions: no common history with origin/develop in this checkout." \
   "$(conventions "$WORK/shallow")"
 
+# --- hand-offs: workflows start each other by dispatch, never by a label ---------
+WF="$HERE/../../workflows"
+# A fake gh that prints its arguments one per line, to read what would be sent.
+mkdir -p "$WORK/bin"; printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@"\n' > "$WORK/bin/gh"; chmod +x "$WORK/bin/gh"
+sent() { PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" "$@" | sed -n 's/^aw_context=//p'; }
+check "dispatch.sh: a pull request carries its aw_context" \
+  '{"item_type":"pull_request","item_number":"136","event_type":"pull_request","repo":"o/r"}' "$(sent rework.lock.yml pr 136 sha=abc)"
+check "dispatch.sh: an issue is an issues event" \
+  '{"item_type":"issue","item_number":"7","event_type":"issues","repo":"o/r"}' "$(sent implement.lock.yml issue 7)"
+check "dispatch.sh: inputs and ref as given" "main pr=136 sha=abc" \
+  "$(PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" rework.lock.yml pr 136 sha=abc | grep -E '^(main|pr=|sha=)' | tr '\n' ' ' | sed 's/ $//')"
+REPO=o/r DRY_RUN=1 bash "$SCRIPTS/dispatch.sh" x.lock.yml pr 12a >/dev/null 2>&1
+check "dispatch.sh: refuses a non-number" "2" "$?"
+
+# Every `dispatch.sh <workflow> <pr|issue>` call names a workflow whose lock
+# accepts a dispatch with that input (and aw_context, which gh-aw adds).
+CALLS=$(grep -rhoE 'dispatch\.sh[^|;]* [a-z-]+\.lock\.yml (pr|issue)' "$WF" "$SCRIPTS" --include='*.md' --include='*.yml' \
+          | grep -oE '[a-z-]+\.lock\.yml (pr|issue)' | sort -u)
+BAD=""
+while read -r LOCK INPUT; do
+  [ -n "$LOCK" ] || continue
+  ON=$(awk '/^"?on"?:/{f=1;next} f&&/^[a-z]/{exit} f' "$WF/$LOCK")
+  grep -q '^  workflow_dispatch:' <<<"$ON" && grep -qE "^      $INPUT:" <<<"$ON" && grep -qE '^      aw_context:' <<<"$ON" \
+    || BAD+="$LOCK($INPUT) "
+done <<<"$CALLS"
+check "every dispatch target accepts its input ($(echo "$CALLS" | wc -l | tr -d ' ') calls)" "" "$BAD"
+
+# No agentic workflow starts on a label any more (they were implement,
+# needs-rework, recheck, refine).
+LABELLED=$(for L in "$WF"/*.lock.yml; do
+  awk '/^"?on"?:/{f=1;next} f&&/^[a-z]/{exit} f' "$L" | grep -q -- '- labeled' && basename "$L"; done | tr '\n' ' ')
+check "no agentic workflow is started by a label" "" "$LABELLED"
+
+# A dispatched review must attach its verdict to the pull request, not to main:
+# without a target, create_check_run uses GITHUB_SHA (create_check_run.cjs).
+NOTARGET=$(for L in "$WF"/*.lock.yml; do
+  grep -o 'create_check_run\\":{[^}]*}' "$L" | grep -qv 'target' && basename "$L"; done | tr '\n' ' ')
+check "every create_check_run names its target" "" "$NOTARGET"
+
+# Every pre-activation output a lock reads is one the job exports. Review read
+# `proceed` without exporting it, so every review skipped (run 36591128696).
+UNSET=$(for L in "$WF"/*.lock.yml; do
+  OUT=$(awk '/^  pre_activation:/{f=1} f&&/^    outputs:/{p=1;next} p&&/^    [a-z]/{exit} p' "$L" | sed -nE 's/^      ([a-z_-]+):.*/\1/p')
+  for K in $(grep -oE 'needs\.pre_activation\.outputs\.[a-z_-]+' "$L" | sed 's/.*\.//' | sort -u); do
+    grep -qx "$K" <<<"$OUT" || printf '%s:%s ' "$(basename "$L")" "$K"
+  done; done)
+check "every pre-activation output that is read is exported" "" "$UNSET"
+
+# Workflows that dispatch with GITHUB_TOKEN need actions: write.
+NOPERM=$(for F in "$WF"/*.md "$WF"/*.yml; do
+  [[ "$F" == *.lock.yml ]] && continue
+  grep -q 'bash [^ ]*dispatch\.sh' "$F" && ! grep -q 'actions: write' "$F" && basename "$F"; done | tr '\n' ' ')
+check "every workflow that dispatches has actions: write" "" "$NOPERM"
+
+# Auto-merge is armed by the implementer App: queued with GITHUB_TOKEN, #136
+# got no merge_group checks and was dropped (2026-09-29).
+check "the sweeper arms auto-merge as the implementer App" "1" \
+  "$(grep -c 'GH_TOKEN="$IMPLEMENTER_TOKEN" gh api graphql' "$WF/sweeper.yml")"
+
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its
 # conclusion there is `failure` (review run 36472313007).

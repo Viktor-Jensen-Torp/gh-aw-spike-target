@@ -16,18 +16,18 @@ imports:
       role: refine
 
 on:
-  # Refine one issue now, without waiting for tonight. gh-aw removes the label
-  # again after the run, so it reads as a verb rather than a state.
-  label_command:
-    name: refine
-    events: [issues]
-
   # Fuzzy `daily` rather than a fixed cron: the compiler warns that a fixed
   # time contributes to load spikes, and scheduled runs are dropped — not
   # merely delayed — when GitHub is busy, which is worst on the hour.
   schedule: daily
+  # "Run workflow": refine one issue (or an epic's pieces) now, without waiting
+  # for tonight; or the whole backlog with a different settling period.
   workflow_dispatch:
     inputs:
+      issue:
+        description: "Refine only this issue, or this epic's pieces. Empty: the backlog."
+        required: false
+        default: ""
       settle_hours:
         description: "Override the settling period, in hours. 0 considers every issue, however recently edited. For testing the role without waiting a night."
         required: false
@@ -35,10 +35,11 @@ on:
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
-  # Deliberately broad. A narrower query would also gate the `refine` label, so
-  # labelling an issue already marked `ready` would silently do nothing — and "I asked
-  # and nothing happened" is worse than one cheap no-op run on a settled
-  # backlog. The deterministic step below does the real filtering.
+  # Deliberately broad. A narrower query would also gate a run asked for one
+  # issue, so asking for an issue already marked `ready` would silently do
+  # nothing — and "I asked and nothing happened" is worse than one cheap no-op
+  # run on a settled backlog. The deterministic step below does the real
+  # filtering.
   skip-if-no-match: "is:issue is:open"
 
 # Without a discriminator every dispatch shares one conclusion concurrency slot,
@@ -75,7 +76,7 @@ pre-agent-steps:
       # edit puts `needs-refinement` back on (back-to-refinement.yml) while the
       # person may still be mid-thought.
       SETTLE_HOURS: ${{ inputs.settle_hours || '4' }}
-      TRIGGERING_ISSUE: ${{ github.event.issue.number }}
+      TRIGGERING_ISSUE: ${{ github.event.inputs.issue }}
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
@@ -99,7 +100,7 @@ pre-agent-steps:
 
       # Asked for by name: refine exactly that issue, and skip every filter.
       # The settling period and the stage labels exist to decide what to touch
-      # on a schedule. A person applying the label has already decided.
+      # on a schedule. A person asking for an issue has already decided.
       #
       # Asked for on an epic: refine the epic's pieces, which is what "refine
       # this epic" means (an epic itself is never ready). The epic comes first,
@@ -109,14 +110,14 @@ pre-agent-steps:
         if [ "$(jq -r --arg n "$TRIGGERING_ISSUE" '.[$n] // ""' /tmp/gh-aw/agent/issue-types.json)" = "Epic" ]; then
           PIECES=$(gh api --paginate "repos/$REPO/issues/$TRIGGERING_ISSUE/sub_issues" \
             --jq '.[] | select(.state == "open")
-                  | select([.labels[].name] | any(. == "ready" or . == "refined" or . == "merged" or . == "implement"
+                  | select([.labels[].name] |  any(. == "ready" or . == "refined" or . == "merged"
                       or . == "agent" or . == "needs-human" or . == "paused") | not) | .number' | head -n $((MAX_ISSUES - 1)))
           { one "$TRIGGERING_ISSUE"; for N in $PIECES; do one "$N"; done; } | jq -s '.' \
             | add_types > /tmp/gh-aw/agent/refine-candidates.json
-          echo "asked by label on epic #$TRIGGERING_ISSUE: the epic and $(printf '%s\n' $PIECES | grep -c . || true) piece(s)"
+          echo "asked for epic #$TRIGGERING_ISSUE: the epic and $(printf '%s\n' $PIECES | grep -c . || true) piece(s)"
         else
           one "$TRIGGERING_ISSUE" | jq -s '.' | add_types > /tmp/gh-aw/agent/refine-candidates.json
-          echo "asked by label: #$TRIGGERING_ISSUE"
+          echo "asked for #$TRIGGERING_ISSUE"
         fi
         jq -r '.[] | "  #\(.number) \(.title)"' /tmp/gh-aw/agent/refine-candidates.json
         exit 0
@@ -135,7 +136,7 @@ pre-agent-steps:
       gh issue list --repo "$REPO" --state open --limit 100 --label needs-refinement \
         --json number,title,body,labels,createdAt,updatedAt,comments,milestone \
         --jq "[ .[]
-                | select([.labels[].name] | any(. == \"implement\" or . == \"agent\"
+                | select([.labels[].name] | any(. == \"agent\"
                     or . == \"needs-human\" or . == \"merged\" or . == \"paused\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | select(.updatedAt < \"$CUTOFF\")
@@ -168,11 +169,9 @@ safe-outputs:
   activation-comments: false
 
   # No github-app, deliberately, and this is a safety property rather than a
-  # shortcut. Writes made with GITHUB_TOKEN trigger no workflows, so nothing the
-  # refiner does can start an implementation — it is mechanically incapable of
-  # putting work into the pipeline, which is the one thing this role must never
-  # do. Every other role here needs an App precisely because its writes must
-  # cascade.
+  # shortcut. Writes made with GITHUB_TOKEN trigger no workflows, and this role
+  # has no dispatch output, so nothing the refiner does can start an
+  # implementation — the one thing this role must never do.
   # These three caps and MAX_ISSUES above are one number in three places. Raise
   # or lower them together.
   update-issue:
@@ -192,7 +191,7 @@ safe-outputs:
     # target would have nothing to act on.
     target: "*"
     # Never `ready`: that is a person's confirmation of `refined`.
-    allowed: [refined, needs-shape, needs-split, bug, enhancement, documentation]
+    allowed: [refined, needs-shape, needs-split]
   # The request is answered once the issue is refined, questioned or split.
   remove-labels:
     max: 15
@@ -319,9 +318,8 @@ split.
 
 For every issue you mark `refined`, also set its type with `set_issue_type`
 and its `Effort` (and `Priority`, only with evidence) with `set_issue_field`,
-as `issues.md` says. Add at most one topic label — `bug`, `enhancement` or
-`documentation` — and only when it is obvious; a label nobody filters on is
-noise.
+as `issues.md` says. The type says what kind of work it is; add no topic
+labels.
 
 ## Step 4: Record what you decided
 
@@ -339,10 +337,9 @@ that is this role's only audit trail.
 
 ## What you must never do
 
-- **Never label an issue `ready` or `implement`.** `ready` is a person's
-  confirmation that a refined issue can be started, and `implement` starts an
-  implementing agent. Both are a person's call, and this role does not make
-  them. (You could not do it if you tried: your labels are restricted, and
-  your writes cannot start a workflow.)
+- **Never label an issue `ready`.** `ready` is a person's confirmation that a
+  refined issue can be started, and this role does not make it. (You could not
+  if you tried: your labels are restricted, and your writes cannot start a
+  workflow.)
 - Never close an issue, never edit code, never touch a pull request.
 - Never edit an issue that is not in the candidates file.

@@ -1,5 +1,5 @@
-# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"e6daa1b8e0af52c6cd791ce72b9cd95b22e0d90f8481a549acbf20fee528a2f5","body_hash":"11cece34b0e256425933bafedeee1073fabd61d8e042dec9cb50edfc81c737b5","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
-# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_CI_TRIGGER_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN","IMPLEMENTER_APP_PRIVATE_KEY"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/create-github-app-token","sha":"bcd2ba49218906704ab6c1aa796996da409d3eb1","version":"v3.2.0"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"has_pull_request":true,"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","missing_data","missing_tool","noop","push_to_pull_request_branch","reply_to_pull_request_review_comment","resolve_pull_request_review_thread"]}]}
+# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"b1d4c3e22283bbd7869501a09077a82a9ec404061d6caf0e6bbd69b7284027b5","body_hash":"2d58a53865175c5170a668fb52fd53079a68a0b17a30d652358141d045bfe89e","compiler_version":"v0.88.7","strict":true,"agent_id":"pi","agent_model":"anthropic/claude-haiku-4-5-20251001","detection_agent_id":"claude","detection_agent_model":"claude-haiku-4-5-20251001","engine_versions":{"claude":"2.1.247","pi":"0.84.3"}}
+# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_CI_TRIGGER_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN","IMPLEMENTER_APP_PRIVATE_KEY"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/create-github-app-token","sha":"bcd2ba49218906704ab6c1aa796996da409d3eb1","version":"v3.2.0"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["add_comment","missing_data","missing_tool","noop","push_to_pull_request_branch","reply_to_pull_request_review_comment","resolve_pull_request_review_thread"]}]}
 # This file was automatically generated by gh-aw (v0.88.7). DO NOT EDIT. To debug this workflow, load the skill at https://github.com/github/gh-aw/blob/main/debug.md
 #
 #    ___                   _   _
@@ -75,106 +75,101 @@
 name: "Rework"
 on:
   # bots: # Bots processed as bot check in pre-activation job
-  # - gh-aw-spike-reviewer # Bots processed as bot check in pre-activation job
+  # - github-actions # Bots processed as bot check in pre-activation job
   # permissions: # Permissions applied to pre-activation job
   # contents: read
   # issues: write
   # pull-requests: write
-  pull_request:
-    names:
-      - needs-rework
-    types:
-      - labeled
-# steps: # Steps injected into pre-activation job
-# - env:
-# GH_TOKEN: ${{ github.token }}
-# LABEL: ${{ github.event.label.name }}
-# LABELLED_SHA: ${{ github.event.pull_request.head.sha }}
-# LIMIT: "3"
-# MEMBER: ${{ steps.check_membership.outputs.is_team_member }}
-# PR: ${{ github.event.pull_request.number }}
-# REPO: ${{ github.repository }}
-# id: gate
-# name: Decide whether to rework, and what for
-# run: |
-# set -euo pipefail
-# stop() { echo "$1"; echo "proceed=false" >> "$GITHUB_OUTPUT"; exit 0; }
-# # REST, not `gh pr edit`: that goes through GraphQL and can fail on the
-# # Projects (classic) deprecation in this repository.
-# add_label()    { gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$1" --silent; }
-# remove_label() { gh api -X DELETE "repos/$REPO/issues/$PR/labels/$1" --silent 2>/dev/null || true; }
-#
-# [ "$LABEL" = "needs-rework" ] || stop "Not our label ($LABEL); nothing to do."
-# [ "$MEMBER" = "true" ] || stop "gh-aw will not activate this run (is_team_member=$MEMBER); no strike spent."
-# PRJSON=$(gh pr view "$PR" --repo "$REPO" --json labels,mergeable,headRefOid,statusCheckRollup)
-# LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
-# # Rework fixes agent work only; a person fixes their own pull request.
-# # Its push already requires `agent`; stopping here spends no strike and
-# # no agent run on one it could never push to (PR #107).
-# grep -qx agent <<< "$LABELS" || stop "#$PR is not an agent pull request; its author fixes it."
-# CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
-# MERGEABLE=$(jq -r '.mergeable' <<< "$PRJSON")
-#
-# # Only the latest commit counts. If the branch moved after the label
-# # went on, that commit has its own review and its own chain. Stop before
-# # a strike is spent, and take the label off so the next one can fire.
-# if [ "$CURRENT_SHA" != "$LABELLED_SHA" ]; then
-# remove_label needs-rework
-# stop "Stale: labelled $LABELLED_SHA, head is now $CURRENT_SHA."
-# fi
-# # A person holds it; the pipeline does not touch it.
-# if grep -qx needs-human <<< "$LABELS"; then
-# remove_label needs-rework
-# stop "needs-human is on #$PR; a person owns it."
-# fi
-# # A person paused it. No strike is spent; when `paused` comes off, the
-# # sweeper finds the red verdict and sends rework again.
-# if grep -qx paused <<< "$LABELS"; then
-# remove_label needs-rework
-# stop "paused is on #$PR; it resumes when the label comes off."
-# fi
-# # Unreachable in practice (a conflicted pull request runs no workflows),
-# # but if it happens the fix is unblock.md, not a rework round.
-# [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."
-#
-# # Red CI first, because a failing build is a more concrete task than a
-# # review finding. `hold` and `Agent review` are not CI.
-# FAILED_CI=$(jq -r '[.statusCheckRollup[]? | select(.name != "Agent review" and .name != "hold")
-# | select(.conclusion == "FAILURE")] | length' <<< "$PRJSON")
-# if [ "${FAILED_CI:-0}" -gt 0 ]; then TASK=fix-ci; else TASK=address-review; fi
-# KIND=strike
-#
-# N=0
-# for i in 1 2 3 4 5; do
-# grep -qx "$KIND:$i" <<< "$LABELS" && N=$i
-# done
-# N=$((N + 1))
-#
-# if [ "$N" -ge "$LIMIT" ]; then
-# add_label needs-human
-# remove_label needs-rework
-# gh api -X POST "repos/$REPO/issues/$PR/comments" --silent \
-# -f body="Third consecutive $KIND. A human owns this now (ADR 0009)."
-# stop "Third consecutive $KIND; escalated to a person."
-# fi
-#
-# # The counter goes on before the agent runs, so a crashed run still
-# # spends its round. needs-rework comes off here too: it is a one-shot
-# # command, and leaving it on would re-fire this workflow on the push.
-# add_label "$KIND:$N"
-# remove_label needs-rework
-# echo "proceed=true"   >> "$GITHUB_OUTPUT"
-# echo "task=$TASK"     >> "$GITHUB_OUTPUT"
-# echo "round=$KIND:$N" >> "$GITHUB_OUTPUT"
-# echo "Round $KIND:$N — $TASK"
+  # steps: # Steps injected into pre-activation job
+  # - env:
+  # GH_TOKEN: ${{ github.token }}
+  # JUDGED_SHA: ${{ github.event.inputs.sha }}
+  # LIMIT: "3"
+  # PR: ${{ github.event.inputs.pr }}
+  # REPO: ${{ github.repository }}
+  # id: gate
+  # name: Decide whether to rework, and what for
+  # run: |
+  # set -euo pipefail
+  # stop() { echo "$1"; echo "proceed=false" >> "$GITHUB_OUTPUT"; exit 0; }
+  # # REST, not `gh pr edit`: that goes through GraphQL and can fail on the
+  # # Projects (classic) deprecation in this repository.
+  # add_label()    { gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$1" --silent; }
+  #
+  # PRJSON=$(gh pr view "$PR" --repo "$REPO" --json state,labels,mergeable,headRefOid,statusCheckRollup,isCrossRepository)
+  # [ "$(jq -r .state <<< "$PRJSON")" = OPEN ] || stop "#$PR is not open."
+  # # Never on a fork: this run pushes with repository credentials.
+  # [ "$(jq -r .isCrossRepository <<< "$PRJSON")" = false ] || stop "#$PR comes from a fork."
+  # LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
+  # # Rework fixes agent work only; a person fixes their own pull request.
+  # # Its push already requires `agent`; stopping here spends no strike and
+  # # no agent run on one it could never push to (PR #107).
+  # grep -qx agent <<< "$LABELS" || stop "#$PR is not an agent pull request; its author fixes it."
+  # CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
+  # MERGEABLE=$(jq -r '.mergeable' <<< "$PRJSON")
+  #
+  # # Only the latest commit counts. If the branch moved after that commit
+  # # was judged, the new one has its own review and its own chain. Stop
+  # # before a strike is spent.
+  # [ "$CURRENT_SHA" = "$JUDGED_SHA" ] || stop "Stale: judged $JUDGED_SHA, head is now $CURRENT_SHA."
+  # # A person holds it; the pipeline does not touch it.
+  # if grep -qx needs-human <<< "$LABELS"; then stop "needs-human is on #$PR; a person owns it."; fi
+  # # A person paused it. No strike is spent; when `paused` comes off, the
+  # # sweeper finds the red verdict and sends rework again.
+  # if grep -qx paused <<< "$LABELS"; then stop "paused is on #$PR; it resumes when the label comes off."; fi
+  # # A conflicted pull request is unblock.md's to fix, not a rework round.
+  # [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."
+  #
+  # # Red CI first, because a failing build is a more concrete task than a
+  # # review finding. `hold` and `Agent review` are not CI.
+  # FAILED_CI=$(jq -r '[.statusCheckRollup[]? | select(.name != "Agent review" and .name != "hold")
+  # | select(.conclusion == "FAILURE")] | length' <<< "$PRJSON")
+  # if [ "${FAILED_CI:-0}" -gt 0 ]; then TASK=fix-ci; else TASK=address-review; fi
+  # KIND=strike
+  #
+  # N=0
+  # for i in 1 2 3 4 5; do
+  # grep -qx "$KIND:$i" <<< "$LABELS" && N=$i
+  # done
+  # N=$((N + 1))
+  #
+  # if [ "$N" -ge "$LIMIT" ]; then
+  # add_label needs-human
+  # gh api -X POST "repos/$REPO/issues/$PR/comments" --silent \
+  # -f body="Third consecutive $KIND. A human owns this now (ADR 0009)."
+  # stop "Third consecutive $KIND; escalated to a person."
+  # fi
+  #
+  # # The counter goes on before the agent runs, so a crashed run still
+  # # spends its round.
+  # add_label "$KIND:$N"
+  # echo "proceed=true"   >> "$GITHUB_OUTPUT"
+  # echo "task=$TASK"     >> "$GITHUB_OUTPUT"
+  # echo "round=$KIND:$N" >> "$GITHUB_OUTPUT"
+  # echo "Round $KIND:$N — $TASK"
+  workflow_dispatch:
+    inputs:
+      aw_context:
+        default: ""
+        description: "Agent caller context (used internally by Agentic Workflows)."
+        required: false
+        type: string
+      pr:
+        description: Number of the pull request to rework
+        required: true
+        type: string
+      sha:
+        description: The head commit that was judged; a newer head means this round is stale
+        required: true
+        type: string
 
 permissions: {}
 
 concurrency:
-  group: "gh-aw-${{ github.workflow }}-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}"
-  cancel-in-progress: true
+  cancel-in-progress: false
+  group: gh-aw-${{ github.workflow }}-${{ github.event.inputs.pr }}
 
-run-name: "Rework"
+run-name: "Rework #${{ github.event.inputs.pr }}"
 
 env:
   OTEL_EXPORTER_OTLP_ENDPOINT: ${{ vars.GH_AW_DEFAULT_OTLP_ENDPOINT }}
@@ -187,12 +182,7 @@ env:
 jobs:
   activation:
     needs: pre_activation
-    if: >
-      needs.pre_activation.outputs.activated == 'true' && ((((needs.pre_activation.outputs.proceed == 'true' &&
-      github.event.pull_request.head.repo.full_name == github.repository) && (github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.id == github.repository_id)) && ((github.event_name != 'pull_request' &&
-      github.event_name != 'pull_request_review') || github.event.pull_request.stack == null || github.event.pull_request.stack.position == github.event.pull_request.stack.size)) &&
-      (github.event_name != 'pull_request' || github.event.action != 'labeled' || github.event.label.name == 'needs-rework'))
+    if: needs.pre_activation.outputs.activated == 'true' && (needs.pre_activation.outputs.proceed == 'true')
     runs-on: ubuntu-slim
     permissions:
       actions: read
@@ -201,7 +191,6 @@ jobs:
       GH_AW_MAX_DAILY_AI_CREDITS: "500"
       GH_AW_RUNTIME_FEATURES: ${{ vars.GH_AW_RUNTIME_FEATURES }}
     outputs:
-      body: ${{ steps.sanitized.outputs.body }}
       comment_id: ""
       comment_repo: ""
       daily_ai_credits_exceeded: ${{ steps.daily-effective-workflow-guardrail.outputs.daily_ai_credits_exceeded == 'true' }}
@@ -217,8 +206,6 @@ jobs:
       setup-span-id: ${{ steps.setup.outputs.span-id }}
       setup-trace-id: ${{ steps.setup.outputs.trace-id }}
       stale_lock_file_failed: ${{ steps.check-lock-file.outputs.stale_lock_file_failed == 'true' }}
-      text: ${{ steps.sanitized.outputs.text }}
-      title: ${{ steps.sanitized.outputs.title }}
     steps:
       - name: Setup Scripts
         id: setup
@@ -372,20 +359,6 @@ jobs:
             setupGlobals(core, github, context, exec, io, getOctokit);
             const { main } = require(path.join(actionsDir, 'check_version_updates.cjs'));
             await main();
-      - name: Compute current body text
-        id: sanitized
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        env:
-          GH_AW_ALLOWED_BOTS: "gh-aw-spike-reviewer"
-          GH_AW_ALLOWED_DOMAINS: "api.npms.io,api.snapcraft.io,archive.ubuntu.com,azure.archive.ubuntu.com,bun.sh,cdn.jsdelivr.net,cdn.playwright.dev,crl.geotrust.com,crl.globalsign.com,crl.identrust.com,crl.sectigo.com,crl.thawte.com,crl.usertrust.com,crl.verisign.com,crl3.digicert.com,crl4.digicert.com,crls.ssl.com,deb.nodesource.com,deno.land,esm.sh,get.pnpm.io,googleapis.deno.dev,googlechromelabs.github.io,json-schema.org,json.schemastore.org,jsr.io,keyserver.ubuntu.com,nodejs.org,npm.pkg.github.com,npmjs.com,npmjs.org,ocsp.digicert.com,ocsp.geotrust.com,ocsp.globalsign.com,ocsp.identrust.com,ocsp.sectigo.com,ocsp.ssl.com,ocsp.thawte.com,ocsp.usertrust.com,ocsp.verisign.com,packagecloud.io,packages.cloud.google.com,packages.microsoft.com,playwright.download.prss.microsoft.com,ppa.launchpad.net,registry.bower.io,registry.npmjs.com,registry.npmjs.org,registry.yarnpkg.com,repo.yarnpkg.com,s.symcb.com,s.symcd.com,security.ubuntu.com,skimdb.npmjs.com,storage.googleapis.com,telemetry.vercel.com,ts-crl.ws.symantec.com,ts-ocsp.ws.symantec.com,www.googleapis.com,www.npmjs.com,www.npmjs.org,yarnpkg.com"
-        with:
-          script: |
-            const path = require('path');
-            const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
-            const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
-            setupGlobals(core, github, context, exec, io, getOctokit);
-            const { main } = require(path.join(actionsDir, 'compute_text.cjs'));
-            await main();
       - name: Log runtime features
         if: ${{ contains(toJSON(vars), '"GH_AW_RUNTIME_FEATURES":') }}
         run: bash "${RUNNER_TEMP}/gh-aw/actions/log_runtime_features_summary.sh"
@@ -401,7 +374,7 @@ jobs:
           GH_AW_EXPR_802A9F6A: ${{ github.event.issue.number || (fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_type == 'issue' && fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_number) }}
           GH_AW_EXPR_FF1D34CE: ${{ github.event.comment.id || fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').comment_id }}
           GH_AW_GITHUB_ACTOR: ${{ github.actor }}
-          GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          GH_AW_GITHUB_EVENT_INPUTS_PR: ${{ github.event.inputs.pr }}
           GH_AW_GITHUB_REPOSITORY: ${{ github.repository }}
           GH_AW_GITHUB_RUN_ID: ${{ github.run_id }}
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
@@ -420,7 +393,7 @@ jobs:
           GH_AW_PROMPT_CONTENT_0010: "## Seeing the app\n\nWhen the change touches `apps/web/`, run the app and look at the screens it\nchanges. Skip this for changes that have no screen.\n\n```bash\nDATABASE_URL=:memory: npm run dev > /tmp/app.log 2>&1 & echo $! > /tmp/app.pid\ncurl --fail --silent --retry 20 --retry-connrefused --retry-all-errors \\\n  --retry-max-time 60 http://127.0.0.1:5173/ >/dev/null \\\n  || { echo \"THE APP DID NOT START\"; tail -n 40 /tmp/app.log; }\nplaywright-cli open --browser=chromium \"http://127.0.0.1:5173/\"\nplaywright-cli snapshot\n```\n\n- The snapshot is the page as text: roles, names and text, with refs you can\n  `playwright-cli click` or `fill`. Check what you see against the issue's\n  \"Done when\", and against `/tmp/gh-aw/agent/design/` when it exists.\n- If the app does not start, say so in your output (the pull request or review\n  body) with the last lines of `/tmp/app.log`. Never skip this silently.\n- Before running `verify.sh` and before you finish, close the browser and stop\n  what you started, by the process id you saved:\n\n  ```bash\n  playwright-cli close\n  kill \"$(cat /tmp/app.pid)\" \"$(cat /tmp/storybook.pid)\" 2>/dev/null || true\n  ```\n\n  A server left running changes what the browser tests start. Never stop\n  processes by name (`pkill`, `killall`, `pgrep`): your own agent process\n  matches too, and on review run 36465779257 that ended the run. The pipeline\n  refuses those commands.\n\n**A shared component** (`src/components/`) is looked at in Storybook, one story\nat a time, instead of in the app:\n\n```bash\nnpm run storybook > /tmp/storybook.log 2>&1 & echo $! > /tmp/storybook.pid\ncurl --fail --silent --retry 30 --retry-connrefused --retry-all-errors \\\n  --retry-max-time 90 http://127.0.0.1:6006/ >/dev/null \\\n  || { echo \"STORYBOOK DID NOT START\"; tail -n 40 /tmp/storybook.log; }\nplaywright-cli open --browser=chromium \"http://127.0.0.1:6006/iframe.html?id=<story-id>&viewMode=story\"\nplaywright-cli snapshot\n```\n\nA story's id is its title and name in kebab case, joined by `--`\n(`components-button--with-icon`); the list is at\n`http://127.0.0.1:6006/index.json`.\n"
           GH_AW_PROMPT_CONTENT_0011: "## Calling safe outputs on this engine\n\nSafe outputs are **not** tools you can call directly here. Call each one from\nbash as `safeoutputs <tool>`, with a JSON payload on stdin:\n\n```bash\ncat <<'EOF' | safeoutputs <tool> .\n{ ...fields... }\nEOF\n```\n\nDo not probe with `--help` first; the fields are the ones named in these\ninstructions.\n"
           GH_AW_PROMPT_CONTENT_0012: "## The design\n\nIf `/tmp/gh-aw/agent/design/index.md` exists, the issue claims parts of a design\nfile, and that folder holds each part's exact JSON (`<id>.json`) plus the file's\n`variables.json` (values such as `$accent` refer to it). These are the\nspecification for layout, sizes, colours and text: build and judge against them,\nreading them with `jq`. Each element's `name` says what it is.\n"
-          GH_AW_PROMPT_CONTENT_0013: "# Rework\n\nPull request #__GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER__ in __GH_AW_GITHUB_REPOSITORY__\ncame back. Your task this round is **__GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_TASK__**\n(round __GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ROUND__).\n\nYou are the same implementer that wrote this branch. Do the job in front of you.\nDo not re-read the issue and start again.\n\n## Step 1: Read what came back\n\n- `/tmp/gh-aw/agent/reviews.json` — the last five reviews, newest last. The most\n  recent `CHANGES_REQUESTED` is the one you must answer.\n- `/tmp/gh-aw/agent/review-comments.json` — the inline findings still open, each\n  with `path`, `line`, `body`, `comment_id` and `thread_id`. These are the\n  specific things to fix.\n- `/tmp/gh-aw/agent/pr-meta.json` — the pull request and its check results.\n\n## Step 2: Do the named task\n\n**address-review** — fix every blocking finding in the most recent\n`CHANGES_REQUESTED` review. A finding about a missing or weak test is a real\nfinding: add the test.\n\n**fix-ci** — read the failing check, reproduce it with\n`bash .github/scripts/verify.sh`, and fix the cause.\n\nWhatever the task: **never make a check pass by weakening or deleting a test.**\nIf a test is genuinely wrong, say so in your comment and explain why.\n\n## Step 3: Verify before you push\n\nRun `bash .github/scripts/verify.sh` and fix everything it names until it\npasses. It runs exactly the checks that gate the pull request, so a failure left\nhere comes back as another rejected review and another round — and this round\nhas already spent a strike. Commit, then push with\n`push_to_pull_request_branch`, and post one `add_comment` saying what you changed\nand which finding each change answers.\n\nThen, for each inline finding your push fixed: `reply_to_pull_request_review_comment`\nwith its `comment_id` and one line saying what changed, and\n`resolve_pull_request_review_thread` with its `thread_id`. Leave a finding you did\nnot fix unresolved, and say why in your comment. Do this only after the push\nsucceeded.\n\n`push_to_pull_request_branch` runs the same checks itself before accepting. If\nit answers **\"BLOCKED by the pipeline\"**, nothing was pushed: fix what it names,\ncommit, and push again. If it tells you to stop, call `report_incomplete` with\nwhat still fails — do not keep trying.\n\n## If you cannot do it\n\nIf the findings contradict each other, or fixing them properly needs a decision\nyou are not allowed to make, do not guess and do not push a partial fix. Call\n`noop` with the reason, and say plainly in it that this needs a person. Stopping\nwith a reason is a valid ending.\n\nNever finish without calling a safe-output tool.\n\n"
+          GH_AW_PROMPT_CONTENT_0013: "# Rework\n\nPull request #__GH_AW_GITHUB_EVENT_INPUTS_PR__ in __GH_AW_GITHUB_REPOSITORY__\ncame back. Your task this round is **__GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_TASK__**\n(round __GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ROUND__).\n\nYou are the same implementer that wrote this branch. Do the job in front of you.\nDo not re-read the issue and start again.\n\n## Step 1: Read what came back\n\n- `/tmp/gh-aw/agent/reviews.json` — the last five reviews, newest last. The most\n  recent `CHANGES_REQUESTED` is the one you must answer.\n- `/tmp/gh-aw/agent/review-comments.json` — the inline findings still open, each\n  with `path`, `line`, `body`, `comment_id` and `thread_id`. These are the\n  specific things to fix.\n- `/tmp/gh-aw/agent/pr-meta.json` — the pull request and its check results.\n\n## Step 2: Do the named task\n\n**address-review** — fix every blocking finding in the most recent\n`CHANGES_REQUESTED` review. A finding about a missing or weak test is a real\nfinding: add the test.\n\n**fix-ci** — read the failing check, reproduce it with\n`bash .github/scripts/verify.sh`, and fix the cause.\n\nWhatever the task: **never make a check pass by weakening or deleting a test.**\nIf a test is genuinely wrong, say so in your comment and explain why.\n\n## Step 3: Verify before you push\n\nRun `bash .github/scripts/verify.sh` and fix everything it names until it\npasses. It runs exactly the checks that gate the pull request, so a failure left\nhere comes back as another rejected review and another round — and this round\nhas already spent a strike. Commit, then push with\n`push_to_pull_request_branch`, and post one `add_comment` saying what you changed\nand which finding each change answers.\n\nThen, for each inline finding your push fixed: `reply_to_pull_request_review_comment`\nwith its `comment_id` and one line saying what changed, and\n`resolve_pull_request_review_thread` with its `thread_id`. Leave a finding you did\nnot fix unresolved, and say why in your comment. Do this only after the push\nsucceeded.\n\n`push_to_pull_request_branch` runs the same checks itself before accepting. If\nit answers **\"BLOCKED by the pipeline\"**, nothing was pushed: fix what it names,\ncommit, and push again. If it tells you to stop, call `report_incomplete` with\nwhat still fails — do not keep trying.\n\n## If you cannot do it\n\nIf the findings contradict each other, or fixing them properly needs a decision\nyou are not allowed to make, do not guess and do not push a partial fix. Call\n`noop` with the reason, and say plainly in it that this needs a person. Stopping\nwith a reason is a valid ending.\n\nNever finish without calling a safe-output tool.\n\n"
         with:
           script: |
             const { setupGlobals } = require(process.env.GH_AW_ACTIONS_DIR + '/setup_globals.cjs');
@@ -432,7 +405,7 @@ jobs:
         env:
           GH_AW_PROMPT: ${{ runner.temp }}/gh-aw/aw-prompts/prompt.txt
           GH_AW_ENGINE_ID: "pi"
-          GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          GH_AW_GITHUB_EVENT_INPUTS_PR: ${{ github.event.inputs.pr }}
           GH_AW_GITHUB_REPOSITORY: ${{ github.repository }}
           GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ROUND: ${{ needs.pre_activation.outputs.round }}
           GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_TASK: ${{ needs.pre_activation.outputs.task }}
@@ -453,7 +426,7 @@ jobs:
           GH_AW_EXPR_802A9F6A: ${{ github.event.issue.number || (fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_type == 'issue' && fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_number) }}
           GH_AW_EXPR_FF1D34CE: ${{ github.event.comment.id || fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').comment_id }}
           GH_AW_GITHUB_ACTOR: ${{ github.actor }}
-          GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          GH_AW_GITHUB_EVENT_INPUTS_PR: ${{ github.event.inputs.pr }}
           GH_AW_GITHUB_REPOSITORY: ${{ github.repository }}
           GH_AW_GITHUB_RUN_ID: ${{ github.run_id }}
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
@@ -479,7 +452,7 @@ jobs:
                 GH_AW_EXPR_802A9F6A: process.env.GH_AW_EXPR_802A9F6A,
                 GH_AW_EXPR_FF1D34CE: process.env.GH_AW_EXPR_FF1D34CE,
                 GH_AW_GITHUB_ACTOR: process.env.GH_AW_GITHUB_ACTOR,
-                GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER: process.env.GH_AW_GITHUB_EVENT_PULL_REQUEST_NUMBER,
+                GH_AW_GITHUB_EVENT_INPUTS_PR: process.env.GH_AW_GITHUB_EVENT_INPUTS_PR,
                 GH_AW_GITHUB_REPOSITORY: process.env.GH_AW_GITHUB_REPOSITORY,
                 GH_AW_GITHUB_RUN_ID: process.env.GH_AW_GITHUB_RUN_ID,
                 GH_AW_GITHUB_WORKSPACE: process.env.GH_AW_GITHUB_WORKSPACE,
@@ -708,14 +681,15 @@ jobs:
         run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/pi-agent-dir/extensions /tmp/gh-aw/pi-agent-dir/verify\ncp .github/pi/postconditions.cjs /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js\n# The pre-push check's scripts, also from the base branch: the agent's own\n# edits to them must not decide whether its work passes.\ncp .github/scripts/verify.sh .github/scripts/check-conventions.sh .github/scripts/check-issue.sh /tmp/gh-aw/pi-agent-dir/verify/\necho \"installed: $(wc -c < /tmp/gh-aw/pi-agent-dir/extensions/postconditions.js) bytes, role=$PI_ROLE, verify=$(ls /tmp/gh-aw/pi-agent-dir/verify | tr '\\n' ' ')\"\n"
       - env:
           GH_TOKEN: ${{ github.token }}
-          ISSUE: ${{ github.event.issue.number }}
+          ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr }}
           PR_BODY: ${{ github.event.pull_request.body }}
           REPO: ${{ github.repository }}
         name: Extract the design parts the issue claims
-        run: "set -euo pipefail\nOUT=/tmp/gh-aw/agent/design\n# The issue: the triggering one, or the one a pull request fixes.\nN=\"${ISSUE:-}\"\nif [ -z \"$N\" ]; then\n  N=$(printf '%s' \"${PR_BODY:-}\" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1 || true)\nfi\n[ -n \"$N\" ] || { echo \"No issue to read design claims from.\"; exit 0; }\nCLAIMS=$(gh api \"repos/$REPO/issues/$N\" --jq '.body // \"\"' \\\n           | { grep -oE '`[^` ]+\\.pen#[A-Za-z0-9_-]+`' || true; } | tr -d '`' | sort -u)\n[ -n \"$CLAIMS\" ] || { echo \"#$N claims no design parts.\"; exit 0; }\nmkdir -p \"$OUT\"\nfor C in $CLAIMS; do\n  FILE=\"${C%%#*}\"; ID=\"${C#*#}\"\n  [ -f \"$FILE\" ] || { echo \"::warning::#$N claims $C, but $FILE is not in the checkout\"; continue; }\n  jq --arg id \"$ID\" '[.. | objects | select(.id? == $id)][0] // empty' \"$FILE\" > \"$OUT/$ID.json\"\n  [ -s \"$OUT/$ID.json\" ] || { rm -f \"$OUT/$ID.json\"; echo \"::warning::$C not found in $FILE\"; continue; }\n  jq '.variables // {}' \"$FILE\" > \"$OUT/variables.json\"\n  echo \"- \\`$ID.json\\`: $(jq -r '.name // .type' \"$OUT/$ID.json\") (from \\`$FILE\\`)\" >> \"$OUT/index.md\"\ndone\necho \"design parts for #$N:\"; cat \"$OUT/index.md\" 2>/dev/null || echo \"  none found\"\n"
+        run: "set -euo pipefail\nOUT=/tmp/gh-aw/agent/design\n# The issue: the triggering one, or the one a pull request fixes.\nN=\"${ISSUE:-}\"\n# A dispatched run has the pull request's number but not its body.\nif [ -z \"$N\" ] && [ -z \"${PR_BODY:-}\" ] && [ -n \"${PR:-}\" ]; then\n  PR_BODY=$(gh api \"repos/$REPO/pulls/$PR\" --jq '.body // \"\"')\nfi\nif [ -z \"$N\" ]; then\n  N=$(printf '%s' \"${PR_BODY:-}\" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1 || true)\nfi\n[ -n \"$N\" ] || { echo \"No issue to read design claims from.\"; exit 0; }\nCLAIMS=$(gh api \"repos/$REPO/issues/$N\" --jq '.body // \"\"' \\\n           | { grep -oE '`[^` ]+\\.pen#[A-Za-z0-9_-]+`' || true; } | tr -d '`' | sort -u)\n[ -n \"$CLAIMS\" ] || { echo \"#$N claims no design parts.\"; exit 0; }\nmkdir -p \"$OUT\"\nfor C in $CLAIMS; do\n  FILE=\"${C%%#*}\"; ID=\"${C#*#}\"\n  [ -f \"$FILE\" ] || { echo \"::warning::#$N claims $C, but $FILE is not in the checkout\"; continue; }\n  jq --arg id \"$ID\" '[.. | objects | select(.id? == $id)][0] // empty' \"$FILE\" > \"$OUT/$ID.json\"\n  [ -s \"$OUT/$ID.json\" ] || { rm -f \"$OUT/$ID.json\"; echo \"::warning::$C not found in $FILE\"; continue; }\n  jq '.variables // {}' \"$FILE\" > \"$OUT/variables.json\"\n  echo \"- \\`$ID.json\\`: $(jq -r '.name // .type' \"$OUT/$ID.json\") (from \\`$FILE\\`)\" >> \"$OUT/index.md\"\ndone\necho \"design parts for #$N:\"; cat \"$OUT/index.md\" 2>/dev/null || echo \"  none found\"\n"
       - env:
           GH_TOKEN: ${{ github.token }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.inputs.pr }}
           REPO: ${{ github.repository }}
         name: Pre-fetch the review findings and the failing checks
         run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/agent\n# --paginate applies --jq per page, so slice after joining the pages.\ngh api \"repos/$REPO/pulls/$PR/reviews\" --paginate \\\n  --jq '.[] | {id, state, user: .user.login, body: .body[:4000]}' \\\n  | jq -s '.[-5:]' > /tmp/gh-aw/agent/reviews.json\n# Only findings still open, each with its thread id, so the agent can\n# reply to and resolve exactly the ones it fixed. REST has no thread ids.\ngh api graphql --paginate -F owner=\"${REPO%/*}\" -F name=\"${REPO#*/}\" -F pr=\"$PR\" -f query='\n  query($owner: String!, $name: String!, $pr: Int!, $endCursor: String) {\n    repository(owner: $owner, name: $name) { pullRequest(number: $pr) {\n      reviewThreads(first: 50, after: $endCursor) {\n        pageInfo { hasNextPage endCursor }\n        nodes { id isResolved path line originalLine\n                comments(first: 1) { nodes { databaseId body author { login } } } } } } } }' \\\n  --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved | not)\n        | {thread_id: .id, comment_id: .comments.nodes[0].databaseId, path,\n           line: (.line // .originalLine), body: .comments.nodes[0].body[:2000],\n           user: .comments.nodes[0].author.login}' \\\n  | jq -s '.' > /tmp/gh-aw/agent/review-comments.json\ngh pr view \"$PR\" --repo \"$REPO\" \\\n  --json number,title,body,headRefName,statusCheckRollup \\\n  > /tmp/gh-aw/agent/pr-meta.json\necho \"fetched $(jq length /tmp/gh-aw/agent/review-comments.json) open review threads\""
@@ -1331,7 +1305,7 @@ jobs:
       issues: write
       pull-requests: write
     concurrency:
-      group: "gh-aw-conclusion-rework"
+      group: "gh-aw-conclusion-rework-${{ github.event.inputs.pr }}"
       cancel-in-progress: false
       queue: max
     env:
@@ -2103,7 +2077,7 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_AW_REQUIRED_ROLES: "admin,maintainer,write"
-          GH_AW_ALLOWED_BOTS: "gh-aw-spike-reviewer"
+          GH_AW_ALLOWED_BOTS: "github-actions"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -2121,11 +2095,11 @@ jobs:
           # REST, not `gh pr edit`: that goes through GraphQL and can fail on the
           # Projects (classic) deprecation in this repository.
           add_label()    { gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$1" --silent; }
-          remove_label() { gh api -X DELETE "repos/$REPO/issues/$PR/labels/$1" --silent 2>/dev/null || true; }
 
-          [ "$LABEL" = "needs-rework" ] || stop "Not our label ($LABEL); nothing to do."
-          [ "$MEMBER" = "true" ] || stop "gh-aw will not activate this run (is_team_member=$MEMBER); no strike spent."
-          PRJSON=$(gh pr view "$PR" --repo "$REPO" --json labels,mergeable,headRefOid,statusCheckRollup)
+          PRJSON=$(gh pr view "$PR" --repo "$REPO" --json state,labels,mergeable,headRefOid,statusCheckRollup,isCrossRepository)
+          [ "$(jq -r .state <<< "$PRJSON")" = OPEN ] || stop "#$PR is not open."
+          # Never on a fork: this run pushes with repository credentials.
+          [ "$(jq -r .isCrossRepository <<< "$PRJSON")" = false ] || stop "#$PR comes from a fork."
           LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
           # Rework fixes agent work only; a person fixes their own pull request.
           # Its push already requires `agent`; stopping here spends no strike and
@@ -2134,26 +2108,16 @@ jobs:
           CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
           MERGEABLE=$(jq -r '.mergeable' <<< "$PRJSON")
 
-          # Only the latest commit counts. If the branch moved after the label
-          # went on, that commit has its own review and its own chain. Stop before
-          # a strike is spent, and take the label off so the next one can fire.
-          if [ "$CURRENT_SHA" != "$LABELLED_SHA" ]; then
-            remove_label needs-rework
-            stop "Stale: labelled $LABELLED_SHA, head is now $CURRENT_SHA."
-          fi
+          # Only the latest commit counts. If the branch moved after that commit
+          # was judged, the new one has its own review and its own chain. Stop
+          # before a strike is spent.
+          [ "$CURRENT_SHA" = "$JUDGED_SHA" ] || stop "Stale: judged $JUDGED_SHA, head is now $CURRENT_SHA."
           # A person holds it; the pipeline does not touch it.
-          if grep -qx needs-human <<< "$LABELS"; then
-            remove_label needs-rework
-            stop "needs-human is on #$PR; a person owns it."
-          fi
+          if grep -qx needs-human <<< "$LABELS"; then stop "needs-human is on #$PR; a person owns it."; fi
           # A person paused it. No strike is spent; when `paused` comes off, the
           # sweeper finds the red verdict and sends rework again.
-          if grep -qx paused <<< "$LABELS"; then
-            remove_label needs-rework
-            stop "paused is on #$PR; it resumes when the label comes off."
-          fi
-          # Unreachable in practice (a conflicted pull request runs no workflows),
-          # but if it happens the fix is unblock.md, not a rework round.
+          if grep -qx paused <<< "$LABELS"; then stop "paused is on #$PR; it resumes when the label comes off."; fi
+          # A conflicted pull request is unblock.md's to fix, not a rework round.
           [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."
 
           # Red CI first, because a failing build is a more concrete task than a
@@ -2171,28 +2135,23 @@ jobs:
 
           if [ "$N" -ge "$LIMIT" ]; then
             add_label needs-human
-            remove_label needs-rework
             gh api -X POST "repos/$REPO/issues/$PR/comments" --silent \
               -f body="Third consecutive $KIND. A human owns this now (ADR 0009)."
             stop "Third consecutive $KIND; escalated to a person."
           fi
 
           # The counter goes on before the agent runs, so a crashed run still
-          # spends its round. needs-rework comes off here too: it is a one-shot
-          # command, and leaving it on would re-fire this workflow on the push.
+          # spends its round.
           add_label "$KIND:$N"
-          remove_label needs-rework
           echo "proceed=true"   >> "$GITHUB_OUTPUT"
           echo "task=$TASK"     >> "$GITHUB_OUTPUT"
           echo "round=$KIND:$N" >> "$GITHUB_OUTPUT"
           echo "Round $KIND:$N — $TASK"
         env:
           GH_TOKEN: ${{ github.token }}
-          LABEL: ${{ github.event.label.name }}
-          LABELLED_SHA: ${{ github.event.pull_request.head.sha }}
+          JUDGED_SHA: ${{ github.event.inputs.sha }}
           LIMIT: "3"
-          MEMBER: ${{ steps.check_membership.outputs.is_team_member }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.inputs.pr }}
           REPO: ${{ github.repository }}
 
   push_evals_state:
@@ -2281,7 +2240,6 @@ jobs:
       GH_AW_EFFECTIVE_TOKENS: ${{ needs.agent.outputs.effective_tokens }}
       GH_AW_ENGINE_ID: "pi"
       GH_AW_ENGINE_MODEL: "anthropic/claude-haiku-4-5-20251001"
-      GH_AW_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       GH_AW_RUNTIME_FEATURES: ${{ vars.GH_AW_RUNTIME_FEATURES }}
       GH_AW_THREAT_DETECTION_AIC: ${{ needs.detection.outputs.aic }}
       GH_AW_WORKFLOW_EMOJI: "🔧"

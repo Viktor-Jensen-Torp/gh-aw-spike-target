@@ -27,63 +27,69 @@ imports:
   # dependencies node-runtime.md installs.
   - shared/node-runtime.md
   - shared/browser.md
-  # gh-aw's own pre-fetch of the diff, metadata and existing review comments,
-  # so the agent spends no turns on it. Pinned to the installed version.
-  - github/gh-aw/.github/workflows/shared/pr-diff-data-fetch.md@v0.88.7
+  # The diff, metadata and existing review comments, pre-fetched so the agent
+  # spends no turns on it. gh-aw's own copy, taught to read a dispatched `pr`.
+  - shared/pr-context.md
 
+# A pull request is reviewed when it opens or gets new commits, and on
+# dispatch (.github/scripts/dispatch.sh): the sweeper sends a review that never
+# came, the unblocker one after its conflict fix. No label starts a review.
 on:
   pull_request:
-    # `labeled` is how a conflict fix gets re-reviewed, and it is the door gh-aw
-    # deliberately left open. Its confused-deputy guard fires ONLY on
-    # `synchronize` with a bot actor, and its own comment says why: "Other
-    # pull_request actions (labeled, unlabeled, assigned…) legitimately have
-    # actor != pr_author". A conflict fix always pushes as `github-actions[bot]`
-    # — gh-aw's signed path cannot represent a merge commit, and its unsigned
-    # path authenticates with the checkout's GITHUB_TOKEN rather than the App it
-    # minted — so `synchronize` is denied and no verdict is ever posted
-    # (Review run 35814898713). A label is not.
-    #
-    # `names:` filters ONLY the labeled action; the compiled condition is
-    # `event.action != 'labeled' || event.label.name == 'recheck'`, so opened,
-    # synchronize and reopened are unaffected.
-    types: [opened, synchronize, reopened, labeled]
-    names: [recheck]
+    types: [opened, synchronize, reopened]
     # Agent pull requests only. The release pull request (`develop -> main`) is a
     # different job — a day's work rather than one change — and is read by
     # release-review.md. Without this filter that reviewer and this one would
     # both run on it, and this one's 2000-line diff cap and 10-comment budget
     # are shaped for a single small change.
     branches: [develop]
-  # The implementer App is not a repository collaborator, so without this the
-  # role check in pre_activation denies its pull requests.
-  # The implementer App opens agent pull requests, pushes to them (rework,
-  # unblock) and applies `recheck` after a conflict fix. For a non-`synchronize`
-  # action the allowlist IS consulted, unlike the guard above.
-  bots: [gh-aw-spike-implementer]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "Number of the pull request to review"
+        required: true
+        type: string
+      sha:
+        description: "Head commit the dispatcher saw (optional; the current head is reviewed)"
+        required: false
+        type: string
+  # The implementer App opens agent pull requests and pushes to them (rework).
+  # A dispatch made with GITHUB_TOKEN runs as github-actions[bot]. Neither has a
+  # repository role, and with `pull_request` among the triggers gh-aw checks
+  # roles on every event, dispatch included (role_checks.go).
+  bots: [gh-aw-spike-implementer, github-actions]
+  permissions:
+    pull-requests: read
+  # A paused pull request is left exactly where it is; when `paused` comes off,
+  # the sweeper's no-verdict check sends the review again. A dispatch carries no
+  # labels, so this reads them.
+  steps:
+    - name: Decide whether to review
+      id: gate
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        PR: ${{ github.event.pull_request.number || github.event.inputs.pr }}
+      run: |
+        set -euo pipefail
+        J=$(gh api "repos/$REPO/pulls/$PR" --jq '{state, base: .base.ref, labels: [.labels[].name]}')
+        if [ "$(jq -r .state <<<"$J")" != open ]; then echo "#$PR is not open"; echo "proceed=false" >> "$GITHUB_OUTPUT"
+        elif [ "$(jq -r .base <<<"$J")" != develop ]; then echo "#$PR does not target develop"; echo "proceed=false" >> "$GITHUB_OUTPUT"
+        elif jq -e '.labels | index("paused")' <<<"$J" >/dev/null; then echo "#$PR is paused"; echo "proceed=false" >> "$GITHUB_OUTPUT"
+        else echo "proceed=true" >> "$GITHUB_OUTPUT"; fi
 
-# A paused pull request is left exactly where it is. When `paused` comes off,
-# the sweeper's no-verdict check sends the review again.
-if: "!contains(github.event.pull_request.labels.*.name, 'paused')"
+run-name: "Review #${{ github.event.pull_request.number || github.event.inputs.pr }}"
 
-# gh-aw's default PR concurrency group is one group per PR number, shared by
-# every pull_request action, cancel-in-progress: true (reference/concurrency.md:
-# "new commits cancel outdated runs"). That is right for opened/synchronize/
-# reopened, wrong for `labeled`: the implementer opens a PR carrying
-# `labels: [agent, needs-review]`, and each label attachment is its own
-# `labeled` event — not a new commit — that lands in the SAME group and
-# cancels the review already running for `opened`. Established live on PR #56
-# (2026-09-24): the `opened`-triggered run was cancelled mid-agent by the
-# `needs-review` label event, and because that event is not `recheck` it
-# self-skipped rather than replacing the cancelled run — no verdict was ever
-# posted, and nothing but the sweeper's 20-minute needs-human escalation would
-# have recovered it. Partitioning the group by event action keeps the
-# intended behaviour (a real `synchronize` still cancels a stale review) while
-# stopping a same-PR label attachment from cancelling one — matching what the
-# `names:` filter above already tries to say but cannot enforce at the
-# concurrency layer on its own.
+if: needs.pre_activation.outputs.proceed == 'true'
+
+# One review per pull request at a time; a newer commit or a dispatch replaces
+# one in flight (gh-aw's default for pull requests, extended to the dispatch).
 concurrency:
-  group: "gh-aw-${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.action == 'labeled' && 'labels' || 'code' }}"
+  group: "gh-aw-${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.pr }}"
   cancel-in-progress: true
+  # The compiler gives dispatched runs' agent and conclusion jobs one shared
+  # slot unless told apart (reference/concurrency.md, job-discriminator).
+  job-discriminator: ${{ github.event.pull_request.number || github.event.inputs.pr }}
 
 permissions:
   contents: read
@@ -97,7 +103,7 @@ engine:
 
 # Warm the pre-fetch across re-reviews of the same head commit.
 cache:
-  key: pr-prefetch-${{ github.event.pull_request.head.sha }}
+  key: pr-prefetch-${{ github.event.pull_request.head.sha || github.event.inputs.sha || github.run_id }}
   path: /tmp/gh-aw/agent
 
 tools:
@@ -128,6 +134,10 @@ safe-outputs:
   create-check-run:
     name: "Agent review"
     max: 1
+    # Required: without a target the check lands on GITHUB_SHA, which on a
+    # dispatched run is the tip of `main`, not the pull request; with one it
+    # looks up the pull request's head (create_check_run.cjs).
+    target: triggering
   noop:
   # The verdict per requirement, as data rather than prose. gh-aw validates it
   # against this schema and appends it to the review body as a JSON block
@@ -156,7 +166,16 @@ safe-outputs:
 #
 # conclusion runs after safe_outputs, so by here the review exists.
 jobs:
+  # The gate's decision, read by the `if:` above.
+  pre-activation:
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
   conclusion:
+    # The routing step dispatches rework with GITHUB_TOKEN: neither App has the
+    # Actions permission (org installations API, 2026-09-29), and gh-aw merges
+    # this into the job's permissions.
+    permissions:
+      actions: write
     pre-steps:
       - uses: actions/create-github-app-token@v3
         id: label_token
@@ -174,7 +193,7 @@ jobs:
       # .github; tested by .github/scripts/test/run.sh.
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: develop
           sparse-checkout: .github/scripts
           persist-credentials: false
       # Fail safe: if the check and the review disagree, treat it as blocking.
@@ -182,20 +201,13 @@ jobs:
       - name: Route on the posted verdict
         env:
           GH_TOKEN: ${{ steps.label_token.outputs.token }}
+          ACTIONS_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-          SHA: ${{ github.event.pull_request.head.sha }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr }}
+          # The commit reviewed: the event's head, or on a dispatch the head the
+          # reviewer found, which is the pull request's current one.
+          EVENT_SHA: ${{ github.event.pull_request.head.sha }}
           APP: gh-aw-spike-reviewer
-          # From the event, not a label lookup: on #113 `gh api …/labels | grep`
-          # failed inside an `if`, which bash treats as "no", so an agent
-          # pull request with a red verdict summoned nobody.
-          AUTHOR: ${{ github.event.pull_request.user.login }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          # The base BRANCH, not base.sha: on a synchronize event base.sha is
-          # an older develop commit (b822ba3 on run 36337277509, from before the
-          # requirements files existed), while the reviewer reads .github from
-          # the base branch's current snapshot. Both must read the same file.
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           set -euo pipefail
           # Fail closed: if any read or label write here errors, send the pull
@@ -204,6 +216,17 @@ jobs:
           # waiting.
           trap 'echo "::error::routing failed at line $LINENO; labelling needs-human"
                 gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-human" --silent || true' ERR
+          # Author, body and base from the pull request itself, so an event and a
+          # dispatch route alike. Read outside any `if`: on #113 a lookup inside
+          # an `if` failed, which bash treats as "no", and nobody was summoned.
+          # The base BRANCH, not base.sha: on a synchronize event base.sha is an
+          # older develop commit (run 36337277509), while the reviewer reads
+          # .github from the base branch's current snapshot.
+          PRJ=$(gh api "repos/$REPO/pulls/$PR")
+          AUTHOR=$(jq -r '.user.login' <<<"$PRJ")
+          PR_BODY=$(jq -r '.body // ""' <<<"$PRJ")
+          BASE_REF=$(jq -r '.base.ref' <<<"$PRJ")
+          SHA="${EVENT_SHA:-$(jq -r '.head.sha' <<<"$PRJ")}"
           # Both verdicts must be about THIS commit, not an older review.
           CHECK=$(bash .github/scripts/check-runs.sh latest "$SHA" "Agent review" "$APP")
           STATE=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
@@ -267,25 +290,22 @@ jobs:
 
           # REST, not `gh pr edit`: the latter goes through GraphQL and fails
           # on the Projects (classic) deprecation in this repo.
-          # `recheck` is a one-shot request, like `implement`. Leaving it on
-          # would mean the next label change never re-fires anything.
-          gh api -X DELETE "repos/$REPO/issues/$PR/labels/recheck" --silent 2>/dev/null \
-            && echo "-> cleared recheck"
-
           case "$VERDICT" in
             block)
               # Only agent work is sent back to an agent. On a person's pull
               # request the review and the red check stand, and they fix it.
+              # Rework is dispatched with the commit judged; its gate stops if
+              # the branch has moved on since.
               if [ "$AUTHOR" = "gh-aw-spike-implementer[bot]" ]; then
-                gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=needs-rework" --silent
-                echo "-> needs-rework"
+                GH_TOKEN="$ACTIONS_TOKEN" bash .github/scripts/dispatch.sh rework.lock.yml pr "$PR" sha="$SHA"
+                echo "-> rework dispatched"
               else
                 echo "-> blocking; not an agent pull request, so no rework"
               fi ;;
             pass)
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
               for L in $(gh api "repos/$REPO/issues/$PR/labels" \
-                           --jq '.[].name | select(startswith("strike:") or startswith("conflict:"))'); do
+                           --jq '.[].name | select(startswith("strike:"))'); do
                 gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent || true
                 echo "-> cleared $L"
               done ;;
@@ -309,7 +329,7 @@ evals:
 # Review
 
 You are a sceptical reviewer for pull request
-#${{ github.event.pull_request.number }} in ${{ github.repository }}. This pull
+#${{ github.event.pull_request.number || github.event.inputs.pr }} in ${{ github.repository }}. This pull
 request was written by an agent, so assume it is plausible-looking and unverified
 until you have checked it.
 

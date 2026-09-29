@@ -4,7 +4,7 @@ name: Dispatcher
 # order is decided here, not by an agent.
 #
 # Every 30 minutes, while fewer than MAX_OPEN agent pull requests are open (or
-# being written), it labels the next issues `implement`:
+# being written), it dispatches implement for the next issues:
 #   - in the current sprint: the open milestone with the earliest due date;
 #   - `ready` (set by a person, after the refiner marked it `refined`), and not
 #     an Epic or a Spike, and not labelled `human` (people do those themselves;
@@ -12,17 +12,18 @@ name: Dispatcher
 #     stopped it for now, without taking it out of the sprint);
 #   - unblocked: every "blocked by" issue is closed, or `merged` (its code is
 #     on develop already, so dependent work can build on it);
-#   - not already being worked: no open pull request fixes it, and no
-#     `implement` or `needs-human` on it;
+#   - not already being worked: no open pull request fixes it, no implement
+#     run for it is in flight, and no `needs-human` on it;
 #   - High, Medium, Low, then no priority; oldest first within each.
 # People decide what is in the sprint and how much it matters; this only picks
 # the next thing from what they decided.
 #
-# MAX_PER_DAY bounds the spend: label-started implement runs skip gh-aw's daily
-# AI-credit cap (spec §9.8), so this is the cap.
+# MAX_PER_DAY bounds the spend: dispatched runs skip gh-aw's daily AI-credit
+# cap (check_daily_aic_workflow_guardrail.cjs), so this is the cap.
 #
-# The reviewer App applies the label: the label must start a workflow, which a
-# GITHUB_TOKEN write cannot, and implement.md allows this App by name.
+# It dispatches with GITHUB_TOKEN (.github/scripts/dispatch.sh): a dispatch,
+# unlike a label, starts a workflow from that token. The reviewer App only
+# reads (issue fields need it).
 
 on:
   # As soon as something may have become startable or a slot may have freed:
@@ -47,7 +48,7 @@ concurrency:
 
 permissions:
   contents: read
-  actions: read
+  actions: write   # dispatch implement
 
 jobs:
   dispatch:
@@ -56,6 +57,10 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'skipped'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
       - uses: actions/create-github-app-token@v3
         id: app_token
         with:
@@ -78,11 +83,10 @@ jobs:
                      --jq '[.[] | select(.due_on != null)][0].title // ""')
           [ -n "$SPRINT" ] || { say "No current sprint (no open milestone with a due date); nothing to start."; exit 0; }
 
-          # Every label change on any issue starts implement.lock.yml, which then
-          # skips itself; only a run whose agent job did not skip is real work. A
-          # run still deciding counts as real, which errs towards starting less.
+          # A run whose gate stopped it (agent job skipped) is not work; a run
+          # still deciding counts as real, which errs towards starting less.
           runs() { GH_TOKEN="$ACTIONS_TOKEN" gh run list --repo "$REPO" --workflow implement.lock.yml --limit 100 \
-                     --json databaseId,status,conclusion "$@"; }
+                     --json databaseId,status,conclusion,displayTitle "$@"; }
           real() { GH_TOKEN="$ACTIONS_TOKEN" gh run view "$1" --repo "$REPO" --json jobs \
                      --jq '[.jobs[] | select(.name == "agent")] | (length == 0 or (.[0].conclusion != "skipped"))'; }
           count_real() { local n=0; for R in $(jq -r '.[] | select(.conclusion != "skipped") | .databaseId'); do
@@ -99,9 +103,13 @@ jobs:
           say "Sprint \`$SPRINT\`: $OPEN_PRS open agent PR(s), $RUNNING run(s) in flight, $TODAY started today; $SLOTS slot(s)."
           [ "$SLOTS" -gt 0 ] || exit 0
 
-          # Issues an open pull request says it fixes.
-          FIXING=$(gh pr list --repo "$REPO" --state open --limit 200 --json body --jq '.[].body // ""' \
-            | { grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -sc 'unique')
+          # Issues an open pull request says it fixes, and issues an implement run
+          # is still working on (its run name is "Implement #N").
+          FIXING=$( { gh pr list --repo "$REPO" --state open --limit 200 --json body --jq '.[].body // ""' \
+                        | { grep -oiE '(fixes|closes|resolves) #[0-9]+' || true; }
+                      runs --jq '.[] | select(.status != "completed") | .displayTitle' \
+                        | { grep -oE '^Implement #[0-9]+' || true; }; } \
+            | { grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -sc 'unique')
 
           CANDIDATES=$(gh api graphql --paginate -F owner="${REPO%/*}" -F name="${REPO#*/}" -f query='
             query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
@@ -121,7 +129,7 @@ jobs:
                    waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})
               | map(select(.sprint == $sprint
                            and (.type != "Epic" and .type != "Spike")
-                           and ([.labels[] | select(. == "implement" or . == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)
+                           and ([.labels[] | select(. == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)
                            and (.number as $n | $fixing | index($n) | not)
                            and (.waiting | length == 0)))
               | sort_by([({"High": 0, "Medium": 1, "Low": 2}[.priority] // 3), .createdAt])')
@@ -129,6 +137,6 @@ jobs:
 
           for N in $(jq -r --argjson k "$SLOTS" '.[:$k][].number' <<<"$CANDIDATES"); do
             if [ "$DRY_RUN" = "true" ]; then say "would start #$N"; continue; fi
-            gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=implement" --silent
+            GH_TOKEN="$ACTIONS_TOKEN" bash .github/scripts/dispatch.sh implement.lock.yml issue "$N" >/dev/null
             say "started #$N"
           done

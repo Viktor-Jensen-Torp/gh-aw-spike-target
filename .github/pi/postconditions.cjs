@@ -50,6 +50,12 @@
  *    was posted. The command is refused before it runs; shared/browser.md says
  *    to stop a server by the process id saved when it was started.
  *
+ * 5. LINKED ISSUE (implement). gh-aw adds "Fixes #N" to a new pull request only
+ *    when the run was started by an issue event (create_pull_request.cjs:895),
+ *    and implement is dispatched. Review, rework, the dispatcher and merged.yml
+ *    all find the issue through that line, so create_pull_request is refused
+ *    without it. PI_ISSUE is the dispatched issue number.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -79,6 +85,7 @@ const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-di
  * verify:   run verify.sh before create_pull_request / push_to_pull_request_branch.
  * decideEach: every issue in `candidates` must end the run with one of `labels`.
  * checkIssue: run check-issue.sh on the body of every update_issue that sets one.
+ * linkIssue: create_pull_request's body must say "Fixes #$PI_ISSUE".
  */
 const ROLES = {
   review: {
@@ -92,6 +99,7 @@ const ROLES = {
     required: [["create_pull_request", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
     verify: true,
+    linkIssue: true,
   },
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
@@ -168,8 +176,9 @@ function log(msg) {
  * @param {string} [giveUp] what to do once the checks have failed MAX_VERIFY_BLOCKS times
  * @param {boolean} [checkIssue] run check-issue.sh on an update_issue body
  * @param {string} [candidates] candidates file, to tell an epic from a work item
+ * @param {boolean} [linkIssue] create_pull_request must name $PI_ISSUE with a closing keyword
  */
-function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "") {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false) {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -270,11 +279,26 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   fi`
     : "";
 
+  // Checked before verify, so a missing link costs no test run.
+  const linkCheck = linkIssue
+    ? `
+  if [ "$1" = create_pull_request ] || [ "$1" = create-pull-request ]; then
+    __iss="\${PI_ISSUE:-}"
+    if [ -n "$__iss" ]; then
+      __body=$(printf '%s' "$__payload" | jq -r '.body // empty' 2>/dev/null); [ -z "$__body" ] && __body=$(__pc_flag body "$@")
+      if ! printf '%s' "$__body" | grep -qiE "(fixes|closes|resolves) #$__iss([^0-9]|\$)"; then
+        echo "BLOCKED by the pipeline: the pull request body must say \\"Fixes #$__iss\\" on a line of its own. The review, the rework and the release find the issue through that line. Nothing was submitted; add it and call $1 again." >&2
+        return 2
+      fi
+    fi
+  fi`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
-  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}
+  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -362,8 +386,9 @@ function postconditions(pi) {
   }
   const verify = spec.verify === true;
   const checkIssue = /** @type {any} */ (spec).checkIssue === true;
-  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue
-    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "")
+  const linkIssue = /** @type {any} */ (spec).linkIssue === true;
+  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue
+    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue)
     : "";
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);

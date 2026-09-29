@@ -3,13 +3,13 @@ emoji: "🔧"
 description: Sends a pull request back to the implementer once, carrying the named reason it came back.
 intent: Close the loop from a rejected review to a corrected branch, with a bounded number of attempts before a person is called.
 
-# `pull_request`, not `pull_request_target`: gh-aw refuses to compile
-# `pull_request_target` with a checkout of the pull request's head ("extremely
-# insecure"), and rework has to modify that head.
+# Dispatched, never labelled: review's routing step sends it with the commit it
+# judged, and the sweeper sends it for a red pull request nobody is acting on
+# (.github/scripts/dispatch.sh). gh-aw reads the pull request from the dispatch's
+# `aw_context`: it checks out that pull request's branch and `target:
+# triggering` resolves to it (checkout_pr_branch.cjs, invocation_context_helpers.cjs).
 #
-# Consequence: a conflicted pull request never fires this workflow (GitHub runs
-# no `pull_request` workflows on one). Conflicts are unblock.md's job, sent by
-# unblock-detect.yml and the sweeper.
+# Conflicts are unblock.md's job, sent by unblock-detect.yml and the sweeper.
 
 inlined-imports: true
 
@@ -29,11 +29,20 @@ imports:
   - shared/design-context.md
 
 on:
-  pull_request:
-    types: [labeled]
-    names: [needs-rework]
-  # The reviewer App applies the label, and a bot actor has no repository role.
-  bots: [gh-aw-spike-reviewer]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "Number of the pull request to rework"
+        required: true
+        type: string
+      sha:
+        description: "The head commit that was judged; a newer head means this round is stale"
+        required: true
+        type: string
+  # The gate below makes gh-aw check the actor's role (a `steps:` key is not one
+  # of its safe triggers, role_checks.go). Review's routing and the sweeper
+  # dispatch with GITHUB_TOKEN, which runs as github-actions[bot].
+  bots: [github-actions]
 
   permissions:
     contents: read
@@ -46,39 +55,30 @@ on:
   # survives a run, and unlike the run log they are visible on the pull request.
   # Design follows ../pi-github-test docs/adr/0009-the-rework-loop.md.
   #
-  # The label writes below use GITHUB_TOKEN, deliberately, NOT an App token.
-  # An App-applied label fires `pull_request labeled` again, and gh-aw's PR
-  # concurrency group cancels the run in flight: on run 35556564292 the gate
-  # added strike:1, that event started run 35556639139, and the second killed
-  # the first before the agent did anything. github-actions[bot] labels do not
-  # trigger workflows, which is exactly what a counter wants. Only the reviewer's
-  # needs-rework label is meant to chain, and that one is applied by its App.
+  # The label writes below use GITHUB_TOKEN, deliberately, NOT an App token:
+  # strike labels are state, and github-actions[bot] labels start no workflow
+  # (on run 35556564292 an App-applied strike label started a second run that
+  # cancelled the first).
   steps:
     - name: Decide whether to rework, and what for
       id: gate
       env:
         GH_TOKEN: ${{ github.token }}
         REPO: ${{ github.repository }}
-        PR: ${{ github.event.pull_request.number }}
-        LABELLED_SHA: ${{ github.event.pull_request.head.sha }}
+        PR: ${{ github.event.inputs.pr }}
+        JUDGED_SHA: ${{ github.event.inputs.sha }}
         LIMIT: "3"
-        LABEL: ${{ github.event.label.name }}
-        # gh-aw's own activation check, which runs just before this step. If it
-        # refuses the run, the agent will not start, so no strike may be spent:
-        # on PR #48 strikes were spent while the agent was blocked, and the pull
-        # request was escalated on rounds that never happened.
-        MEMBER: ${{ steps.check_membership.outputs.is_team_member }}
       run: |
         set -euo pipefail
         stop() { echo "$1"; echo "proceed=false" >> "$GITHUB_OUTPUT"; exit 0; }
         # REST, not `gh pr edit`: that goes through GraphQL and can fail on the
         # Projects (classic) deprecation in this repository.
         add_label()    { gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$1" --silent; }
-        remove_label() { gh api -X DELETE "repos/$REPO/issues/$PR/labels/$1" --silent 2>/dev/null || true; }
 
-        [ "$LABEL" = "needs-rework" ] || stop "Not our label ($LABEL); nothing to do."
-        [ "$MEMBER" = "true" ] || stop "gh-aw will not activate this run (is_team_member=$MEMBER); no strike spent."
-        PRJSON=$(gh pr view "$PR" --repo "$REPO" --json labels,mergeable,headRefOid,statusCheckRollup)
+        PRJSON=$(gh pr view "$PR" --repo "$REPO" --json state,labels,mergeable,headRefOid,statusCheckRollup,isCrossRepository)
+        [ "$(jq -r .state <<< "$PRJSON")" = OPEN ] || stop "#$PR is not open."
+        # Never on a fork: this run pushes with repository credentials.
+        [ "$(jq -r .isCrossRepository <<< "$PRJSON")" = false ] || stop "#$PR comes from a fork."
         LABELS=$(jq -r '.labels[].name' <<< "$PRJSON")
         # Rework fixes agent work only; a person fixes their own pull request.
         # Its push already requires `agent`; stopping here spends no strike and
@@ -87,26 +87,16 @@ on:
         CURRENT_SHA=$(jq -r '.headRefOid' <<< "$PRJSON")
         MERGEABLE=$(jq -r '.mergeable' <<< "$PRJSON")
 
-        # Only the latest commit counts. If the branch moved after the label
-        # went on, that commit has its own review and its own chain. Stop before
-        # a strike is spent, and take the label off so the next one can fire.
-        if [ "$CURRENT_SHA" != "$LABELLED_SHA" ]; then
-          remove_label needs-rework
-          stop "Stale: labelled $LABELLED_SHA, head is now $CURRENT_SHA."
-        fi
+        # Only the latest commit counts. If the branch moved after that commit
+        # was judged, the new one has its own review and its own chain. Stop
+        # before a strike is spent.
+        [ "$CURRENT_SHA" = "$JUDGED_SHA" ] || stop "Stale: judged $JUDGED_SHA, head is now $CURRENT_SHA."
         # A person holds it; the pipeline does not touch it.
-        if grep -qx needs-human <<< "$LABELS"; then
-          remove_label needs-rework
-          stop "needs-human is on #$PR; a person owns it."
-        fi
+        if grep -qx needs-human <<< "$LABELS"; then stop "needs-human is on #$PR; a person owns it."; fi
         # A person paused it. No strike is spent; when `paused` comes off, the
         # sweeper finds the red verdict and sends rework again.
-        if grep -qx paused <<< "$LABELS"; then
-          remove_label needs-rework
-          stop "paused is on #$PR; it resumes when the label comes off."
-        fi
-        # Unreachable in practice (a conflicted pull request runs no workflows),
-        # but if it happens the fix is unblock.md, not a rework round.
+        if grep -qx paused <<< "$LABELS"; then stop "paused is on #$PR; it resumes when the label comes off."; fi
+        # A conflicted pull request is unblock.md's to fix, not a rework round.
         [ "$MERGEABLE" != "CONFLICTING" ] || stop "Conflicted; that is unblock.md's job."
 
         # Red CI first, because a failing build is a more concrete task than a
@@ -124,17 +114,14 @@ on:
 
         if [ "$N" -ge "$LIMIT" ]; then
           add_label needs-human
-          remove_label needs-rework
           gh api -X POST "repos/$REPO/issues/$PR/comments" --silent \
             -f body="Third consecutive $KIND. A human owns this now (ADR 0009)."
           stop "Third consecutive $KIND; escalated to a person."
         fi
 
         # The counter goes on before the agent runs, so a crashed run still
-        # spends its round. needs-rework comes off here too: it is a one-shot
-        # command, and leaving it on would re-fire this workflow on the push.
+        # spends its round.
         add_label "$KIND:$N"
-        remove_label needs-rework
         echo "proceed=true"   >> "$GITHUB_OUTPUT"
         echo "task=$TASK"     >> "$GITHUB_OUTPUT"
         echo "round=$KIND:$N" >> "$GITHUB_OUTPUT"
@@ -147,9 +134,17 @@ jobs:
       task: ${{ steps.gate.outputs.task }}
       round: ${{ steps.gate.outputs.round }}
 
-# Never on a fork: this trigger carries repository credentials.
+run-name: "Rework #${{ github.event.inputs.pr }}"
+
 if: needs.pre_activation.outputs.proceed == 'true'
-  && github.event.pull_request.head.repo.full_name == github.repository
+
+# One round per pull request at a time; different pull requests side by side.
+concurrency:
+  group: "gh-aw-${{ github.workflow }}-${{ github.event.inputs.pr }}"
+  cancel-in-progress: false
+  # The compiler gives dispatched runs' agent and conclusion jobs one shared
+  # slot unless told apart (reference/concurrency.md, job-discriminator).
+  job-discriminator: ${{ github.event.inputs.pr }}
 
 permissions:
   contents: read
@@ -166,7 +161,7 @@ pre-agent-steps:
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
-      PR: ${{ github.event.pull_request.number }}
+      PR: ${{ github.event.inputs.pr }}
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
@@ -248,7 +243,7 @@ evals:
 
 # Rework
 
-Pull request #${{ github.event.pull_request.number }} in ${{ github.repository }}
+Pull request #${{ github.event.inputs.pr }} in ${{ github.repository }}
 came back. Your task this round is **${{ needs.pre_activation.outputs.task }}**
 (round ${{ needs.pre_activation.outputs.round }}).
 
