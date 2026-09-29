@@ -45,6 +45,9 @@ The job is to find the root cause, with evidence, not to fix anything.
     ("Route on the posted verdict").
 - **Establish, don't assume**: a claim says how it was established (the run,
   the lock, the API).
+- **What an agent was given**: `bash .github/scripts/agent-inputs.sh <role>`
+  maps its prompt sections, the files prepared for it, the guard's refusals and
+  nudges. A run's `aw-prompts/prompt.txt` is the full prompt it actually got.
 
 ## Working here
 
