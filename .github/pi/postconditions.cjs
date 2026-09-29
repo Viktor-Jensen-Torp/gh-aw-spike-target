@@ -64,6 +64,13 @@
  *    `data`, so the reviewer fixes the wording before anything is posted.
  *    Verdicts (unmet, unproven) are never refused, only form.
  *
+ * 7. COMMIT SCOPE (implement, rework). Before create_pull_request or
+ *    push_to_pull_request_branch, every file in a commit not yet on the remote
+ *    must be one the role may change. Rework run 36601234520 ran `git add -A`
+ *    and committed a Chromium install and the `.github/` files gh-aw restores
+ *    from the base; the push failed on its size. The refusal names the files
+ *    and the exact reset that undoes the commits.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -87,7 +94,7 @@ const KILL_BY_NAME_REASON =
 const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/check-issue.sh";
 // The routing's row check, also the base-branch copy, and what it reads: the
 // requirements for the issue's type and the pull request's changed files, both
-// written by pre-agent steps (shared/issue-context.md, shared/pr-context.md).
+// written by pre-agent steps (shared/agent-context.md, shared/pr-context.md).
 const REVIEW_ROWS = process.env.PI_REVIEW_ROWS_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/review-rows.sh";
 const REQUIREMENTS = process.env.PI_REQUIREMENTS || "/tmp/gh-aw/agent/requirements.md";
 const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
@@ -101,6 +108,7 @@ const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
  * checkIssue: run check-issue.sh on the body of every update_issue that sets one.
  * linkIssue: create_pull_request's body must say "Fixes #$PI_ISSUE".
  * checkRows: submit_pull_request_review's `data` must pass review-rows.sh's form rules.
+ * allowedPaths: a regex every committed, unpushed path must match (commit scope).
  */
 const ROLES = {
   review: {
@@ -116,11 +124,14 @@ const ROLES = {
     checks: {},
     verify: true,
     linkIssue: true,
+    // Implement's allowed-files (implement.md): the app code and the map.
+    allowedPaths: "^(apps|packages)/|^docs/architecture\\.md$",
   },
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
     verify: true,
+    allowedPaths: "^(apps|packages)/|^docs/architecture\\.md$",
   },
   // A quiet night is a correct outcome for the refiner, so `noop` counts — but
   // finishing with no output at all does not, because that is indistinguishable
@@ -194,8 +205,9 @@ function log(msg) {
  * @param {string} [candidates] candidates file, to tell an epic from a work item
  * @param {boolean} [linkIssue] create_pull_request must name $PI_ISSUE with a closing keyword
  * @param {boolean} [checkRows] submit_pull_request_review's rows must pass review-rows.sh's form rules
+ * @param {string} [allowedPaths] regex every committed, unpushed path must match
  */
-function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false, checkRows = false) {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false, checkRows = false, allowedPaths = "") {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -341,11 +353,29 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   fi`
     : "";
 
+  // Before verify, so an out-of-scope commit costs no test run.
+  const scopeCheck = allowedPaths
+    ? `
+  case "$1" in create_pull_request|create-pull-request|push_to_pull_request_branch|push-to-pull-request-branch)
+    if [ "$2" != "--help" ]; then
+      __root="\${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+      __out=$(cd "$__root" && git log --name-only --format= HEAD --not --remotes 2>/dev/null | sort -u | grep -vE '${allowedPaths}' | grep . || true)
+      if [ -n "$__out" ]; then
+        __first=$(cd "$__root" && git rev-list HEAD --not --remotes 2>/dev/null | tail -1)
+        echo "BLOCKED by the pipeline: your commits include files this role may not change. Nothing was submitted." >&2
+        printf '%s\\n' "$__out" | head -n 20 | sed 's/^/  /' >&2
+        echo "Undo the commits and keep your changes: git reset \${__first}^ ; then git add only the files you changed (never git add -A), commit, and call $1 again." >&2
+        return 2
+      fi
+    fi ;;
+  esac`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
-  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}${rowsCheck}
+  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}${rowsCheck}${scopeCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -435,8 +465,9 @@ function postconditions(pi) {
   const checkIssue = /** @type {any} */ (spec).checkIssue === true;
   const linkIssue = /** @type {any} */ (spec).linkIssue === true;
   const checkRows = /** @type {any} */ (spec).checkRows === true;
-  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue || checkRows
-    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue, checkRows)
+  const allowedPaths = /** @type {any} */ (spec).allowedPaths || "";
+  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue || checkRows || allowedPaths
+    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue, checkRows, allowedPaths)
     : "";
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);

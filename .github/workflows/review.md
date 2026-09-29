@@ -20,7 +20,7 @@ imports:
   - shared/design-context.md
   # The linked issue and the requirements for its type, as files. A person's
   # pull request may link no issue; it is then reviewed without requirements.
-  - uses: shared/issue-context.md
+  - uses: shared/agent-context.md
     with:
       required: false
   # Runs the app for the reviewer to look at (#108); browser.md needs the
@@ -363,8 +363,8 @@ re-review builds on it instead of restating it.
 
 ## Step 2: Analyse the changed lines
 
-Read `.github/conventions/index.md` and the document it points at, and judge the
-change against it. The conventions are the repository's stated rules; a finding
+Read `/tmp/gh-aw/agent/conventions.md`, the conventions for the paths this pull
+request touches (already picked for you), and judge the change against them. The conventions are the repository's stated rules; a finding
 that cites one is a fact rather than a preference, and the `conventions` check
 only covers the part that can be checked mechanically.
 

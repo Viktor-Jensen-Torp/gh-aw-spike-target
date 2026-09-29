@@ -19,7 +19,7 @@ imports:
     with:
       role: implement
   - shared/design-context.md
-  - shared/issue-context.md
+  - shared/agent-context.md
   - shared/browser.md
 
 # Started by dispatch, never by a label: the dispatcher sends the next ready
@@ -182,11 +182,11 @@ give, per row, the file and line that meets it.
 
 Work in this order:
 
-1. **Read `.github/conventions/index.md` first, then the documents it lists
-   under Always and those for the paths you will touch.** It is not background
+1. **Read `/tmp/gh-aw/agent/conventions.md` first**: the conventions for the
+   paths this issue names, already picked for you. It is not background
    reading: it states how code is laid out and tested here, and a pull request
-   that ignores it fails the checks and cannot merge. Then read the issue and the
-   code the architecture map (`docs/architecture.md`) points you to.
+   that ignores it fails the checks and cannot merge. Then read the code its
+   architecture map points you to.
 2. Make the smallest change that satisfies the issue, following those
    conventions. Touch only `apps/`, `packages/` and `docs/architecture.md`.
 3. Write a test for every case under the issue's "Done when", named after it

@@ -18,6 +18,9 @@ FIX="$HERE/fixtures"
 BASE="$(mktemp -d "${TMPDIR:-/tmp}/postconditions-test.XXXX")"
 trap 'rm -rf "$BASE"' EXIT
 fails=0
+# The commit-scope check reads the workspace's unpushed commits; by default the
+# tests run against an empty folder, not this repository's own branch.
+mkdir -p "$BASE/nogit"; export GITHUB_WORKSPACE="$BASE/nogit"
 
 new_root() {
   ROOT="$(mktemp -d "$BASE/r.XXXX")"
@@ -114,7 +117,7 @@ CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "work 
 CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "work item missing Why, Details, a table" block "echo '{\"issue_number\":7,\"operation\":\"replace\",\"body\":'\"\$(printf '%s' '$BAD')\"'}' | safeoutputs update_issue ."
 CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "an epic is checked against epic.md"   block "echo '{\"issue_number\":81,\"operation\":\"replace\",\"body\":'\"\$(printf '%s' '$GOOD')\"'}' | safeoutputs update_issue ."
 CHECK_ISSUE="$REPO_ROOT/.github/scripts/check-issue.sh" ROLE=refine case_ "title only is not checked"            pass  'echo "{\"issue_number\":7,\"title\":\"t\"}" | safeoutputs update_issue .'
-unset GITHUB_WORKSPACE
+export GITHUB_WORKSPACE="$BASE/nogit"
 
 echo "== pass-through"
 new_root
@@ -169,7 +172,7 @@ grep -q "Stop trying: escalate as in Step 4: add_labels needs-human" "$ROOT/last
   && echo "PASS  unblock gives up its own way, not report_incomplete" \
   || { echo "FAIL  unblock give-up message: $(head -c 200 "$ROOT/last_err")"; fails=$((fails + 1)); }
 new_root; fake_verify
-WS="$(git -C "$HERE" rev-parse --show-toplevel)"
+git init -q "$BASE/wsroot"; WS="$(cd "$BASE/wsroot" && pwd -P)"
 GITHUB_WORKSPACE="$WS" ROLE=implement case_ "called from another directory" pass "cd / && $PR"
 [ "$(cat "$ROOT/verify.cwd")" = "$WS" ] \
   && echo "PASS  verify runs from the repository root, not the command's directory" \
@@ -189,6 +192,23 @@ new_root; fake_verify
 PI_ISSUE=125 ROLE=implement case_ "closes #125, any case"                 pass  "$(link 'closes #125.')"
 PI_ISSUE=""  ROLE=implement case_ "no PI_ISSUE (a person's run): not checked" pass "$(link 'x')"
 PI_ISSUE=125 ROLE=rework    case_ "rework pushes are not checked"         pass  "$PUSH"
+
+echo "== commits stay inside the role's paths (rework run 36601234520 committed a browser)"
+SCOPE="$BASE/scope"; git init -q --bare "$SCOPE/origin.git"
+git clone -q "$SCOPE/origin.git" "$SCOPE/ws" 2>/dev/null
+( cd "$SCOPE/ws" && git config user.email t@t && git config user.name t && mkdir -p apps/web && echo a > apps/web/a.ts \
+  && git add . && git commit -qm base && git push -q origin HEAD:main ) >/dev/null 2>&1
+in_ws() { (cd "$SCOPE/ws" && "$@") >/dev/null 2>&1; }
+new_root; fake_verify
+in_ws sh -c 'echo b >> apps/web/a.ts && git add -A && git commit -qm fix'
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "only apps/ changed: goes through"            pass  "$PUSH"
+in_ws sh -c 'mkdir -p .github x/y && echo c > .github/ci.yml && echo d > "x/y/chrome" && git add -A && git commit -qm sweep'
+new_root; fake_verify
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ ".github/ and a stray folder: refused"      block "$PUSH"
+grep -q "  .github/ci.yml" "$ROOT/last_err" && grep -q "git reset " "$ROOT/last_err" && echo "PASS  the agent is told which files, and how to undo" || { echo "FAIL  refusal lacks files or reset"; fails=$((fails+1)); }
+[ ! -f "$ROOT/verify.runs" ] && echo "PASS  refused before verify ran" || { echo "FAIL  verify ran for an out-of-scope commit"; fails=$((fails+1)); }
+new_root; fake_verify
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=review  case_ "review role: not checked"                  pass  "$PUSH"
 
 echo "== review rows are refused in the form the routing would refuse them"
 REPO_ROOT="$(cd "$HERE/../../.." && pwd)"

@@ -27,6 +27,13 @@ imports:
     with:
       role: rework
   - shared/design-context.md
+  # The issue, its requirement rows and the conventions for the changed paths:
+  # the same bar the implementer built to and the reviewer judges by. Without
+  # them, rework on #136 fixed padding with a raw value although the
+  # conventions say design tokens only (run 36601234520).
+  - uses: shared/agent-context.md
+    with:
+      required: true
 
 on:
   workflow_dispatch:
@@ -258,6 +265,11 @@ Do not re-read the issue and start again.
   with `path`, `line`, `body`, `comment_id` and `thread_id`. These are the
   specific things to fix.
 - `/tmp/gh-aw/agent/pr-meta.json` — the pull request and its check results.
+- `/tmp/gh-aw/agent/requirements.md` — the rows the reviewer checks; a fix must
+  keep every row met. `/tmp/gh-aw/agent/issue.json` is the issue they come from.
+- `/tmp/gh-aw/agent/conventions.md` — the conventions for the paths this pull
+  request touches. Fix the way they say (for sizes and colours: design tokens,
+  not raw values).
 
 ## Step 2: Do the named task
 

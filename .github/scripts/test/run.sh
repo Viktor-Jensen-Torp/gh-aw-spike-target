@@ -161,6 +161,37 @@ check "every workflow that dispatches has actions: write" "" "$NOPERM"
 check "the sweeper arms auto-merge as the implementer App" "1" \
   "$(grep -c 'GH_TOKEN="$IMPLEMENTER_TOKEN" gh api graphql' "$WF/sweeper.yml")"
 
+# --- agent-context.sh: the conventions an agent is given -------------------------
+# Picked from index.md; on review run 36602126236 the reviewer, choosing for
+# itself, skipped the four documents under "Always".
+ctx() { # <paths, newline-separated> <issue body> -> the picked files, space-separated
+  printf '%s\n' "$1" > "$WORK/ctx-paths.txt"; printf '%s' "$2" > "$WORK/ctx-body.md"
+  (cd "$HERE/../../.." && bash .github/scripts/agent-context.sh "$WORK/ctx-paths.txt" "$WORK/ctx-body.md" "$WORK/ctx.md" >/dev/null) \
+    && sed -nE 's/^- `([^`]+)` \(.*/\1/p' "$WORK/ctx.md" | tr '\n' ' ' | sed 's/ $//'
+}
+ALWAYS=".github/conventions/chain/principles.md .github/conventions/chain/structure.md .github/conventions/chain/testing.md docs/architecture.md"
+check "a component with design claims (#136)" \
+  "$ALWAYS .github/conventions/web.md .github/conventions/chain/design.md .github/conventions/components.md" \
+  "$(ctx "apps/web/src/components/Button/Button.tsx" 'Builds `design/tempo.pen#yg090`.')"
+check "design.md only when the issue claims design parts" \
+  "$ALWAYS .github/conventions/web.md .github/conventions/components.md" \
+  "$(ctx "apps/web/src/components/Button/Button.tsx" "No claims.")"
+check "an API change" "$ALWAYS .github/conventions/api.md" "$(ctx "apps/api/src/app.ts" "")"
+check "no paths: the Always documents only" "$ALWAYS" "$(ctx "" "")"
+check "each document's text is included, without its frontmatter" "0 1" \
+  "$(grep -c '^okf_version:' "$WORK/ctx.md") $(grep -c '^<!-- docs/architecture.md -->' "$WORK/ctx.md")"
+
+# --- agent-inputs.sh: the map of what each role is given -------------------------
+MAPOK=""
+for R in implement review rework refine relate unblock release-review; do
+  OUT=$(bash "$SCRIPTS/agent-inputs.sh" "$R" 2>&1) || { MAPOK+="$R(failed) "; continue; }
+  for H in "## 1." "## 2." "## 3." "## 4." "## 5."; do grep -qF "$H" <<<"$OUT" || MAPOK+="$R(no $H) "; done
+  grep -qE '^\| # ' <<<"$OUT" || MAPOK+="$R(no task section) "
+done
+check "agent-inputs.sh maps every role" "" "$MAPOK"
+check "the map names review's pre-fetched diff" "1" \
+  "$(bash "$SCRIPTS/agent-inputs.sh" review | grep -c 'pr-diff.patch')"
+
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its
 # conclusion there is `failure` (review run 36472313007).
