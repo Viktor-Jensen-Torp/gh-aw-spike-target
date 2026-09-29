@@ -87,7 +87,7 @@ const KILL_BY_NAME_REASON =
 const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/check-issue.sh";
 // The routing's row check, also the base-branch copy, and what it reads: the
 // requirements for the issue's type and the pull request's changed files, both
-// written by pre-agent steps (shared/issue-context.md, shared/pr-context.md).
+// written by pre-agent steps (shared/agent-context.md, shared/pr-context.md).
 const REVIEW_ROWS = process.env.PI_REVIEW_ROWS_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/review-rows.sh";
 const REQUIREMENTS = process.env.PI_REQUIREMENTS || "/tmp/gh-aw/agent/requirements.md";
 const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
