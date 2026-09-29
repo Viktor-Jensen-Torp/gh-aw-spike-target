@@ -191,7 +191,7 @@ safe-outputs:
     # target would have nothing to act on.
     target: "*"
     # Never `ready`: that is a person's confirmation of `refined`.
-    allowed: [refined, needs-shape, needs-split, bug, enhancement, documentation]
+    allowed: [refined, needs-shape, needs-split]
   # The request is answered once the issue is refined, questioned or split.
   remove-labels:
     max: 15
@@ -318,9 +318,8 @@ split.
 
 For every issue you mark `refined`, also set its type with `set_issue_type`
 and its `Effort` (and `Priority`, only with evidence) with `set_issue_field`,
-as `issues.md` says. Add at most one topic label — `bug`, `enhancement` or
-`documentation` — and only when it is obvious; a label nobody filters on is
-noise.
+as `issues.md` says. The type says what kind of work it is; add no topic
+labels.
 
 ## Step 4: Record what you decided
 

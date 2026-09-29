@@ -141,6 +141,15 @@ NOTARGET=$(for L in "$WF"/*.lock.yml; do
   grep -o 'create_check_run\\":{[^}]*}' "$L" | grep -qv 'target' && basename "$L"; done | tr '\n' ' ')
 check "every create_check_run names its target" "" "$NOTARGET"
 
+# Every pre-activation output a lock reads is one the job exports. Review read
+# `proceed` without exporting it, so every review skipped (run 36591128696).
+UNSET=$(for L in "$WF"/*.lock.yml; do
+  OUT=$(awk '/^  pre_activation:/{f=1} f&&/^    outputs:/{p=1;next} p&&/^    [a-z]/{exit} p' "$L" | sed -nE 's/^      ([a-z_-]+):.*/\1/p')
+  for K in $(grep -oE 'needs\.pre_activation\.outputs\.[a-z_-]+' "$L" | sed 's/.*\.//' | sort -u); do
+    grep -qx "$K" <<<"$OUT" || printf '%s:%s ' "$(basename "$L")" "$K"
+  done; done)
+check "every pre-activation output that is read is exported" "" "$UNSET"
+
 # Workflows that dispatch with GITHUB_TOKEN need actions: write.
 NOPERM=$(for F in "$WF"/*.md "$WF"/*.yml; do
   [[ "$F" == *.lock.yml ]] && continue
