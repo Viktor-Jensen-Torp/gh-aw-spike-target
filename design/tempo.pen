@@ -43,7 +43,12 @@
                   "id": "K1mBi",
                   "type": "ref",
                   "ref": "b96aYA",
-                  "name": "List Column"
+                  "name": "List Column",
+                  "descendants": {
+                    "Ych7T/LVFgM": {
+                      "fill": "$faint"
+                    }
+                  }
                 },
                 {
                   "type": "frame",
@@ -12726,7 +12731,7 @@
     },
     "faint": {
       "type": "color",
-      "value": "#A3A29B"
+      "value": "#6e6e68"
     },
     "accent": {
       "type": "color",
