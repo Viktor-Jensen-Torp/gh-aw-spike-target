@@ -65,6 +65,23 @@ if [ -n "$SOURCE" ] && [ -z "$TESTS" ]; then
   FAILED=1
 fi
 
+# --- The accessibility check stays on --------------------------------------------
+# components.md: every story passes the accessibility check, never turned off.
+# A reviewer once marked this met while the stories disabled it for the whole
+# file (implement run 36679853765, PR #213), so it is checked here, not by eye.
+A11Y=""
+for F in $(grep -E '\.stories\.tsx$' <<<"$CHANGED" || true); do
+  [ -f "$F" ] || continue
+  A11Y+=$(grep -nE '\ba11y[[:space:]]*:' "$F" | sed "s#^#    $F:#")
+done
+if [ -n "$A11Y" ]; then
+  echo "✗ The accessibility check stays on: these stories configure it:"
+  printf '%s\n' "$A11Y"
+  echo "  Remove the a11y setting and fix what the check reports: the role, name,"
+  echo "  contrast or focus problem is real (.github/conventions/components.md)."
+  FAILED=1
+fi
+
 # --- The map comes with features ------------------------------------------------
 # chain/structure.md: adding, moving or removing a feature folder updates
 # docs/architecture.md in the same change.

@@ -101,6 +101,12 @@ git -C "$WORK/shallow" fetch -q --depth=1 origin '+refs/heads/develop:refs/remot
 check "shallow history: says so instead of a false breach" \
   "exit=2 ✗ cannot check conventions: no common history with origin/develop in this checkout." \
   "$(conventions "$WORK/shallow")"
+# Replay: PR #213 turned the accessibility check off for all Menu stories.
+(cd "$WORK/full" && git config user.email t@t && git config user.name t \
+  && printf 'export default {\n  parameters: {\n    a11y: { disable: true },\n  },\n};\n' > apps/web/src/components/Button/Button.stories.tsx \
+  && git commit -qam a11y-off) >/dev/null
+check "a story that turns the accessibility check off is a breach" \
+  "exit=1 ✗ The accessibility check stays on: these stories configure it:" "$(conventions "$WORK/full")"
 
 # --- hand-offs: workflows start each other by dispatch, never by a label ---------
 WF="$HERE/../../workflows"
