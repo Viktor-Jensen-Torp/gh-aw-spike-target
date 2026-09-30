@@ -209,6 +209,62 @@ describe('Auth Routes', () => {
     });
   });
 
+  describe('two concurrent requests with the same email', () => {
+    it('the second returns 400 duplicate_email, not a database error', async () => {
+      // Fire two concurrent sign-up requests with the same email
+      const results = await Promise.allSettled([
+        app.inject({
+          method: 'POST',
+          url: '/api/sign-up',
+          payload: {
+            fullName: 'User One',
+            email: 'concurrent@example.com',
+            password: 'password123',
+          },
+        }),
+        app.inject({
+          method: 'POST',
+          url: '/api/sign-up',
+          payload: {
+            fullName: 'User Two',
+            email: 'concurrent@example.com',
+            password: 'password456',
+          },
+        }),
+      ]);
+
+      // Both should settle
+      expect(results[0]).toHaveProperty('status', 'fulfilled');
+      expect(results[1]).toHaveProperty('status', 'fulfilled');
+
+      const response1 =
+        results[0].status === 'fulfilled' ? results[0].value : null;
+      const response2 =
+        results[1].status === 'fulfilled' ? results[1].value : null;
+
+      expect(response1).toBeDefined();
+      expect(response2).toBeDefined();
+
+      // One should succeed (201)
+      const successCount = [
+        response1?.statusCode,
+        response2?.statusCode,
+      ].filter((code) => code === 201).length;
+      expect(successCount).toBe(1);
+
+      // The other should return 400 duplicate_email
+      const failureResponse =
+        response1?.statusCode === 201 ? response2 : response1;
+      expect(failureResponse?.statusCode).toBe(400);
+      expect(failureResponse?.json()).toEqual({
+        error: {
+          code: 'duplicate_email',
+          message: 'Email already in use.',
+        },
+      });
+    });
+  });
+
   describe('GET /api/health with no cookie', () => {
     it('returns 200', async () => {
       const response = await app.inject({

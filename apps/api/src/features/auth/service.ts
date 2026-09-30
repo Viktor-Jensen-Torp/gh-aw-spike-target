@@ -72,14 +72,25 @@ export async function signUp(
   const passwordHash = hashPassword(data.password);
   const now = Date.now();
 
-  // Insert user
-  await db.insert(users).values({
-    id: userId,
-    fullName: data.fullName,
-    email: normalizedEmail,
-    passwordHash,
-    createdAt: new Date(now),
-  });
+  // Insert user - catch UNIQUE constraint violation (race condition)
+  try {
+    await db.insert(users).values({
+      id: userId,
+      fullName: data.fullName,
+      email: normalizedEmail,
+      passwordHash,
+      createdAt: new Date(now),
+    });
+  } catch (error) {
+    // Handle SQLite UNIQUE constraint violation on email
+    if (
+      error instanceof Error &&
+      error.message.includes('UNIQUE constraint failed')
+    ) {
+      throw new ApiError(400, 'duplicate_email', 'Email already in use.');
+    }
+    throw error;
+  }
 
   // Create session
   const sessionId = generateSessionId();
