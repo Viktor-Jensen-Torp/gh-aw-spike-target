@@ -44,7 +44,7 @@ function getCookie(request: FastifyRequest, name: string): string | undefined {
 }
 
 export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
-  app.post('/sign-up', async (request, reply) => {
+  app.post('/auth/sign-up', async (request, reply) => {
     const body = SignUpRequest.parse(request.body);
     const { user, sessionId } = await signUp(app.db, body);
 
@@ -54,7 +54,7 @@ export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
     return reply.status(201).send(response);
   });
 
-  app.post('/sign-in', async (request, reply) => {
+  app.post('/auth/sign-in', async (request, reply) => {
     const body = SignInRequest.parse(request.body);
     const { user, sessionId } = await signIn(app.db, body);
 

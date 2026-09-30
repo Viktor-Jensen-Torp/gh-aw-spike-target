@@ -31,7 +31,7 @@ describe('Auth Routes', () => {
       // Sign up first
       const signUpResponse = await app.inject({
         method: 'POST',
-        url: '/api/sign-up',
+        url: '/api/auth/sign-up',
         payload: {
           fullName: 'Test User',
           email: 'test@example.com',
@@ -81,7 +81,7 @@ describe('Auth Routes', () => {
       // Sign up
       const signUpResponse = await app.inject({
         method: 'POST',
-        url: '/api/sign-up',
+        url: '/api/auth/sign-up',
         payload: {
           fullName: 'Test User',
           email: 'test@example.com',
@@ -131,7 +131,7 @@ describe('Auth Routes', () => {
       // Sign up first user with capitalized email
       const first = await app.inject({
         method: 'POST',
-        url: '/api/sign-up',
+        url: '/api/auth/sign-up',
         payload: {
           fullName: 'Mara Reyes',
           email: 'Mara@Reyes.studio',
@@ -144,7 +144,7 @@ describe('Auth Routes', () => {
       // Try to sign up second user with lowercase email
       const second = await app.inject({
         method: 'POST',
-        url: '/api/sign-up',
+        url: '/api/auth/sign-up',
         payload: {
           fullName: 'Another Mara',
           email: 'mara@reyes.studio',
@@ -152,11 +152,12 @@ describe('Auth Routes', () => {
         },
       });
 
-      expect(second.statusCode).toBe(400);
+      expect(second.statusCode).toBe(409);
       expect(second.json()).toEqual({
         error: {
           code: 'duplicate_email',
-          message: 'Email already in use.',
+          message:
+            'This email is already in use. Sign in instead or reset your password.',
         },
       });
     });
@@ -167,7 +168,7 @@ describe('Auth Routes', () => {
       // Sign up
       await app.inject({
         method: 'POST',
-        url: '/api/sign-up',
+        url: '/api/auth/sign-up',
         payload: {
           fullName: 'Test User',
           email: 'test@example.com',
@@ -198,7 +199,7 @@ describe('Auth Routes', () => {
       // Verify it can be used to verify the correct password (through service)
       const signInResponse = await app.inject({
         method: 'POST',
-        url: '/api/sign-in',
+        url: '/api/auth/sign-in',
         payload: {
           email: 'test@example.com',
           password: 'password123',
@@ -215,7 +216,7 @@ describe('Auth Routes', () => {
       const results = await Promise.allSettled([
         app.inject({
           method: 'POST',
-          url: '/api/sign-up',
+          url: '/api/auth/sign-up',
           payload: {
             fullName: 'User One',
             email: 'concurrent@example.com',
@@ -224,7 +225,7 @@ describe('Auth Routes', () => {
         }),
         app.inject({
           method: 'POST',
-          url: '/api/sign-up',
+          url: '/api/auth/sign-up',
           payload: {
             fullName: 'User Two',
             email: 'concurrent@example.com',
@@ -252,14 +253,15 @@ describe('Auth Routes', () => {
       ].filter((code) => code === 201).length;
       expect(successCount).toBe(1);
 
-      // The other should return 400 duplicate_email
+      // The other should return 409 duplicate_email
       const failureResponse =
         response1?.statusCode === 201 ? response2 : response1;
-      expect(failureResponse?.statusCode).toBe(400);
+      expect(failureResponse?.statusCode).toBe(409);
       expect(failureResponse?.json()).toEqual({
         error: {
           code: 'duplicate_email',
-          message: 'Email already in use.',
+          message:
+            'This email is already in use. Sign in instead or reset your password.',
         },
       });
     });

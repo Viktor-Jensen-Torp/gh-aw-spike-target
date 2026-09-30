@@ -8,11 +8,33 @@ export const Me = z.object({
 });
 export type Me = z.infer<typeof Me>;
 
-/** Request body for POST /api/sign-up */
+/**
+ * Password validation rule: at least 8 characters and a number or symbol.
+ * Used by both the form and the API.
+ */
+function validatePassword(password: string): boolean {
+  if (password.length < 8) return false;
+  // Check for at least one digit or symbol
+  const symbolPattern = new RegExp(
+    '[0-9!@#$%^&*()_+\\-=\\[\\]{};:\'",.<?>/\\\\|`~]',
+  );
+  return symbolPattern.test(password);
+}
+
+/** Request body for POST /api/auth/sign-up */
 export const SignUpRequest = z.object({
-  fullName: z.string().trim().min(1),
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8),
+  fullName: z.string().trim().min(1, 'Full name is required'),
+  email: z.string().trim().toLowerCase().email('Email must be a valid address'),
+  password: z
+    .string()
+    .min(
+      8,
+      'Password is too weak. Use at least 8 characters and add a number or symbol.',
+    )
+    .refine(
+      validatePassword,
+      'Password is too weak. Use at least 8 characters and add a number or symbol.',
+    ),
 });
 export type SignUpRequest = z.infer<typeof SignUpRequest>;
 
