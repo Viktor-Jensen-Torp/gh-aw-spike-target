@@ -80,7 +80,7 @@ jobs:
           set -euo pipefail
 
           acted=0
-          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0 n_approved=0 n_review=0
+          declare -i n_conflict=0 n_noverdict=0 n_stuck=0 n_armed=0 n_branch=0 n_skipped=0 n_approved=0 n_review=0 n_detect=0 n_detect_human=0
 
           budget_left() { [ "$acted" -lt "$MAX_ACTIONS" ]; }
           spend() { acted=$((acted + 1)); }
@@ -242,6 +242,52 @@ jobs:
             fi
           done
 
+          # ---- agent runs lost to a threat-detection crash --------------------
+          # gh-aw scans an agent's output before anything is written. When the
+          # scanner itself crashes ("Threat Detection Engine Failure ... a tooling
+          # failure, not a security finding"), the safe outputs are skipped and the
+          # agent's finished work is lost: no pull request, or no push. No event
+          # follows, so nothing retries it (rework run 36675721641 on #205,
+          # 2026-09-30). Re-running the run's failed jobs scans the same output
+          # again and writes it; the agent does not run again. Once only: a second
+          # crash hands the issue or pull request to a person. Never a strike: a
+          # strike says the work was rejected, and this says nothing about the work.
+          SINCE=$(date -u -d '-6 hours' +%Y-%m-%dT%H:%M:%SZ)
+          for WF in implement rework unblock; do
+            RUNS=$(gh run list --repo "$REPO" --workflow "$WF.lock.yml" --status failure --created ">=$SINCE" \
+                     --limit 20 --json databaseId,attempt,displayTitle 2>/dev/null || echo '[]')
+            for row in $(jq -r '.[] | @base64' <<<"$RUNS"); do
+              budget_left || break 2
+              RID=$(base64 -d <<<"$row" | jq -r '.databaseId')
+              ATTEMPT=$(base64 -d <<<"$row" | jq -r '.attempt')
+              TITLE=$(base64 -d <<<"$row" | jq -r '.displayTitle')
+              JOBS=$(gh run view "$RID" --repo "$REPO" --attempt "$ATTEMPT" --json jobs --jq '[.jobs[] | {name, conclusion, databaseId}]')
+              # Only the scan failed: the agent finished, and nothing else broke.
+              [ "$(jq -r '[.[] | select(.name == "agent")][0].conclusion // ""' <<<"$JOBS")" = success ] || continue
+              DJ=$(jq -r '[.[] | select(.name == "detection" and .conclusion == "failure")][0].databaseId // empty' <<<"$JOBS")
+              [ -n "$DJ" ] || continue
+              # A tooling crash, not a finding: a real threat is never retried.
+              gh run view "$RID" --repo "$REPO" --attempt "$ATTEMPT" --log-failed 2>/dev/null \
+                | grep -q "tooling failure, not a security finding" || continue
+              N=$(grep -oE '#[0-9]+' <<<"$TITLE" | head -1 | tr -d '#')
+              [ -n "$N" ] || continue
+              if [ "$ATTEMPT" -le 1 ]; then
+                if gh run rerun "$RID" --failed --repo "$REPO" 2>/dev/null; then
+                  echo "$TITLE (run $RID): threat detection crashed; re-ran its failed jobs"
+                  spend; n_detect=$((n_detect+1))
+                fi
+              else
+                MARK="<!-- sweeper:detection:$RID -->"
+                already_said "$N" "$MARK" && continue
+                say "$N" "$MARK" \
+                  "**Swept:** gh-aw's threat detection crashed twice on [$TITLE]($GITHUB_SERVER_URL/$REPO/actions/runs/$RID), so the agent's finished work was never written. This is a tooling failure, not a security finding. Re-run the run's failed jobs once it is fixed, or remove \`needs-human\` to let the pipeline start again."
+                label_as_app "$N" needs-human
+                echo "$TITLE (run $RID): detection crashed twice; handed #$N to a person"
+                spend; n_detect_human=$((n_detect_human+1))
+              fi
+            done
+          done
+
           # ---- workflow runs waiting for approval -----------------------------
           # A push from `github-actions[bot]` leaves its workflow runs in
           # `action_required`, waiting for a person. The unblocker's push is
@@ -305,6 +351,8 @@ jobs:
             echo "| still no verdict → needs-human | $n_noverdict |"
             echo "| red, nothing acting → rework sent | $n_stuck |"
             echo "| auto-merge armed | $n_armed |"
+            echo "| detection crashed → failed jobs re-run | $n_detect |"
+            echo "| detection crashed twice → needs-human | $n_detect_human |"
             echo "| gated runs approved | $n_approved |"
             echo "| merged branches deleted | $n_branch |"
             echo "| skipped (already held by a person) | $n_skipped |"
