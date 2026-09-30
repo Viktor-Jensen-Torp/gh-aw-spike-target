@@ -40,6 +40,8 @@ design shows them, on the field, in the design's words.
 
 ## Styling
 
+- Tailwind v4, configured in CSS: the theme is the `@theme` block in
+  `apps/web/src/index.css`. There is no `tailwind.config` file.
 - Tailwind classes only, with the design's colours and font through the theme.
   The design's variables map to tokens: `$bg` → `bg-bg`, `$surface` →
   `bg-surface`, `$border` → `border-border`, `$text` → `text-text`, `$muted` →
