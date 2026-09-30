@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, within, userEvent } from 'storybook/test';
+import { vi } from 'vitest';
 import { AuthCard } from './AuthCard.tsx';
 import { TextField } from '../TextField/TextField.tsx';
 
@@ -81,7 +82,12 @@ export const FooterWithLink: Story = {
     ),
   },
   play: async ({ canvasElement }) => {
-    const link = within(canvasElement).getByRole('link', {
+    const page = within(canvasElement);
+    // Check footer text is visible
+    const footerText = page.getByText("Don't have an account?");
+    await expect(footerText).toBeVisible();
+    // Check link is visible
+    const link = page.getByRole('link', {
       name: 'Create one',
     });
     await expect(link).toBeVisible();
@@ -97,9 +103,9 @@ export const FormSubmitHandler: Story = {
     footerText: "Don't have an account?",
     footerLinkText: 'Create one',
     footerLinkHref: '/signup',
-    onSubmit: (e) => {
+    onSubmit: vi.fn((e) => {
       e.preventDefault();
-    },
+    }),
     children: (
       <>
         <TextField label="Email" type="email" placeholder="you@company.com" />
@@ -107,11 +113,14 @@ export const FormSubmitHandler: Story = {
       </>
     ),
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const button = within(canvasElement).getByRole('button', {
       name: 'Sign in',
     });
     await expect(button).toBeVisible();
+    await userEvent.click(button);
+    // Verify the onSubmit handler was called
+    await expect(args.onSubmit).toHaveBeenCalledOnce();
   },
 };
 
