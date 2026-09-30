@@ -12,23 +12,15 @@ tools:
   playwright:
 
 pre-agent-steps:
-  # gh-aw v0.88.7 installs the browser with `PLAYWRIGHT_BROWSERS_PATH:
-  # ${RUNNER_TEMP}/gh-aw/playwright-browsers` in a step's `env:`, which GitHub
-  # Actions does not expand (pkg/workflow/playwright_cli.go:35). The browser
-  # lands in a folder literally named `${RUNNER_TEMP}` inside the checkout, and
-  # playwright-cli, which looks in the real one, finds nothing: no agent could
-  # open a browser (review run 36675018713, call 15). Move it where it is looked
-  # for, and say whether a browser now opens. Remove once gh-aw fixes it (#163).
-  - name: Put Playwright's browser where playwright-cli looks for it
+  # gh-aw installs the browser under $RUNNER_TEMP/gh-aw/playwright-browsers
+  # (fixed in v0.89.17, #61423; before it the path was not expanded and no agent
+  # could open a browser, review run 36675018713). Say before the agent starts
+  # whether a browser opens, so a broken install shows in the log, not as an
+  # agent that silently skips looking at the app.
+  - name: Check that playwright-cli opens a browser
     run: |
-      WRONG="$GITHUB_WORKSPACE/\${RUNNER_TEMP}/gh-aw/playwright-browsers"
-      RIGHT="$RUNNER_TEMP/gh-aw/playwright-browsers"
-      if [ -d "$WRONG" ]; then
-        mkdir -p "$RIGHT" && cp -a "$WRONG"/. "$RIGHT"/ && rm -rf "$GITHUB_WORKSPACE/\${RUNNER_TEMP}"
-        echo "moved the browsers to $RIGHT"
-      fi
-      if PLAYWRIGHT_BROWSERS_PATH="$RIGHT" playwright-cli open about:blank >/dev/null 2>&1; then
-        PLAYWRIGHT_BROWSERS_PATH="$RIGHT" playwright-cli close >/dev/null 2>&1 || true
+      if PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/gh-aw/playwright-browsers" playwright-cli open about:blank >/dev/null 2>&1; then
+        PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/gh-aw/playwright-browsers" playwright-cli close >/dev/null 2>&1 || true
         echo "playwright-cli opens a browser"
       else
         echo "::warning::playwright-cli cannot open a browser; the agent will not be able to look at the app"

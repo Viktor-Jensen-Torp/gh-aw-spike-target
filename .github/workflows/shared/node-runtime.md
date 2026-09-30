@@ -6,7 +6,7 @@ description: >
 
   No `network` here, on purpose: `runtimes: node` already opens the npm
   registry, and an imported `network` makes gh-aw drop the importing
-  workflow's `network.blocked` (v0.88.7, pkg/workflow/imports.go
+  workflow's `network.blocked` (v0.88.7 to v0.89.21, pkg/workflow/imports.go
   MergeNetworkPermissions keeps only `allowed`), which Review relies on.
 
 runtimes:

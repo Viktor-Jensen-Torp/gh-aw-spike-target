@@ -195,7 +195,7 @@ jobs:
     permissions:
       actions: write
     pre-steps:
-      - uses: actions/create-github-app-token@v3
+      - uses: actions/create-github-app-token@v3.2.0
         id: label_token
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}
@@ -216,7 +216,7 @@ jobs:
       #
       # The routing's scripts, from the base branch as the reviewer read
       # .github; tested by .github/scripts/test/run.sh.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7.0.1
         with:
           ref: develop
           sparse-checkout: .github/scripts
