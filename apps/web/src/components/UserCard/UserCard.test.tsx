@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserCard } from './UserCard.tsx';
@@ -27,13 +27,13 @@ describe('UserCard', () => {
   });
 
   it('Given the card clicked — Expect its click handler to run', async () => {
-    const handleClick = () => {};
+    const handleClick = vi.fn();
     render(
       <UserCard name="Mara Reyes" plan="Free plan" onClick={handleClick} />,
     );
     const button = screen.getByRole('button', { name: 'Mara Reyes' });
     const user = userEvent.setup();
     await user.click(button);
-    expect(button).toBeInTheDocument();
+    expect(handleClick).toHaveBeenCalledOnce();
   });
 });

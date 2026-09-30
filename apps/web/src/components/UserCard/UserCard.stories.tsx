@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, fn, within } from 'storybook/test';
 import { UserCard } from './UserCard.tsx';
 
 const meta = {
@@ -66,12 +66,17 @@ export const ClickHandler: Story = {
   args: {
     name: 'Mara Reyes',
     plan: 'Free plan',
+    onClick: fn(),
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const page = within(canvasElement);
     const button = page.getByRole('button', { name: 'Mara Reyes' });
-    // Verify the button is clickable
+    // Verify the button is visible and enabled
     await expect(button).toBeVisible();
     await expect(button).toBeEnabled();
+    // Click the button
+    await button.click();
+    // Verify the click handler was called
+    await expect(args.onClick).toHaveBeenCalledOnce();
   },
 };
