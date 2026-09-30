@@ -25,7 +25,7 @@ project. The design is `design/tempo.pen`.
 |---|---|---|---|
 | home | `apps/web/src/features/home/`: the start page, until sign-in replaces it | `apps/api/src/features/health/`: GET /api/health | `packages/shared/src/health.ts`: HealthResponse |
 | errors | none | `apps/api/src/lib/errors.ts`: the one error shape | `packages/shared/src/errors.ts` |
-| auth | (future) | `apps/api/src/features/auth/`: sign-up, sign-in, GET /api/me | `packages/shared/src/auth.ts`: sign-up, sign-in, me schemas |
+| auth | `apps/web/src/features/auth/`: sign-up screen | `apps/api/src/features/auth/`: sign-up, sign-in, GET /api/me | `packages/shared/src/auth.ts`: sign-up, sign-in, me schemas, password rule |
 
 Add a row when a feature folder is added, and change it when one moves or goes.
 

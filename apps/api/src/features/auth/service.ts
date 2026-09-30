@@ -65,7 +65,11 @@ export async function signUp(
     .limit(1);
 
   if (existing.length > 0) {
-    throw new ApiError(400, 'duplicate_email', 'Email already in use.');
+    throw new ApiError(
+      409,
+      'duplicate_email',
+      'This email is already in use. Sign in instead or reset your password.',
+    );
   }
 
   const userId = randomBytes(16).toString('hex');
@@ -87,7 +91,11 @@ export async function signUp(
       error instanceof Error &&
       error.message.includes('UNIQUE constraint failed')
     ) {
-      throw new ApiError(400, 'duplicate_email', 'Email already in use.');
+      throw new ApiError(
+        409,
+        'duplicate_email',
+        'This email is already in use. Sign in instead or reset your password.',
+      );
     }
     throw error;
   }
