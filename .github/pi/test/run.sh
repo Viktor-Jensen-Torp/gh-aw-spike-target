@@ -69,6 +69,9 @@ new_root; case_ "--event=COMMENT"                     pass  'safeoutputs submit_
 new_root; case_ "body only, no event"                 block 'safeoutputs submit_pull_request_review --body x'
 new_root; case_ "event APPROVE (not allowed)"         block 'echo "{\"event\":\"APPROVE\",\"body\":\"x\"}" | safeoutputs submit_pull_request_review .'
 new_root; case_ "check run without conclusion"        block 'echo "{\"title\":\"t\",\"summary\":\"s\"}" | safeoutputs create_check_run .'
+# Replay: review run 36675018713, call 58: an unescaped quote inside summary.
+new_root; case_ "invalid JSON (unescaped quote)"      block $'cat > /tmp/p.json <<\'EOF\'\n{"conclusion": "failure", "summary": "requires "asChild" here"}\nEOF\ncat /tmp/p.json | safeoutputs create_check_run .'
+grep -q "not valid JSON" "$ROOT/last_err" && echo "PASS  it says the JSON is invalid, not that the conclusion is missing" || { echo "FAIL  invalid JSON reported as: $(cat "$ROOT/last_err" | head -1)"; fails=$((fails + 1)); }
 
 echo "== review and check must agree, either order"
 new_root
@@ -222,6 +225,9 @@ FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3
 new_root; case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
 new_root; case_ "no data at all is refused"                  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
 new_root; case_ "a row left out is refused"                  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(select(.id != "U2"))' <<<"$FIXED")")"
+# Replay: review run 36675018713, call 56: data sent as a bare list.
+new_root; case_ "data as a bare list, not {requirements}"  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements' <<<"$FIXED")")"
+grep -q "data must be an object" "$ROOT/last_err" && echo "PASS  it names the shape data needs" || { echo "FAIL  bare list reported as: $(head -1 "$ROOT/last_err")"; fails=$((fails + 1)); }
 new_root; case_ "n/a on a row that does not allow it"        block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(if .id == "U1" then .status = "n/a" else . end)' <<<"$FIXED")")"
 new_root; REQS="$ROOT/none.md" case_ "no requirements file (a person's PR): not checked" pass 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
 unset ROWS_SCRIPT REQS META
@@ -310,6 +316,13 @@ grep -q "safeoutputs <tool> --help" <<<"$(advised refine 'cat <<EOF | safeoutput
   && echo "PASS  replay refine 36561914371: advice after refused fields" || { echo "FAIL  no advice after refused fields"; fails=$((fails + 1)); }
 [ "$(advised rework "bash .github/scripts/verify.sh" "✓ all passed" 0)" = unchanged ] && echo "PASS  a passing verify.sh gets no advice" || { echo "FAIL  advice on success"; fails=$((fails + 1)); }
 [ "$(advised rework "ls /nope" "No such file" 1)" = unchanged ] && echo "PASS  other failures get no advice" || { echo "FAIL  advice on unrelated failure"; fails=$((fails + 1)); }
+
+# Item 12: once every required output is in, the result says to finish; not before.
+rm -rf "$BASE/k"; mkdir -p "$BASE/k"
+[ "$(advised review 'echo x | safeoutputs submit_pull_request_review .' ok 0)" = unchanged ] && echo "PASS  review: nothing said while the check run is still missing" || { echo "FAIL  finish advice too early"; fails=$((fails + 1)); }
+printf 'submit_pull_request_review\ncreate_check_run\n' > "$BASE/k/called"
+grep -q "Your task is done" <<<"$(advised review 'echo x | safeoutputs create_check_run .' ok 0)" && echo "PASS  review: told to finish once both outputs are in" || { echo "FAIL  no finish advice"; fails=$((fails + 1)); }
+[ "$(advised refine 'echo x | safeoutputs add_labels .' ok 0)" = unchanged ] && echo "PASS  refine is never told to finish (it decides many issues)" || { echo "FAIL  refine told to finish"; fails=$((fails + 1)); }
 
 out=$(GH_AW_PHASE=evals PI_ROLE=review node -e 'let n=0; require(process.argv[1])({ on: () => n++ }); console.log(n)' "$EXT" 2>/dev/null)
 [ "$out" = "0" ] && echo "PASS  does nothing in the evals phase" || { echo "FAIL  evals registered $out handlers"; fails=$((fails + 1)); }

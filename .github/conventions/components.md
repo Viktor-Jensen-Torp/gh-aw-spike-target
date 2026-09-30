@@ -50,6 +50,17 @@ state; its `play` function acts (clicks, types, keys) and asserts, with
 `expect` and `within` from `storybook/test`. A "Done when" case is a story named
 after it (`.github/conventions/chain/testing.md`).
 
+- **Assert what a person perceives**: the role and accessible name, the text,
+  the state (checked, disabled, expanded, focused). Never class names
+  (`toHaveClass('bg-accent')`): they repeat the implementation, so every styling
+  change breaks them without anything being wrong (implement run 36674016191
+  spent 20 edits on that). Whether it looks like the design is checked by
+  looking at it (`.github/pi/seeing-the-app.md`) and by the reviewer.
+- **A file holds at most 300 lines** of code (lint `max-lines`, blank lines and
+  comments not counted). A component with many variants splits its stories by
+  variant group (`Button.stories.tsx`, `Button.icon.stories.tsx`) rather than
+  squeezing one file.
+
 Every story runs as a test in a real browser (Storybook's Vitest addon, inside
 `npm test`, so `verify.sh` runs it), and every story passes the accessibility
 check (Storybook's a11y addon, set to fail). Never turn that check off for a
