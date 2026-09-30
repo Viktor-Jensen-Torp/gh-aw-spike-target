@@ -52,6 +52,11 @@ When an issue cannot finish without another, say so under "Details" as a line
 cannot finish without the other, not where it merely touches the same files.
 The "blocked by" link follows from the line.
 
+When a case needs something another issue builds, say how this issue's tests
+get it without building it: "tests create sessions through the service; the
+sign-up and sign-in routes are #176 and #177". Otherwise the implementer builds
+the other issue's work to make its test pass (#168 built both routes, PR #194).
+
 ## Type, effort, priority
 
 - **Type**: `Bug` for something behaving wrongly, `Feature` for new behaviour,

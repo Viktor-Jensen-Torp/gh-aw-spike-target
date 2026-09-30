@@ -86,6 +86,16 @@
  *    `git commit -a` are refused before they run, with the alternative (rework
  *    run 36601234520; item 7 is the backstop at push time).
  *
+ * 11. READABLE REFUSALS. A payload that is not valid JSON is refused as such,
+ *    with jq's error. Review run 36675018713 sent a check run whose summary held
+ *    an unescaped quote; the conclusion check read nothing and said "got:
+ *    nothing", and the agent spent four calls fixing a conclusion that was never
+ *    wrong. Review `data` sent as an array is refused with the shape it needs.
+ *
+ * 12. FINISH WHEN DONE (review, implement, release). Once every required output
+ *    has gone through, the result says the task is done. Review run 36675018713
+ *    spent 13 of its 72 turns re-checking after both outputs were in.
+ *
  * Configuration: PI_ROLE (review | implement | rework | release | refine | relate | unblock), set via engine.env.
  * Unknown or missing role: the extension logs and does nothing.
  */
@@ -133,12 +143,14 @@ const ROLES = {
       create_check_run: { field: "conclusion", allowed: ["success", "failure"], upper: false, once: true },
     },
     checkRows: true,
+    finishWhenDone: true,
   },
   implement: {
     required: [["create_pull_request", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
     verify: true,
     linkIssue: true,
+    finishWhenDone: true,
     // Implement's allowed-files (implement.md): the app code and the map.
     allowedPaths: "^(apps|packages)/|^docs/architecture\\.md$",
   },
@@ -191,6 +203,7 @@ const ROLES = {
   release: {
     required: [["add_comment", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
+    finishWhenDone: true,
   },
 };
 
@@ -247,6 +260,9 @@ function adviceFor(command, output) {
   }
   return "";
 }
+
+const FINISHED =
+  "\n[pipeline] Every required output is submitted. Your task is done: finish now. Do not re-check your work or call them again; a second call is dropped.";
 
 /** Why each required output matters, in the agent's terms. */
 const WHY = {
@@ -404,6 +420,10 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
         echo "BLOCKED by the pipeline: the review has no data. Submit it with {\\"requirements\\": [...]}, one entry per row, C1 included (Step 5). Nothing was submitted." >&2
         return 2
       fi
+      if ! printf '%s' "$__data" | jq -e 'type == "object" and (.requirements | type) == "array"' >/dev/null 2>&1; then
+        echo "BLOCKED by the pipeline: data must be an object, {\\"requirements\\": [{\\"id\\": ..., \\"status\\": ..., \\"evidence\\": ...}, ...]}, not a bare list. Nothing was submitted." >&2
+        return 2
+      fi
       __rd="${STATE_DIR}/rows-data.json"; __rf="${STATE_DIR}/rows-files.txt"
       printf '%s' "$__data" > "$__rd"; jq -r '.files[].path' "${PR_META}" > "$__rf" 2>/dev/null
       if ! __rows=$(bash "${REVIEW_ROWS}" "$__rd" "${REQUIREMENTS}" "$__rf" 2>&1); then
@@ -444,7 +464,13 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
   __payload=""; __rec=""; __val=""
-  if [ "$2" = "." ]; then __payload=$(cat); fi${issueCheck}${linkCheck}${rowsCheck}${scopeCheck}
+  if [ "$2" = "." ]; then
+    __payload=$(cat)
+    if ! __jerr=$(printf '%s' "$__payload" | jq -e . 2>&1 >/dev/null); then
+      echo "BLOCKED by the pipeline: the payload for $1 is not valid JSON (jq: \${__jerr:-empty input}). Usually an unescaped quote or line break inside a string. Build it with jq so it is always valid, e.g. jq -n --arg s 'your text' '{conclusion: \\"failure\\", summary: \\$s}' | safeoutputs $1 . Nothing was submitted." >&2
+      return 2
+    fi
+  fi${issueCheck}${linkCheck}${rowsCheck}${scopeCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -546,9 +572,19 @@ function postconditions(pi) {
     return { systemPrompt: `${event.systemPrompt || ""}${systemRules(role)}` };
   });
 
+  let finished = false;
   pi.on("tool_result", async (/** @type {any} */ event) => {
-    if (event.toolName !== "bash" || !event.isError) return;
+    if (event.toolName !== "bash") return;
     const command = String(event.input?.command || "");
+    if (!event.isError) {
+      // Item 12: say so once, right after the last required output goes through.
+      if (finished || !/** @type {any} */ (spec).finishWhenDone || !/\bsafeoutputs\b/.test(command)) return;
+      const called = calledTools();
+      if (!spec.required.every(group => group.some(tool => called.has(tool)))) return;
+      finished = true;
+      log("all required outputs submitted; told the agent to finish");
+      return { content: [...(event.content || []), { type: "text", text: FINISHED }] };
+    }
     const output = (event.content || []).map((/** @type {any} */ c) => c.text || "").join("\n");
     const advice = adviceFor(command, output);
     if (!advice) return;
