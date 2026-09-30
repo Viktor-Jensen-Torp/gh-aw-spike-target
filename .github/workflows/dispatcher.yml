@@ -20,7 +20,9 @@ name: Dispatcher
 # the next thing from what they decided.
 #
 # MAX_PER_DAY bounds the spend: dispatched runs skip gh-aw's daily AI-credit
-# cap (check_daily_aic_workflow_guardrail.cjs), so this is the cap.
+# cap (check_daily_aic_workflow_guardrail.cjs), so this is the cap. 30 matches
+# Review's 2000 AIC a day: ~45 AIC a review, ~1.5 reviews per pull request
+# (10 stopped Sprint 1 at 11:21 on 2026-09-30).
 #
 # It dispatches with GITHUB_TOKEN (.github/scripts/dispatch.sh): a dispatch,
 # unlike a label, starts a workflow from that token. The reviewer App only
@@ -79,7 +81,7 @@ jobs:
           REPO: ${{ github.repository }}
           PROJECT: "2"
           MAX_OPEN: "2"
-          MAX_PER_DAY: "10"
+          MAX_PER_DAY: "30"
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
         run: |
           set -euo pipefail

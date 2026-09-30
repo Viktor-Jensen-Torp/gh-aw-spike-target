@@ -19,7 +19,7 @@ max-ai-credits: 100
 # It applies only to event and scheduled runs: every workflow_dispatch run skips
 # it (check_daily_aic_workflow_guardrail.cjs:105-122; the spec's §9.8 says
 # otherwise, the code decides). Implement, rework and unblock are dispatched,
-# so their bounds are the dispatcher's 10 a day, rework's three strikes and
+# so their bounds are the dispatcher's 30 a day, rework's three strikes and
 # the sweeper's once per commit.
 max-daily-ai-credits: 500
 
