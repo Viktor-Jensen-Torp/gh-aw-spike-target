@@ -30,6 +30,11 @@
 # blockers first, each complete in one `gh issue create` (--type, --parent,
 # --blocked-by), so nothing is patched afterwards.
 #
+# A body names a sibling in the same plan as `#{key}`, typically under "## Out
+# of scope" ("The sign-in route: #{sign-in}."), since the numbers do not exist
+# yet. Each becomes the sibling's number: at creation when the sibling already
+# exists, otherwise by one edit once every issue is created.
+#
 # Design claims in a body (`design.pen#<id>`) are rendered with the pen.dev CLI
 # and attached to the issue as images, below the claims (`gh issue create
 # --attach`, gh 2.99+). Nothing is committed. Without a logged-in `pen`, the
@@ -52,6 +57,9 @@ DUP=$(jq -r '[.issues[].key] | group_by(.) | map(select(length > 1)[0]) | .[]' "
 BAD=$(jq -r '[.issues[].key] as $k | .issues[] | .key as $me | (.depends_on // [])[]
              | select(.key and ((.key as $d | $k | index($d)) == null) or .key == $me) | "\($me) -> \(.key)"' "$PLAN")
 [ -z "$BAD" ] || { echo "plan: dependencies on unknown keys or on themselves: $BAD"; exit 1; }
+BADREF=$(jq -r '[.issues[].key] as $k | .issues[] | .key as $me | [.body | scan("#\\{([^}]*)\\}")[0]] | .[]
+                | select((. as $r | $k | index($r)) == null or . == $me) | "\($me) -> #{\(.)}"' "$PLAN")
+[ -z "$BADREF" ] || { echo "plan: bodies name unknown keys or themselves: $BADREF"; exit 1; }
 BADV=$(jq -r '.issues[] | select(((.type // "Task") as $t | ["Feature","Task","Bug","Component"] | index($t)) == null
                              or (.priority and ((.priority as $p | ["High","Medium","Low"] | index($p)) == null))) | .key' "$PLAN")
 [ -z "$BADV" ] || { echo "plan: type must be Feature/Task/Bug/Component and priority High/Medium/Low: $BADV"; exit 1; }
@@ -66,7 +74,8 @@ if jq -e '.epic.body' "$PLAN" >/dev/null; then
 fi
 for K in $(jq -r '.issues[].key' "$PLAN"); do
   STAGE=$(jq -r --arg k "$K" '.issues[] | select(.key == $k) | .stage // "needs-refinement"' "$PLAN")
-  OUT=$(jq -r --arg k "$K" '.issues[] | select(.key == $k) | .body' "$PLAN" | bash "$CHECK") && continue
+  # A `#{key}` becomes a number at creation; check it as one.
+  OUT=$(jq -r --arg k "$K" '.issues[] | select(.key == $k) | .body' "$PLAN" | sed -E 's/#\{[^}]*\}/#0/g' | bash "$CHECK") && continue
   if [ "$STAGE" = ready ]; then echo "plan: [$K] is ready, but its body:"; sed 's/^/  /' <<<"$OUT"; SHAPE=1
   else echo "  note: [$K] ($STAGE) does not have the template's shape yet:"; sed 's/^/    /' <<<"$OUT"; fi
 done
@@ -162,6 +171,10 @@ fi
 
 NUMS='{}'   # key -> issue number; JSON, not `declare -A`, which macOS's bash 3.2 lacks
 num() { jq -r --arg k "$1" '.[$k]' <<<"$NUMS"; }
+# with_refs <body>: each `#{key}` whose issue exists becomes its number.
+with_refs() { jq -rn --arg b "$1" --argjson n "$NUMS" \
+                '$b | gsub("#\\{(?<k>[^}]*)\\}"; if $n[.k] then "#\($n[.k])" else "#{\(.k)}" end)'; }
+LATER=""    # keys whose body still names a sibling created after them
 # with_depends <body> <lines>: the `Depends on` lines, first under "## Details".
 with_depends() {
   [ -n "$2" ] || { printf '%s' "$1"; return; }
@@ -186,12 +199,26 @@ for K in $ORDER; do
   WHO=$(jq -r --arg d "$(jq -r '.assignee // empty' "$PLAN")" '.assignee // $d' <<<"$ITEM")
   # The stage the person chose: its label, or none for a draft.
   LABELS=$(jq -r '(.labels // []) + ((.stage // "needs-refinement") | if . == "draft" then [] else [.] end) | unique | join(",")' <<<"$ITEM")
-  N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")" \
+  N=$(create_issue "$(jq -r .title <<<"$ITEM")" "$(with_refs "$(with_depends "$(jq -r .body <<<"$ITEM")" "$LINES")")" \
         --type "$(jq -r '.type // "Task"' <<<"$ITEM")" --parent "$EPIC" ${BLOCKERS:+--blocked-by "$BLOCKERS"} \
         ${WHO:+--assignee "$WHO"} ${LABELS:+--label "$LABELS"})
   NUMS=$(jq -c --arg k "$K" --argjson n "$N" '. + {($k): $n}' <<<"$NUMS")
+  jq -e --argjson n "$NUMS" '[.body | scan("#\\{([^}]*)\\}")[0]] | any(. as $r | $n[$r] | not)' <<<"$ITEM" >/dev/null \
+    && LATER="$LATER $K"
   echo "  #$N [$K] $(jq -r .title <<<"$ITEM")${BLOCKERS:+, blocked by #${BLOCKERS//,/, #}}"
   P=$(jq -r '.priority // empty' <<<"$ITEM"); [ -z "$P" ] || set_priority "$N" "$P"
+done
+
+# Siblings created later: one edit each, now that every number exists. REST,
+# not `gh issue edit` (GraphQL, which fails on this repository's Projects).
+for K in $LATER; do
+  N=$(num "$K")
+  BODY=$(gh api "repos/$REPO/issues/$N" --jq '.body // ""')
+  if gh api -X PATCH "repos/$REPO/issues/$N" -f body="$(with_refs "$BODY")" --silent; then
+    echo "  #$N [$K] now names its later siblings by number"
+  else
+    echo "  warning: #$N [$K] still says #{…}; edit it by hand"
+  fi
 done
 
 echo "Done: https://github.com/$REPO/issues/$EPIC"

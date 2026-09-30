@@ -184,6 +184,33 @@ pre-agent-steps:
       jq -r '.[] | "  #\(.number) \(.title)\(if .type != "" then " [\(.type)]" else "" end)\(if .sprint then " (sprint)" else "" end)"' \
         /tmp/gh-aw/agent/refine-candidates.json
 
+  # "Out of scope" names nearby work by the issue that owns it
+  # (chain/issues.md, "Boundaries"), and the refiner cannot name siblings it
+  # never sees: a run on an epic leaves out pieces already ready, and a daily
+  # run sees no siblings at all (#227). So each candidate gets its neighbours:
+  # the other sub-issues of its epic, and the issues it blocks.
+  - name: List each candidate's neighbours
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    run: |
+      set -euo pipefail
+      DIR=/tmp/gh-aw/agent
+      what() { jq '{number, title, state, labels: [.labels[].name],
+                    what: ((.body // "") | capture("## What\\s*\\n+(?<w>[^#]*)").w? // "" | .[0:300])}'; }
+      for N in $(jq -r '.[].number' "$DIR/refine-candidates.json"); do
+        EPIC=$(gh api "repos/$REPO/issues/$N" --jq '.parent_issue_url // "" | split("/") | last')
+        SIBS='[]'
+        if [ -n "$EPIC" ]; then
+          SIBS=$(gh api --paginate "repos/$REPO/issues/$EPIC/sub_issues" --jq '.[]' \
+                   | what | jq -s --argjson n "$N" 'map(select(.number != $n))')
+        fi
+        BLOCKS=$(gh api "repos/$REPO/issues/$N/dependencies/blocking" --jq '[.[].number]' 2>/dev/null || echo '[]')
+        jq -n --argjson n "$N" --arg e "$EPIC" --argjson s "$SIBS" --argjson b "$BLOCKS" \
+          '{issue: $n, epic: ($e | tonumber? // null), blocks: $b, siblings: $s}'
+      done | jq -s '.' > "$DIR/refine-neighbours.json"
+      echo "neighbours: $(jq -r 'map("#\(.issue): \(.siblings | length) siblings, blocks \(.blocks | length)") | join("; ")' "$DIR/refine-neighbours.json")"
+
 tools:
   cli-proxy: true
   github:
@@ -293,6 +320,12 @@ spike). Read that change first and judge the issue against it. If the issue
 still holds, it is already refined. If the change follows clearly from the sources (a rename, a
 decision the spike made), rewrite the issue to match. If the direction itself
 changed and the issue may no longer be wanted, it needs a person.
+
+`/tmp/gh-aw/agent/refine-neighbours.json` lists, for each candidate, the
+other sub-issues of its epic (number, title, stage labels, the start of "What")
+and the issues it blocks. Use it for "Out of scope": name the nearby work each
+neighbour owns, by number, as `issues.md` ("Boundaries") says. An issue whose
+"Out of scope" names no neighbour it plausibly overlaps is not refined yet.
 
 **When the run was asked for on an epic,** the candidates are that epic and its
 pieces that are not refined or ready yet. Read the epic first: its goal, sources and "Out
