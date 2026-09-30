@@ -94,15 +94,25 @@ fi
 
 # --- write ------------------------------------------------------------------
 RENDERS=$(mktemp -d); trap 'rm -rf "$RENDERS"' EXIT
-PEN_OK=0; command -v pen >/dev/null && pen status >/dev/null 2>&1 && PEN_OK=1
+# pen runs under the Node it was installed with (`#!/usr/bin/env node` would
+# take whichever node is first on PATH; under Node 20 its export fails with
+# "failed to initialize QuickJS", 2026-09-30).
+pen_cli() {
+  local bin; bin=$(command -v pen)
+  if [ -x "$(dirname "$bin")/node" ]; then "$(dirname "$bin")/node" "$bin" "$@"; else pen "$@"; fi
+}
+PEN_OK=0; command -v pen >/dev/null && pen_cli status >/dev/null 2>&1 && PEN_OK=1
 [ "$PEN_OK" = 1 ] || echo "  warning: pen CLI missing or not logged in; issues get no design images"
 # render <pen file> <id>... : one PNG per id in $RENDERS, named <id>.png
 render() {
   local file="$1"; shift
   local ids; ids=$(printf '"%s",' "$@"); ids="[${ids%,}]"
-  printf '%s\n' "execute({ input: 'Export($ids, \"png\", \"$RENDERS\")' })" 'exit()' \
-    | pen interactive --in "$file" --out "$RENDERS/scratch.pen" >/dev/null 2>&1 \
+  local out
+  out=$(printf '%s\n' "execute({ input: 'Export($ids, \"png\", \"$RENDERS\")' })" 'exit()' \
+    | pen_cli interactive --in "$file" --out "$RENDERS/scratch.pen" 2>&1) \
     || echo "  warning: could not render $file"
+  # pen exits 0 even when the export fails; its errors are only in its output.
+  grep -m1 -F '[ERROR]' <<<"$out" | sed 's/^/  warning: pen: /' || true
 }
 # create_issue <title> <body> [gh flags...]: prints the new issue's number.
 # Claimed design parts get their image linked under the claim, then uploaded
@@ -117,7 +127,7 @@ create_issue() {
     done
     for c in $claims; do
       local id="${c#*#}"
-      [ -f "$RENDERS/$id.png" ] || continue
+      [ -f "$RENDERS/$id.png" ] || { echo "  warning: no image for $c" >&2; continue; }
       # The image goes on the line after its claim; --attach rewrites the link.
       body=$(awk -v c="\`$c\`" -v img="![$id](./$id.png)" '{print} index($0, c) && !done[c]++ {print ""; print img; print ""}' <<<"$body")
       attach+=(--attach "./$id.png")
