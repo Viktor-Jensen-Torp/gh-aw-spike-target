@@ -3,6 +3,10 @@ import {
   type PropsWithChildren,
   type ButtonHTMLAttributes,
   type ComponentType,
+  Children,
+  cloneElement,
+  isValidElement,
+  type ReactNode,
 } from 'react';
 import type { LucideProps } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -70,12 +74,37 @@ const buttonVariants = cva(
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonVariants {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?:
+    'primary' | 'solid' | 'secondary' | 'icon-secondary' | 'icon-danger';
+  size?: ButtonVariants['size'];
+  /** Tone variant: 'default' or 'danger'. Only applies to solid variant. */
+  tone?: 'default' | 'danger';
   /** Leading icon component from lucide-react. The icon is decorative. */
   icon?: ComponentType<LucideProps>;
-  /** Tone variant: 'default' or 'danger'. Defaults to 'default'. Only applies to solid variant. */
-  tone?: 'default' | 'danger';
+  /** Render as another element (e.g., a link). Uses Radix Slot internally. */
+  asChild?: boolean;
+}
+
+// Helper to properly clone an element with merged props
+function cloneButtonChild(
+  child: ReactNode,
+  buttonClasses: string,
+  props: Record<string, unknown>,
+  ref: unknown,
+) {
+  if (!isValidElement(child)) return null;
+
+  const childProps = child.props as { className?: string };
+  const mergedClassName = childProps.className
+    ? `${childProps.className} ${buttonClasses}`
+    : buttonClasses;
+
+  return cloneElement(child, {
+    className: mergedClassName,
+    ...props,
+    ref,
+  } as Record<string, unknown>);
 }
 
 /**
@@ -83,6 +112,7 @@ interface ButtonProps
  * Covers the design's six button variants: primary block, solid small/medium,
  * secondary small/medium, with leading icon, and icon-only.
  * Native button props pass through, including ref.
+ * Use asChild to render as another element (e.g., a link).
  */
 export const Button = forwardRef<
   HTMLButtonElement,
@@ -94,6 +124,7 @@ export const Button = forwardRef<
       size = 'primary-block',
       tone = 'default',
       icon: Icon,
+      asChild,
       className,
       children,
       disabled,
@@ -108,17 +139,17 @@ export const Button = forwardRef<
       (variant === 'icon-secondary' && Icon) ||
       (variant === 'icon-danger' && Icon);
 
-    return (
-      <button
-        ref={ref}
-        disabled={disabled}
-        className={cn(
-          buttonVariants({ variant, size, tone }),
-          hasGap && 'gap-2',
-          className,
-        )}
-        {...props}
-      >
+    // Determine tone value (only solid variant supports tone)
+    const toneValue = variant === 'solid' ? tone : 'default';
+
+    const buttonClasses = cn(
+      buttonVariants({ variant, size, tone: toneValue }),
+      hasGap && 'gap-2',
+      className,
+    );
+
+    const buttonContent = (
+      <>
         {Icon && (
           <Icon
             size={16}
@@ -128,6 +159,29 @@ export const Button = forwardRef<
           />
         )}
         {children}
+      </>
+    );
+
+    // If asChild is true, clone the child element with button styles
+    if (asChild) {
+      const child = Children.only(children);
+      const cloned = cloneButtonChild(
+        child,
+        buttonClasses,
+        { disabled, ...props },
+        ref,
+      );
+      return cloned;
+    }
+
+    return (
+      <button
+        ref={ref}
+        disabled={disabled}
+        className={buttonClasses}
+        {...props}
+      >
+        {buttonContent}
       </button>
     );
   },

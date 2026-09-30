@@ -313,3 +313,17 @@ export const IconOnlyDangerDisabled: Story = {
     ).toBeDisabled();
   },
 };
+
+// AsChild: render as a link
+export const AsChild: Story = {
+  render: () => (
+    <Button asChild>
+      <a href="/sign-in">Sign in</a>
+    </Button>
+  ),
+  play: async ({ canvasElement }) => {
+    const link = within(canvasElement).getByRole('link', { name: 'Sign in' });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveClass('bg-accent', 'text-on-accent');
+  },
+};
