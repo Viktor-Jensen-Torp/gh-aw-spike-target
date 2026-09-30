@@ -191,29 +191,27 @@ const Menu = forwardRef<HTMLDivElement, MenuProps>(
     return (
       <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
         <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            ref={ref}
-            style={{ width: `${width}px` }}
-            className={cn(
-              // Sizing and spacing
-              'px-1.5 py-1.5',
-              // Radius
-              'rounded-[10px]',
-              // Colors
-              'bg-surface',
-              'border border-border',
-              // Shadow - from design tokens
-              'shadow-lg',
-              // Z-index
-              'z-50',
-            )}
-            sideOffset={8}
-            {...props}
-          >
-            {children}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
+        <DropdownMenu.Content
+          ref={ref}
+          style={{ width: `${width}px` }}
+          className={cn(
+            // Sizing and spacing
+            'px-1.5 py-1.5',
+            // Radius
+            'rounded-[10px]',
+            // Colors
+            'bg-surface',
+            'border border-border',
+            // Shadow - from design tokens
+            'shadow-lg',
+            // Z-index
+            'z-50',
+          )}
+          sideOffset={8}
+          {...props}
+        >
+          {children}
+        </DropdownMenu.Content>
       </DropdownMenu.Root>
     );
   },
