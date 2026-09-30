@@ -16,6 +16,6 @@ gives it nothing to check.
 |---|---|---|---|
 | F1 | Every case under the issue's "Done when" has its own test, named after the case, of the kind `.github/conventions/chain/testing.md` maps it to | For each case: the test's name, file and line |  |
 | F2 | Each of those tests asserts the case's Expect (or Then) through the interface, not how the code produces it | For each case: the assertion's file and line |  |
-| F3 | Every boundary named under "Details" (empty, maximum, bad input) is handled in the code | For each boundary: file and line | yes |
-| F4 | The change delivers what "What" describes and touches nothing listed under "Out of scope" | The lines that deliver it; every changed file accounted for |  |
+| F3 | Every item under "Details" is done: each boundary (empty, maximum, bad input) is handled and each other instruction is followed. A line marked as context asks for nothing | For each item: file and line, or "context" | yes |
+| F4 | Everything the change adds is asked for by "What", "Details" or "Done when", and none of it is work "Out of scope" gives to another issue | For each route, export, screen, story or table the change adds: file and line, and the line of the issue that asks for it |  |
 | F5 | If the issue claims design parts, the built screen matches their JSON: text, sizes, colours | For each claimed part: file and line, or "no design claims" | yes |

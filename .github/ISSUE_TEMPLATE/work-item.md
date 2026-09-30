@@ -75,4 +75,8 @@ issue claims is not built yet.
 
 ## Out of scope
 
-Optional. Anything nearby that this issue deliberately does not cover.
+Nearby work this issue does not do, and which issue does it, by number: "The
+sign-up and sign-in routes: #176, #177." Name every neighbour an implementer
+might build by mistake: siblings in the same epic, issues this one blocks, work
+a line under "Details" mentions in passing. If nothing is nearby, write "Nothing
+nearby." Anything else deliberately left out goes here too.

@@ -61,6 +61,14 @@ dependencies (in the plan's `depends_on`, which the script turns into the
 `Depends on #N — why` lines), type and effort. Together the pieces claim every
 new frame from the claims list.
 
+Give every piece an "Out of scope" that names the nearby work its siblings do,
+by the sibling's key: `The sign-in route: #{sign-in}.` The script turns each
+key into the sibling's number. Look hardest where one piece builds something
+another relies on (an API before its screens, a component before the screen
+that uses it). Name what the later piece adds, so the earlier one does not
+build it to make its own test pass. A piece with no neighbours says "Nothing
+nearby."
+
 Write the plan as JSON to a temporary file outside the repository, in the
 format `bash .claude/skills/decompose/create-issues.sh --help` prints. To add to
 an existing epic, give its number instead of a title and body.

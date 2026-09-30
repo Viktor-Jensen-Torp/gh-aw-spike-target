@@ -16,5 +16,5 @@ gives it nothing to check.
 |---|---|---|---|
 | T1 | Every case under the issue's "Done when" has its own test, named after the case, of the kind `.github/conventions/chain/testing.md` maps it to | For each case: the test's name, file and line |  |
 | T2 | Each of those tests asserts the case's Expect (or Then) through the interface, not how the code produces it | For each case: the assertion's file and line |  |
-| T3 | Every boundary named under "Details" is handled in the code | For each boundary: file and line | yes |
-| T4 | The change does what "What" describes and touches nothing listed under "Out of scope" | Every changed file accounted for |  |
+| T3 | Every item under "Details" is done: each boundary (empty, maximum, bad input) is handled and each other instruction is followed. A line marked as context asks for nothing | For each item: file and line, or "context" | yes |
+| T4 | Everything the change adds is asked for by "What", "Details" or "Done when", and none of it is work "Out of scope" gives to another issue | For each route, export, screen, story or table the change adds: file and line, and the line of the issue that asks for it |  |
