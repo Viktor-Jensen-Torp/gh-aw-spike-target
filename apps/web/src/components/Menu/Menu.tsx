@@ -77,10 +77,10 @@ const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(
           // Base: flex row, gap, padding, radius
           'flex items-center',
           isDefault
-            ? 'gap-2.5 px-2.5 py-2 rounded'
+            ? 'gap-2.5 px-2.5 py-2 rounded-[7px]'
             : 'gap-[9px] px-[9px] py-[7px] rounded-[6px]',
           // Typography: label
-          'text-sm font-normal',
+          'text-[13px] font-normal',
           // Colors: text and background
           danger ? 'text-danger' : 'text-text',
           'focus:bg-bg focus-visible:outline-none focus-visible:ring-0',
@@ -108,7 +108,7 @@ const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(
         )}
 
         {/* Label */}
-        <span className="flex-1 text-sm font-normal">{label}</span>
+        <span className="flex-1 text-[13px] font-normal">{label}</span>
 
         {/* Shortcut (compact only) */}
         {shortcut && size === 'compact' && (
@@ -144,14 +144,14 @@ const MenuHeader = forwardRef<HTMLDivElement, MenuHeaderProps>(
       ref={ref}
       className={cn(
         // Container: flex column, gap 1, padding
-        'flex flex-col gap-0.5 px-2.5 py-2',
+        'flex flex-col gap-px px-2.5 py-2',
         className,
       )}
     >
       {/* Title: 13px weight 600 */}
-      <div className="text-sm font-semibold text-text">{title}</div>
+      <div className="text-[13px] font-semibold text-text">{title}</div>
       {/* Detail: 11px $faint */}
-      <div className="text-xs font-normal text-faint">{detail}</div>
+      <div className="text-[11px] font-normal text-faint">{detail}</div>
     </div>
   ),
 );

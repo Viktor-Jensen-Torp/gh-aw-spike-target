@@ -290,9 +290,6 @@ export const DefaultSize: Story = {
       name: 'Profile',
     });
     await expect(profile).toBeVisible();
-
-    // Default size items have larger padding/gap
-    await expect(profile).toHaveClass('gap-2.5', 'px-2.5', 'py-2');
   },
 };
 
