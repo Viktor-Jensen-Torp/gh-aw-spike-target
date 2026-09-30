@@ -45,5 +45,15 @@ if grep -qxF "Done when" <<<"$REQUIRED"; then
   fi
 fi
 
+# "Out of scope" on a work item names nearby work by the issue that owns it, or
+# says there is none (issues.md, "Boundaries"). The implementer sees only its
+# own issue; #168 had no such line and built #176's and #177's routes (#211).
+if [ "$(basename "$TEMPLATE")" = "work-item.md" ] && grep -qxF "Out of scope" <<<"$FOUND"; then
+  OOS=$(awk '/^## /{f=($0=="## Out of scope")} f' <<<"$BODY")
+  if ! grep -qE '#[0-9]+' <<<"$OOS" && ! grep -qi 'nothing nearby' <<<"$OOS"; then
+    echo "✗ \"Out of scope\" names no issue (#N) for nearby work and does not say \"Nothing nearby.\""; FAILED=1
+  fi
+fi
+
 [ "$FAILED" = 0 ] && echo "✓ matches $(basename "$TEMPLATE")"
 exit "$FAILED"

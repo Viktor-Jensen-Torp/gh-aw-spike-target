@@ -1,7 +1,7 @@
 ---
 type: Convention
 title: Writing issues
-description: How an issue is filled in so an agent can start without asking a question — Done when, boundaries, design claims, dependencies, type, effort and priority. Read by everything that writes issues (the refiner, /decompose). Part of the chain.
+description: How an issue is filled in so an agent can start without asking a question — Done when, design claims, dependencies, boundaries (Out of scope names neighbours by number), type, effort and priority. Read by everything that writes issues (the refiner, /decompose). Part of the chain.
 tags: [issues, refinement, chain]
 ---
 
@@ -56,6 +56,22 @@ When a case needs something another issue builds, say how this issue's tests
 get it without building it: "tests create sessions through the service; the
 sign-up and sign-in routes are #176 and #177". Otherwise the implementer builds
 the other issue's work to make its test pass (#168 built both routes, PR #194).
+
+## Boundaries
+
+An implementer sees only its own issue, so "Out of scope" is where it learns
+what its neighbours will build. Name each piece of nearby work with the issue
+that owns it, by number: "The sign-up and sign-in routes: #176, #177."
+Neighbours are the other sub-issues of the same epic, the issues this one
+blocks, and anything a line under "Details" mentions without asking for it.
+Name the ones an implementer could plausibly build by mistake, not every
+sibling. When nothing is nearby, write "Nothing nearby." `check-issue.sh`
+refuses an "Out of scope" with neither. Keep the epic's own "Out of scope" as
+well: it covers work no issue owns yet.
+
+Everything under "Details" is part of the work: the reviewer checks each item,
+not only the "Done when" cases. A line that is context, not work, says so ("for
+context: …").
 
 ## Type, effort, priority
 
