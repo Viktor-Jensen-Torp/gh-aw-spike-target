@@ -86,3 +86,99 @@ test('Given I am on the sign-up screen, when I choose "Sign in", then I see the 
   // Should navigate to sign-in page
   await expect(page).toHaveURL('/sign-in');
 });
+
+test('Given an account for mara@reyes.studio with the password "tempo2026!", when I sign in with those, then I see the start page', async ({
+  page,
+}) => {
+  const email = `mara${Date.now()}@reyes.studio`;
+  // First, create the account
+  await page.goto('/sign-up');
+  await page.getByLabel('Full name').fill('Mara Reyes');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('tempo2026!');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Wait for redirect to start page
+  await expect(page).toHaveURL('/');
+
+  // Now sign out and sign back in (simulate by going to sign-in page)
+  await page.goto('/sign-in');
+
+  // Sign in with the same credentials
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('tempo2026!');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // Should be redirected to the start page
+  await expect(page).toHaveURL('/');
+  await expect(page.getByRole('heading', { name: 'Tempo' })).toBeVisible();
+  await expect(page.getByText('API: ok')).toBeVisible();
+});
+
+test('Given an account for mara@reyes.studio, when I sign in with a wrong password, then I see "Email or password is incorrect."', async ({
+  page,
+}) => {
+  const email = `mara${Date.now()}@reyes.studio`;
+  // First, create the account
+  await page.goto('/sign-up');
+  await page.getByLabel('Full name').fill('Mara Reyes');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('tempo2026!');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Wait for redirect to start page
+  await expect(page).toHaveURL('/');
+
+  // Go to sign-in page
+  await page.goto('/sign-in');
+
+  // Try to sign in with wrong password
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('wrongpassword');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // Error message should be shown - check the last error (password field)
+  await expect(
+    page
+      .locator('[id*="text-field-"][id*="-error"]')
+      .last()
+      .getByText('Email or password is incorrect.'),
+  ).toBeVisible();
+
+  // Should still be on sign-in page
+  await expect(page).toHaveURL('/sign-in');
+});
+
+test('Given no account for nobody@example.com, when I sign in with it, then I see exactly the same message', async ({
+  page,
+}) => {
+  await page.goto('/sign-in');
+
+  // Try to sign in with non-existent email
+  await page.getByLabel('Email').fill('nobody@example.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('anypassword');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // Error message should be shown - check the last error (password field)
+  await expect(
+    page
+      .locator('[id*="text-field-"][id*="-error"]')
+      .last()
+      .getByText('Email or password is incorrect.'),
+  ).toBeVisible();
+
+  // Should still be on sign-in page
+  await expect(page).toHaveURL('/sign-in');
+});
+
+test('Given I am on the sign-in screen, when I choose "Create one", then I see the sign-up screen', async ({
+  page,
+}) => {
+  await page.goto('/sign-in');
+
+  // Click the create account link in the footer
+  await page.getByRole('link', { name: 'Create one' }).click();
+
+  // Should navigate to sign-up page
+  await expect(page).toHaveURL('/sign-up');
+});
