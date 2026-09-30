@@ -1,87 +1,315 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
+import { Plus, Check, Clock3, Trash2 } from 'lucide-react';
 import { Button } from './Button.tsx';
 
-const meta = {
-  title: 'Components/Button',
-  component: Button,
-  args: {
-    children: 'Sign in',
-  },
-} satisfies Meta<typeof Button>;
+const meta = { title: 'Components/Button', component: Button } satisfies Meta<
+  typeof Button
+>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A plain button with just a label. */
-export const PlainButton: Story = {
+const t =
+  (n: string, ...c: string[]) =>
+  async (el: HTMLElement) => {
+    const btn = within(el).getByRole('button', { name: n });
+    c.forEach((x) => expect(btn).toHaveClass(x));
+  };
+
+// Primary Block
+export const PrimaryBlock: Story = {
+  args: { variant: 'primary', size: 'primary-block', children: 'Sign in' },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', { name: 'Sign in' });
+    await expect(btn).toBeVisible();
+    await t('Sign in', 'w-full', 'bg-accent')(canvasElement);
+  },
+};
+
+export const PrimaryBlockDisabled: Story = {
   args: {
+    variant: 'primary',
+    size: 'primary-block',
     children: 'Sign in',
+    disabled: true,
   },
   play: async ({ canvasElement }) => {
-    const page = within(canvasElement);
-    const button = page.getByRole('button', { name: 'Sign in' });
-    await expect(button).toBeVisible();
-    await expect(button).toHaveClass('bg-accent');
-    await expect(button).toHaveClass('text-white');
-    // Font weight should be 600 (font-semibold) for TCoTB design
-    await expect(button).toHaveClass('font-semibold');
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Sign in' }),
+    ).toBeDisabled();
   },
 };
 
-/** A button with a leading icon. The icon is decorative, so the button's name is just the label. */
-export const WithIcon: Story = {
+// Solid Small
+export const SolidSmall: Story = {
+  args: { variant: 'solid', size: 'solid-small', children: 'Delete task' },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Delete task',
+    });
+    await expect(btn).toBeVisible();
+    await t(
+      'Delete task',
+      'bg-accent',
+      'text-on-accent',
+      'text-xs',
+    )(canvasElement);
+  },
+};
+
+export const SolidSmallDanger: Story = {
   args: {
-    children: 'New task',
-    icon: 'plus',
-    variant: 'medium',
+    variant: 'solid',
+    size: 'solid-small',
+    tone: 'danger',
+    children: 'Delete task',
   },
   play: async ({ canvasElement }) => {
-    const page = within(canvasElement);
-    const button = page.getByRole('button', { name: 'New task' });
-    await expect(button).toBeVisible();
-    // Icon should be present and hidden from accessible name
-    const icon = button.querySelector('svg');
-    // The icon should exist
-    await expect(!!icon).toBe(true);
-    // Font weight should be 500 (font-medium) for yg090 design
-    await expect(button).toHaveClass('font-medium');
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Delete task',
+    });
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveClass('bg-danger');
   },
 };
 
-/** A submit button inside a form. When clicked, the form's submit handler runs once. */
-export const SubmitInForm: Story = {
-  render: () => {
-    let submitCount = 0;
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      submitCount++;
-      (e.target as HTMLFormElement).dataset.submitCount = String(submitCount);
-    };
-
-    return (
-      <form onSubmit={handleSubmit} data-submit-count="0">
-        <input
-          type="text"
-          placeholder="Enter something"
-          aria-label="Test input"
-        />
-        <Button type="submit">Submit</Button>
-      </form>
-    );
+export const SolidSmallDisabled: Story = {
+  args: {
+    variant: 'solid',
+    size: 'solid-small',
+    children: 'Delete task',
+    disabled: true,
   },
   play: async ({ canvasElement }) => {
-    const page = within(canvasElement);
-    const form = canvasElement.querySelector('form');
-    const button = page.getByRole('button', { name: 'Submit' });
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Delete task' }),
+    ).toBeDisabled();
+  },
+};
 
-    // Initial state
-    await expect(form?.dataset.submitCount).toBe('0');
+// Solid Medium
+export const SolidMedium: Story = {
+  args: { variant: 'solid', size: 'solid-medium', children: 'Save changes' },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Save changes',
+    });
+    await expect(btn).toBeVisible();
+    await t(
+      'Save changes',
+      'bg-accent',
+      'text-sm',
+      'font-semibold',
+    )(canvasElement);
+  },
+};
 
-    // Click the button
-    await userEvent.click(button);
+export const SolidMediumDanger: Story = {
+  args: {
+    variant: 'solid',
+    size: 'solid-medium',
+    tone: 'danger',
+    children: 'Delete task',
+  },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Delete task',
+    });
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveClass('bg-danger');
+  },
+};
 
-    // Form submit handler should have run once
-    await expect(form?.dataset.submitCount).toBe('1');
+export const SolidMediumDisabled: Story = {
+  args: {
+    variant: 'solid',
+    size: 'solid-medium',
+    children: 'Save changes',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Save changes' }),
+    ).toBeDisabled();
+  },
+};
+
+// Secondary Small
+export const SecondarySmall: Story = {
+  args: { variant: 'secondary', size: 'secondary-small', children: 'Cancel' },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', { name: 'Cancel' });
+    await expect(btn).toBeVisible();
+    await t('Cancel', 'border', 'border-border', 'text-muted')(canvasElement);
+  },
+};
+
+export const SecondarySmallDisabled: Story = {
+  args: {
+    variant: 'secondary',
+    size: 'secondary-small',
+    children: 'Cancel',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Cancel' }),
+    ).toBeDisabled();
+  },
+};
+
+// Secondary Medium
+export const SecondaryMedium: Story = {
+  args: { variant: 'secondary', size: 'secondary-medium', children: 'Cancel' },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', { name: 'Cancel' });
+    await expect(btn).toBeVisible();
+    await t('Cancel', 'bg-surface', 'text-text', 'border')(canvasElement);
+  },
+};
+
+export const SecondaryMediumDisabled: Story = {
+  args: {
+    variant: 'secondary',
+    size: 'secondary-medium',
+    children: 'Cancel',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Cancel' }),
+    ).toBeDisabled();
+  },
+};
+
+// With Leading Icon
+export const WithLeadingIcon: Story = {
+  args: {
+    variant: 'solid',
+    size: 'with-icon',
+    icon: Plus,
+    children: 'New task',
+  },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', { name: 'New task' });
+    await expect(btn).toBeVisible();
+    await t('New task', 'w-full', 'bg-accent', 'gap-2')(canvasElement);
+    await expect(!!btn.querySelector('svg[aria-hidden="true"]')).toBe(true);
+  },
+};
+
+export const WithLeadingIconDisabled: Story = {
+  args: {
+    variant: 'solid',
+    size: 'with-icon',
+    icon: Plus,
+    children: 'New task',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'New task' }),
+    ).toBeDisabled();
+  },
+};
+
+// Solid Icon Compact
+export const SolidIconCompact: Story = {
+  args: {
+    variant: 'solid',
+    size: 'solid-icon-compact',
+    icon: Check,
+    children: 'Mark complete',
+  },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Mark complete',
+    });
+    await expect(btn).toBeVisible();
+    await t('Mark complete', 'bg-accent', 'gap-2')(canvasElement);
+  },
+};
+
+export const SolidIconCompactDisabled: Story = {
+  args: {
+    variant: 'solid',
+    size: 'solid-icon-compact',
+    icon: Check,
+    children: 'Mark complete',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Mark complete' }),
+    ).toBeDisabled();
+  },
+};
+
+// Icon Only Secondary
+export const IconOnlySecondary: Story = {
+  args: {
+    variant: 'icon-secondary',
+    size: 'icon-only',
+    icon: Clock3,
+    'aria-label': 'Snooze',
+  },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', { name: 'Snooze' });
+    await expect(btn).toBeVisible();
+    await t('Snooze', 'border', 'border-border', 'text-muted')(canvasElement);
+    await expect(!!btn.querySelector('svg')).toBe(true);
+  },
+};
+
+export const IconOnlySecondaryDisabled: Story = {
+  args: {
+    variant: 'icon-secondary',
+    size: 'icon-only',
+    icon: Clock3,
+    'aria-label': 'Snooze',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Snooze' }),
+    ).toBeDisabled();
+  },
+};
+
+// Icon Only Danger
+export const IconOnlyDanger: Story = {
+  args: {
+    variant: 'icon-danger',
+    size: 'icon-only',
+    icon: Trash2,
+    'aria-label': 'Delete task',
+  },
+  play: async ({ canvasElement }) => {
+    const btn = within(canvasElement).getByRole('button', {
+      name: 'Delete task',
+    });
+    await expect(btn).toBeVisible();
+    await t(
+      'Delete task',
+      'border-danger-border',
+      'text-danger',
+    )(canvasElement);
+    await expect(!!btn.querySelector('svg')).toBe(true);
+  },
+};
+
+export const IconOnlyDangerDisabled: Story = {
+  args: {
+    variant: 'icon-danger',
+    size: 'icon-only',
+    icon: Trash2,
+    'aria-label': 'Delete task',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Delete task' }),
+    ).toBeDisabled();
   },
 };
