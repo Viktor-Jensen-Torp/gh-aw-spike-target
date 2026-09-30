@@ -10,7 +10,7 @@ import {
   SignInResponse,
   MeResponse,
 } from '@tempo/shared/auth';
-import { signUp, signIn, getUserBySession } from './service.ts';
+import { signUp, signIn, getUserBySession, signOut } from './service.ts';
 import { ApiError } from '../../lib/errors.ts';
 
 const SECURE = process.env.NODE_ENV !== 'development';
@@ -79,5 +79,28 @@ export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
 
     const response: MeResponse = { user };
     return reply.send(response);
+  });
+
+  app.post('/auth/sign-out', async (request, reply) => {
+    const sessionId = getCookie(request, 'session');
+
+    if (!sessionId) {
+      throw new ApiError(401, 'unauthorized', 'Not signed in.');
+    }
+
+    // Verify the session exists before deleting
+    const user = await getUserBySession(app.db, sessionId);
+
+    if (!user) {
+      throw new ApiError(401, 'unauthorized', 'Not signed in.');
+    }
+
+    // Delete the session
+    await signOut(app.db, sessionId);
+
+    // Clear the session cookie by setting it to empty with Max-Age=0
+    setCookie(reply, 'session', '', 0);
+
+    return reply.send({});
   });
 }

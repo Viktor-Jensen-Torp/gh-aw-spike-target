@@ -267,6 +267,79 @@ describe('Auth Routes', () => {
     });
   });
 
+  describe('POST /api/auth/sign-out with a valid session cookie', () => {
+    it('returns 200 and clears the session cookie', async () => {
+      // Sign up first
+      const signUpResponse = await app.inject({
+        method: 'POST',
+        url: '/api/auth/sign-up',
+        payload: {
+          fullName: 'Test User',
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      });
+
+      expect(signUpResponse.statusCode).toBe(201);
+
+      // Extract session cookie from Set-Cookie header
+      const setCookieHeader = signUpResponse.headers['set-cookie'];
+      expect(setCookieHeader).toBeDefined();
+      const setCookieStr = Array.isArray(setCookieHeader)
+        ? setCookieHeader[0]
+        : (setCookieHeader as string | undefined);
+      const sessionMatch = setCookieStr?.match(/session=([^;]+)/);
+      const sessionId = sessionMatch?.[1];
+      expect(sessionId).toBeDefined();
+
+      // Sign out with the session cookie
+      const signOutResponse = await app.inject({
+        method: 'POST',
+        url: '/api/auth/sign-out',
+        headers: {
+          cookie: `session=${sessionId}`,
+        },
+      });
+
+      expect(signOutResponse.statusCode).toBe(200);
+      expect(signOutResponse.json()).toEqual({});
+
+      // Verify that the session no longer works
+      const meResponse = await app.inject({
+        method: 'GET',
+        url: '/api/me',
+        headers: {
+          cookie: `session=${sessionId}`,
+        },
+      });
+
+      expect(meResponse.statusCode).toBe(401);
+      expect(meResponse.json()).toEqual({
+        error: {
+          code: 'unauthorized',
+          message: 'Not signed in.',
+        },
+      });
+    });
+  });
+
+  describe('POST /api/auth/sign-out with no cookie', () => {
+    it('returns 401', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/auth/sign-out',
+      });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.json()).toEqual({
+        error: {
+          code: 'unauthorized',
+          message: 'Not signed in.',
+        },
+      });
+    });
+  });
+
   describe('GET /api/health with no cookie', () => {
     it('returns 200', async () => {
       const response = await app.inject({

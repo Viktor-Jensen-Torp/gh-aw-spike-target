@@ -214,3 +214,8 @@ export async function getUserBySession(
     email: user.email,
   };
 }
+
+/** Delete a session by ID. Does nothing if the session does not exist. */
+export async function signOut(db: Db, sessionId: string): Promise<void> {
+  await db.delete(sessions).where(eq(sessions.id, sessionId));
+}

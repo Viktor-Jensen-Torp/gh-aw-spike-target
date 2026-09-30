@@ -23,9 +23,17 @@ export async function api<T extends z.ZodType>(
   schema: T,
   init: RequestInit = {},
 ): Promise<z.infer<T>> {
+  const headers: Record<string, string> = { ...init.headers } as Record<
+    string,
+    string
+  >;
+  // Only set content-type if there's a body
+  if (init.body !== undefined) {
+    headers['content-type'] = 'application/json';
+  }
   const response = await fetch(`/api${path}`, {
     ...init,
-    headers: { 'content-type': 'application/json', ...init.headers },
+    headers,
     credentials: 'same-origin',
   });
   const body: unknown = await response.json().catch(() => null);
