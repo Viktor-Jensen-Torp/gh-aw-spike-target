@@ -28,8 +28,12 @@ name: Back to refinement
 on:
   issues:
     types: [closed]
+  # develop only: changes land there. A release merge into main repeats every
+  # change since the last release at once, so its design diff made each claimed
+  # part look new and sent 21 ready Tasks issues back (release 8f68fd5,
+  # 2026-09-30); they had all been handled on develop already.
   push:
-    branches: [main, develop]
+    branches: [develop]
 
 permissions:
   contents: read

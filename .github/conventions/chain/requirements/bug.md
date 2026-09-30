@@ -17,4 +17,5 @@ gives it nothing to check.
 | B1 | A test reproduces the reported failure: it uses the input or steps from the issue and asserts the correct behaviour, so it would fail without the fix | The test's name, file and line, and the input it uses |  |
 | B2 | The fix changes the code that caused the failure, not a symptom elsewhere | File and line of the cause, and one sentence on why it failed |  |
 | B3 | Every case under the issue's "Done when" has its own test, named after the case | For each case: the test's name, file and line |  |
-| B4 | Nothing changes beyond the fix | Every changed file accounted for |  |
+| B4 | Nothing changes beyond the fix: everything the change adds is asked for by "What", "Details" or "Done when", and none of it is work "Out of scope" gives to another issue | For each route, export, screen, story or table the change adds: file and line, and the line of the issue that asks for it |  |
+| B5 | Every item under "Details" is done: each boundary (empty, maximum, bad input) is handled and each other instruction is followed. A line marked as context asks for nothing | For each item: file and line, or "context" | yes |

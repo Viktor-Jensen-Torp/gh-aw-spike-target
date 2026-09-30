@@ -32,7 +32,8 @@ review() { # <json rows...> -> a data.json path
 row() { printf '{"id":"%s","status":"%s","evidence":"%s"}' "$1" "$2" "$3"; }
 
 # Replay: #136's review on a2ab5ec (run 36524573206). U6 names the component's
-# folder, which holds changed files; U3 names no file at all.
+# folder, which holds changed files; U3 names no file at all. U7 came later
+# (#227), so that review lacks it.
 check "replay #136: rows as routed after the fix" \
 "C1: unmet
 U1: met
@@ -40,7 +41,8 @@ U2: met
 U3: met-without-a-changed-file
 U4: unmet
 U5: n/a
-U6: met" \
+U6: met
+U7: missing" \
   "$(rows "$FIX/pr136-review.json" "$REQ_COMPONENT" "$FIX/pr136-files.txt")"
 
 printf '%s\n' apps/web/src/components/Button/Button.tsx apps/web/src/components/Button/Button.stories.tsx docs/architecture.md > "$WORK/files.txt"
@@ -228,6 +230,21 @@ check "design-part: a descendant with a type replaces the part, resolved too" \
 check "design-part: other instances of the component are untouched" '"Default"' \
   "$(part screen | jq -c '.children[2].children[1].content')"
 part missing >/dev/null 2>&1; check "design-part: an absent id is an error" "nonzero" "$([ $? -ne 0 ] && echo nonzero || echo zero)"
+
+# --- check-issue.sh: "Out of scope" names its neighbours (#227) --------------------
+body() { # <out-of-scope text, or "-" for no heading> -> a work-item body
+  printf '## What\nx\n\n## Why\ny\n\n## Details\nz\n\n## Done when\n\n| Given | Expect |\n|---|---|\n| a | b |\n'
+  [ "$1" = "-" ] || printf '\n## Out of scope\n\n%s\n' "$1"
+}
+issue() { body "$1" | bash "$SCRIPTS/check-issue.sh" >/dev/null 2>&1; echo $?; }
+check "check-issue: a neighbour named by number passes"      "0" "$(issue "The sign-up and sign-in routes: #176, #177.")"
+check "check-issue: \"Nothing nearby\" passes"                "0" "$(issue "Nothing nearby.")"
+check "check-issue: nearby work without a number is refused" "1" "$(issue "Sign-up and sign-in routes (Accounts).")"
+check "check-issue: no Out of scope heading is refused"      "1" "$(issue -)"
+check "check-issue: #N under another heading does not count"  "1" \
+  "$( { body "Sign-up." | sed 's/^z$/Depends on #168 — sessions/'; } | bash "$SCRIPTS/check-issue.sh" >/dev/null 2>&1; echo $?)"
+check "check-issue: an epic needs no issue numbers"           "0" \
+  "$(printf '## Goal\ng\n\n## Sources\n\n- `design/x.pen`\n\n## Out of scope\n\nPhotos.\n\n## Sub-issues\n\nListed.\n' | bash "$SCRIPTS/check-issue.sh" --epic >/dev/null 2>&1; echo $?)"
 
 # --- check-runs.sh, replayed against the API ----------------------------------------
 # c113cac1 (#136) has 121 check runs; `Agent review` is on page 3 of 30. Its

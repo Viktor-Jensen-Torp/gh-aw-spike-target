@@ -20,3 +20,4 @@ gives it nothing to check.
 | U4 | Sizes, colours and text come from the claimed parts' JSON through design tokens, never raw values | For each claimed part: file and line | yes |
 | U5 | It reuses the existing shared components it contains instead of rebuilding them | The import of each one it contains | yes |
 | U6 | It lives in its own folder under the web app's `src/components/`, passes native props through, and holds no API calls, dates or app state | The component's file and line |  |
+| U7 | Everything the change adds is asked for by "What", "Details" or "Done when", and none of it is work "Out of scope" gives to another issue | For each story, prop or export the change adds: file and line, and the line of the issue that asks for it |  |

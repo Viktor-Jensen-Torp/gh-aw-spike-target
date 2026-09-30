@@ -105,6 +105,8 @@ z
 | Given | Expect |
 |---|---|
 | a | b |
+## Out of scope
+Nothing nearby.
 B
 )
 BAD=$(jq -Rs . <<'B'
@@ -221,7 +223,8 @@ submit() { printf 'echo %q | safeoutputs submit_pull_request_review .' "{\"event
 REPLAY=$(cat "$FIX/review-136-55930b3.json")
 new_root; case_ "replay #136: U1-U3 without a full path refused" block "$(submit REQUEST_CHANGES "$REPLAY")"
 grep -q "U1: met-without-a-changed-file" "$ROOT/last_err" && echo "PASS  the agent is told which rows" || { echo "FAIL  the agent is not told which rows"; fails=$((fails+1)); }
-FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3") then .evidence = "apps/web/src/components/Button/Button.stories.tsx:16" else . end)' <<<"$REPLAY")
+FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3") then .evidence = "apps/web/src/components/Button/Button.stories.tsx:16" else . end)
+  + [{"id": "U7", "status": "met", "evidence": "apps/web/src/components/Button/Button.stories.tsx:16"}]' <<<"$REPLAY")
 new_root; case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
 new_root; case_ "no data at all is refused"                  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
 new_root; case_ "a row left out is refused"                  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(select(.id != "U2"))' <<<"$FIXED")")"

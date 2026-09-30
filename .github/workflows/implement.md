@@ -188,7 +188,10 @@ Work in this order:
    that ignores it fails the checks and cannot merge. Then read the code its
    architecture map points you to.
 2. Make the smallest change that satisfies the issue, following those
-   conventions. Touch only `apps/`, `packages/` and `docs/architecture.md`.
+   conventions. Do every item under "Details". Build nothing that "Out of
+   scope" gives to another issue, even when a test would be easier with it:
+   make what the test needs through the code that exists instead. Touch only
+   `apps/`, `packages/` and `docs/architecture.md`.
 3. Write a test for every case under the issue's "Done when", named after it
    (`.github/conventions/chain/testing.md`).
 4. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
