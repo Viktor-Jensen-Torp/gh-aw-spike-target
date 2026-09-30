@@ -5,7 +5,7 @@ For Claude Code sessions that investigate this repository's workflow runs.
 It lives in `.claude/`, not at the root, on purpose: the pipeline's agents (Pi,
 under GitHub Agentic Workflows) load a root `CLAUDE.md` or `AGENTS.md` as their
 own instructions, and Pi looks only in the working directory and above it
-(Pi 0.84.3, `dist/core/resource-loader.js`). Claude Code reads it from here.
+(Pi 0.87.0, `dist/core/resource-loader.js`). Claude Code reads it from here.
 
 ## What is here
 

@@ -49,7 +49,7 @@ jobs:
           # Pinned to the version the workflows were compiled with. The
           # documented setup-cli action is referenced at @main, which is not a
           # thing to put in a scheduled workflow.
-          gh extension install github/gh-aw --pin v0.88.7
+          gh extension install github/gh-aw --pin v0.89.21
           gh aw version
 
       - name: Restore the metrics history

@@ -65,11 +65,11 @@ jobs:
     outputs:
       issues: ${{ steps.sprint.outputs.issues }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7.0.1
         with:
           sparse-checkout: .github/scripts
           persist-credentials: false
-      - uses: actions/create-github-app-token@v3
+      - uses: actions/create-github-app-token@v3.2.0
         id: token
         with:
           client-id: ${{ vars.REVIEWER_CLIENT_ID }}

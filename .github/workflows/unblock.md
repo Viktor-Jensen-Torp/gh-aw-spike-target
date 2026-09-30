@@ -179,7 +179,7 @@ jobs:
     permissions:
       actions: write
     pre-steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7.0.1
         if: needs.safe_outputs.outputs.push_commit_sha != ''
         with:
           ref: develop
