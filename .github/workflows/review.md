@@ -6,6 +6,11 @@ intent: Give an agent-authored pull request a review a maintainer would trust, w
 
 inlined-imports: true
 
+# Above shared/budget.md's 500: every pull request event runs a review (with
+# detection, ~45 AIC), so 500 stopped reviews after ~11 on 2026-09-30 (#216)
+# while the dispatcher allows 10 implement runs a day, each reviewed 1-3 times.
+max-daily-ai-credits: 2000
+
 # No npm registry for the reviewer: it runs the app from the dependencies
 # installed before it starts (shared/node-runtime.md) and never adds a package.
 # `runtimes: node` opens the registry by itself, so it is blocked here. This
