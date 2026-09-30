@@ -138,7 +138,7 @@ export async function signIn(
     throw new ApiError(
       401,
       'invalid_credentials',
-      'Invalid email or password.',
+      'Email or password is incorrect.',
     );
   }
 
@@ -147,7 +147,7 @@ export async function signIn(
     throw new ApiError(
       401,
       'invalid_credentials',
-      'Invalid email or password.',
+      'Email or password is incorrect.',
     );
   }
 
