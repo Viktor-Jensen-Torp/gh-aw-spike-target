@@ -112,7 +112,7 @@ const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(
 
         {/* Shortcut (compact only) */}
         {shortcut && size === 'compact' && (
-          <span className="text-xs font-normal text-faint">{shortcut}</span>
+          <span className="text-[11px] font-normal text-faint">{shortcut}</span>
         )}
       </DropdownMenu.Item>
     );
