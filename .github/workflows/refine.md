@@ -93,6 +93,17 @@ jobs:
           CUR=$(bash .github/scripts/current-sprint.sh "${REPO%/*}" 2)
           echo "current sprint: $(jq -c . <<<"$CUR")"
           echo "issues=$(jq -c .issues <<<"$CUR")" >> "$GITHUB_OUTPUT"
+  # A refine may re-add `ready`, so it wakes the dispatcher itself: a run
+  # dispatched with GITHUB_TOKEN fires no `workflow_run` (implement.md).
+  conclusion:
+    permissions:
+      actions: write
+    pre-steps:
+      - name: Wake the dispatcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh workflow run dispatcher.yml --repo "$REPO" --ref main || echo "::warning::could not wake the dispatcher"
 
 engine:
   id: pi

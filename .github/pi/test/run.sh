@@ -337,6 +337,8 @@ grep -q "safeoutputs <tool> --help" <<<"$(advised refine 'cat <<EOF | safeoutput
 # #246: a command that mentions verify.sh without running it gets no advice (review 36701439061).
 [ "$(advised review "grep -n verify.sh .github/workflows/review.md" "" 1)" = unchanged ] && echo "PASS  a grep that mentions verify.sh gets no advice" || { echo "FAIL  advice on a grep"; fails=$((fails + 1)); }
 [ "$(advised review "bash .github/scripts/verify.sh" "✗ test" 1)" = unchanged ] && echo "PASS  review (no verify) gets no verify advice" || { echo "FAIL  verify advice for review"; fails=$((fails + 1)); }
+# A safeoutputs call whose body names verify.sh on a line of its own (implement run 36840260856).
+! grep -q "verify.sh failed" <<<"$(advised implement "$(printf 'safeoutputs create_pull_request <<EOF\n.github/scripts/verify.sh passes\nEOF')" "BLOCKED by the pipeline: x" 1)" && echo "PASS  a safeoutputs call naming verify.sh gets no verify advice" || { echo "FAIL  verify advice on a safeoutputs body"; fails=$((fails + 1)); }
 # The guard's own text (prepended by tool_call) names verify.sh; a failed guarded call must not get verify advice.
 guarded() { PI_ROLE="$1" PI_POSTCONDITIONS_STATE_DIR="$BASE/k" CMD="$2" node -e '
   const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
