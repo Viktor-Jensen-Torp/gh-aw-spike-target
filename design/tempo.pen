@@ -1,5 +1,5 @@
 {
-  "version": "2.19",
+  "version": "2.20",
   "children": [
     {
       "type": "frame",
@@ -859,30 +859,15 @@
                               "name": "Empty Primary"
                             },
                             {
-                              "type": "frame",
-                              "id": "OTzqQ",
+                              "id": "R4su2E",
+                              "type": "ref",
+                              "ref": "abJOc",
                               "name": "Empty Secondary",
-                              "cornerRadius": 8,
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "gap": 8,
-                              "padding": [
-                                10,
-                                16
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "Oho7R",
-                                  "name": "Label",
-                                  "fill": "$muted",
-                                  "content": "Browse upcoming (12)",
-                                  "fontFamily": "$font",
-                                  "fontSize": 13,
-                                  "fontWeight": "500"
+                              "descendants": {
+                                "DMGtY": {
+                                  "content": "Browse upcoming (12)"
                                 }
-                              ]
+                              }
                             }
                           ]
                         }
@@ -1005,7 +990,7 @@
                           "id": "RsN4g",
                           "name": "Banner Title",
                           "fill": "$warning-strong",
-                          "content": "You're offline — working from local cache",
+                          "content": "You're offline",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "600"
@@ -1015,35 +1000,10 @@
                           "id": "Hp6Ua",
                           "name": "Banner Body",
                           "fill": "$warning",
-                          "content": "2 changes will sync automatically when the connection returns.",
+                          "content": "2 changes are saved on this device and will sync when you reconnect.",
                           "fontFamily": "$font",
                           "fontSize": 12.5,
                           "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "xxGeb",
-                      "name": "Banner Action",
-                      "cornerRadius": 7,
-                      "stroke": "$warning-border-strong",
-                      "strokeWidth": 1,
-                      "padding": [
-                        6,
-                        12
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "pxEtr",
-                          "name": "Label",
-                          "fill": "$warning-strong",
-                          "content": "Retry now",
-                          "fontFamily": "$font",
-                          "fontSize": 12.5,
-                          "fontWeight": "600"
                         }
                       ]
                     }
@@ -1084,7 +1044,7 @@
                       "id": "krZej",
                       "name": "Error State",
                       "width": "fill_container",
-                      "height": 380,
+                      "height": 420,
                       "fill": "$surface",
                       "cornerRadius": 10,
                       "stroke": "$danger-border",
@@ -1128,7 +1088,7 @@
                           "fill": "$muted",
                           "textGrowth": "fixed-width",
                           "width": 420,
-                          "content": "The server didn't respond in time (error 504). Your local changes are safe and nothing was lost.",
+                          "content": "Check your connection and try again. Your local changes are safe and nothing was lost.",
                           "lineHeight": 1.5,
                           "textAlign": "center",
                           "fontFamily": "$font",
@@ -1147,7 +1107,7 @@
                               "type": "ref",
                               "ref": "KUWLJ",
                               "name": "Error Primary",
-                              "fill": "$text",
+                              "fill": "$accent",
                               "descendants": {
                                 "w70Ssd": {
                                   "icon": "refresh-cw"
@@ -1158,41 +1118,17 @@
                               }
                             },
                             {
-                              "type": "frame",
-                              "id": "b4roxN",
+                              "id": "Z01XuE",
+                              "type": "ref",
+                              "ref": "abJOc",
                               "name": "Error Secondary",
-                              "cornerRadius": 8,
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "padding": [
-                                10,
-                                16
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "dKfsz",
-                                  "name": "Label",
-                                  "fill": "$muted",
-                                  "content": "View cached tasks",
-                                  "fontFamily": "$font",
-                                  "fontSize": 13,
-                                  "fontWeight": "500"
+                              "descendants": {
+                                "DMGtY": {
+                                  "content": "View cached tasks"
                                 }
-                              ]
+                              }
                             }
                           ]
-                        },
-                        {
-                          "type": "text",
-                          "id": "JZKDH",
-                          "name": "Error Code",
-                          "fill": "$faint",
-                          "content": "Request ID a41f-9cd2 · 14:22 GMT",
-                          "fontFamily": "$font",
-                          "fontSize": 11.5,
-                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -1361,14 +1297,10 @@
               "alignItems": "center",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "iNSyK",
-                  "name": "Option Box",
-                  "width": 16,
-                  "height": 16,
-                  "cornerRadius": 5,
-                  "stroke": "$border-strong",
-                  "strokeWidth": 1.5
+                  "id": "KYNXU",
+                  "type": "ref",
+                  "ref": "tCld5",
+                  "name": "Option Box"
                 },
                 {
                   "type": "text",
@@ -1937,7 +1869,7 @@
                       "id": "w3aLQ9",
                       "name": "No Results State",
                       "width": "fill_container",
-                      "height": 360,
+                      "height": 420,
                       "fill": "$surface",
                       "cornerRadius": 10,
                       "stroke": "$border",
@@ -2000,7 +1932,7 @@
                               "type": "ref",
                               "ref": "sQwPG",
                               "name": "Clear Filters Button",
-                              "fill": "$text",
+                              "fill": "$accent",
                               "descendants": {
                                 "z0wMs": {
                                   "content": "Clear filters"
@@ -2568,7 +2500,8 @@
                           "id": "bHNFP",
                           "type": "ref",
                           "ref": "udfnn",
-                          "name": "Row — Syncing"
+                          "name": "Row — Syncing",
+                          "opacity": 1
                         },
                         {
                           "type": "frame",
@@ -2678,6 +2611,7 @@
                           "name": "Row — Sync failed",
                           "fill": "$danger-faint",
                           "stroke": "$danger-border",
+                          "opacity": 1,
                           "descendants": {
                             "Lwdxg": {
                               "stroke": "$danger"
@@ -2763,7 +2697,7 @@
           "id": "t8AtcA",
           "layoutPosition": "absolute",
           "x": 460,
-          "y": 200,
+          "y": 206,
           "name": "New Task Dialog",
           "width": 520,
           "fill": "$surface",
@@ -2811,8 +2745,8 @@
                   "type": "icon",
                   "id": "nHOC7",
                   "name": "Close Icon",
-                  "width": 17,
-                  "height": 17,
+                  "width": 16,
+                  "height": 16,
                   "icon": "x",
                   "library": "lucide",
                   "fill": "$faint"
@@ -2820,154 +2754,77 @@
               ]
             },
             {
-              "type": "frame",
-              "id": "XSJps",
+              "id": "HgMLR",
+              "type": "ref",
+              "ref": "pOTNB",
               "name": "Task name Field",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 6,
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "kohkr",
-                  "name": "Label Row",
-                  "width": "fill_container",
-                  "gap": 6,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "gQcZi",
-                      "name": "Label",
-                      "fill": "$muted",
-                      "content": "Task name",
-                      "fontFamily": "$font",
-                      "fontSize": 12.5,
-                      "fontWeight": "600"
-                    },
-                    {
-                      "type": "text",
-                      "id": "ZWy8Q",
-                      "name": "Required",
-                      "fill": "$faint",
-                      "content": "Required",
-                      "fontFamily": "$font",
-                      "fontSize": 11,
-                      "fontWeight": "500"
-                    }
-                  ]
+              "descendants": {
+                "gklV8/U7fHr": {
+                  "content": "Task name"
                 },
-                {
-                  "type": "frame",
-                  "id": "X9VCz",
-                  "name": "Input",
-                  "width": "fill_container",
-                  "fill": "$danger-faint",
-                  "cornerRadius": 8,
-                  "stroke": "$danger",
-                  "strokeWidth": 1.5,
-                  "gap": 8,
-                  "padding": [
-                    10,
-                    12
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "XNyjE",
-                      "name": "Input Text",
-                      "fill": "$faint",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "What needs to be done?",
-                      "fontFamily": "$font",
-                      "fontSize": 13.5,
-                      "fontWeight": "normal"
-                    }
-                  ]
+                "gklV8/lBV1g": {
+                  "enabled": true,
+                  "content": "Required",
+                  "fill": "$faint"
                 },
-                {
-                  "id": "plIZJ",
-                  "type": "ref",
-                  "ref": "nYAPZ",
-                  "name": "Error Row"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "WlawT",
-              "name": "Due date Field",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 6,
-              "children": [
-                {
-                  "id": "HAZmO",
-                  "type": "ref",
-                  "ref": "AOMYp",
-                  "name": "Label Row"
-                },
-                {
-                  "id": "P5cLqH",
-                  "type": "ref",
-                  "ref": "BGWVc",
-                  "name": "Input",
-                  "fill": "$danger-faint",
+                "kJj8j": {
                   "stroke": "$danger",
                   "strokeWidth": 1.5
                 },
-                {
-                  "id": "C3EVz",
-                  "type": "ref",
-                  "ref": "nYAPZ",
-                  "name": "Error Row",
-                  "descendants": {
-                    "Xodxr": {
-                      "content": "Due date is in the past"
-                    }
-                  }
+                "kJj8j/w35lb7": {
+                  "content": "What needs to be done?"
+                },
+                "jc8wO": {
+                  "enabled": true
+                },
+                "jc8wO/G0EvJ": {
+                  "content": "Task name can't be empty."
                 }
-              ]
+              }
             },
             {
-              "type": "frame",
-              "id": "aEGJT",
-              "name": "Project Field",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 6,
-              "children": [
-                {
-                  "id": "z7ohl",
-                  "type": "ref",
-                  "ref": "AOMYp",
-                  "name": "Label Row",
-                  "descendants": {
-                    "Zjo0h": {
-                      "content": "Project"
-                    }
-                  }
+              "id": "HACPC",
+              "type": "ref",
+              "ref": "FWpoq",
+              "name": "Due date Field",
+              "descendants": {
+                "Au9vx/U7fHr": {
+                  "content": "Due date"
                 },
-                {
-                  "id": "J1YBQY",
-                  "type": "ref",
-                  "ref": "BGWVc",
-                  "name": "Input",
-                  "fill": "$bg",
-                  "stroke": "$border",
-                  "strokeWidth": 1,
-                  "descendants": {
-                    "kEdv1": {
-                      "icon": "square-dashed"
-                    },
-                    "jEomn": {
-                      "content": "Website redesign"
-                    }
-                  }
+                "B28riJ": {
+                  "stroke": "$danger",
+                  "strokeWidth": 1.5
+                },
+                "B28riJ/kEdv1": {
+                  "icon": "calendar"
+                },
+                "B28riJ/jEomn": {
+                  "content": "Tue, March 12 · 9:00 AM"
+                },
+                "L0cBSM": {
+                  "enabled": true
+                },
+                "L0cBSM/G0EvJ": {
+                  "content": "Due date is in the past."
                 }
-              ]
+              }
+            },
+            {
+              "id": "oKtFd",
+              "type": "ref",
+              "ref": "FWpoq",
+              "name": "Project Field",
+              "descendants": {
+                "Au9vx/U7fHr": {
+                  "content": "Project"
+                },
+                "B28riJ/kEdv1": {
+                  "icon": "square-dashed"
+                },
+                "B28riJ/jEomn": {
+                  "content": "Website redesign"
+                }
+              }
             },
             {
               "type": "frame",
@@ -2978,12 +2835,12 @@
               "gap": 6,
               "children": [
                 {
-                  "id": "F3wUO1",
+                  "id": "BvmFp",
                   "type": "ref",
-                  "ref": "AOMYp",
+                  "ref": "FXRDe",
                   "name": "Label Row",
                   "descendants": {
-                    "Zjo0h": {
+                    "U7fHr": {
                       "content": "Notes"
                     }
                   }
@@ -2993,17 +2850,24 @@
                   "id": "t9zY1z",
                   "name": "Input",
                   "width": "fill_container",
-                  "fill": "$bg",
+                  "height": 88,
+                  "fill": "$surface",
                   "cornerRadius": 8,
                   "stroke": "$accent",
                   "strokeWidth": 1.5,
-                  "gap": 8,
                   "padding": [
-                    10,
+                    11,
                     12
                   ],
-                  "alignItems": "center",
                   "children": [
+                    {
+                      "type": "frame",
+                      "id": "W8LqaL",
+                      "name": "Caret",
+                      "width": 1.5,
+                      "height": 18,
+                      "fill": "$accent"
+                    },
                     {
                       "type": "text",
                       "id": "BYY9x",
@@ -3013,16 +2877,8 @@
                       "width": "fill_container",
                       "content": "Add context, links or acceptance criteria…",
                       "fontFamily": "$font",
-                      "fontSize": 13.5,
+                      "fontSize": 14,
                       "fontWeight": "normal"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "W8LqaL",
-                      "name": "Caret",
-                      "width": 1.5,
-                      "height": 17,
-                      "fill": "$accent"
                     }
                   ]
                 },
@@ -3032,6 +2888,7 @@
                   "name": "Help Text",
                   "fill": "$faint",
                   "content": "Markdown supported · 0/500 characters",
+                  "lineHeight": 1.45,
                   "fontFamily": "$font",
                   "fontSize": 12,
                   "fontWeight": "normal"
@@ -3082,7 +2939,7 @@
                       "id": "xI4t9",
                       "name": "Toggle Label",
                       "fill": "$muted",
-                      "content": "Remind me 30 min before",
+                      "content": "Remind me 15 min before",
                       "fontFamily": "$font",
                       "fontSize": 12.5,
                       "fontWeight": "normal"
@@ -3103,28 +2960,17 @@
                       "name": "Cancel Button"
                     },
                     {
-                      "type": "frame",
-                      "id": "n0o6WO",
-                      "name": "Save Button (Disabled)",
+                      "id": "o3InI",
+                      "type": "ref",
+                      "ref": "sQwPG",
+                      "name": "Create Button (Disabled)",
                       "fill": "$accent-disabled",
-                      "cornerRadius": 8,
-                      "padding": [
-                        10,
-                        16
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "Ii9bQ",
-                          "name": "Label",
-                          "fill": "$on-accent",
+                      "descendants": {
+                        "z0wMs": {
                           "content": "Create task",
-                          "fontFamily": "$font",
-                          "fontSize": 13,
-                          "fontWeight": "600"
+                          "fill": "$on-accent-disabled"
                         }
-                      ]
+                      }
                     }
                   ]
                 }
@@ -3303,13 +3149,35 @@
                   "id": "AhSP0",
                   "type": "ref",
                   "ref": "ZZjXt",
-                  "name": "List Column"
+                  "name": "List Column",
+                  "descendants": {
+                    "EB3Ka/a8AUPh": {
+                      "fill": "$accent-soft"
+                    },
+                    "EB3Ka/a8AUPh/WZl0d": {
+                      "stroke": "$border-strong"
+                    },
+                    "EB3Ka/XiZrz": {
+                      "fill": "$accent-soft"
+                    },
+                    "EB3Ka/Z9N8yV": {
+                      "fill": "$accent-soft"
+                    }
+                  }
                 },
                 {
-                  "id": "buQdr",
+                  "id": "J5AgU",
                   "type": "ref",
-                  "ref": "kaPEv",
-                  "name": "Detail Panel"
+                  "ref": "kvDyl",
+                  "name": "Detail Panel — Multiple Selected",
+                  "descendants": {
+                    "zb2V9": {
+                      "icon": "list-checks"
+                    },
+                    "LTXhP": {
+                      "content": "3 tasks selected. Use the action bar to update them together."
+                    }
+                  }
                 }
               ]
             }
@@ -3465,58 +3333,29 @@
           "padding": 6,
           "children": [
             {
-              "type": "frame",
-              "id": "UgKV0",
+              "id": "j1b2u0",
+              "type": "ref",
+              "ref": "ZsXwz",
               "name": "Menu — Edit task",
-              "width": "fill_container",
-              "fill": "$transparent",
-              "cornerRadius": 6,
-              "gap": 9,
-              "padding": [
-                7,
-                9
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon",
-                  "id": "PwuLc",
-                  "name": "Icon",
-                  "width": 14,
-                  "height": 14,
-                  "icon": "pencil",
-                  "library": "lucide",
-                  "fill": "$muted"
+              "descendants": {
+                "sctil": {
+                  "icon": "pencil"
                 },
-                {
-                  "type": "text",
-                  "id": "JhOII",
-                  "name": "Label",
-                  "fill": "$text",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Edit task",
-                  "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
+                "mAcu3": {
+                  "content": "Edit task"
                 },
-                {
-                  "type": "text",
-                  "id": "jak81",
-                  "name": "Shortcut",
-                  "fill": "$faint",
-                  "content": "E",
-                  "fontFamily": "$font",
-                  "fontSize": 11,
-                  "fontWeight": "normal"
+                "mpIOp": {
+                  "enabled": true,
+                  "content": "E"
                 }
-              ]
+              }
             },
             {
               "id": "kjAFb",
               "type": "ref",
               "ref": "ZsXwz",
-              "name": "Menu — Set due date"
+              "name": "Menu — Set due date",
+              "fill": "$bg"
             },
             {
               "id": "o5Ft9D",
@@ -3549,12 +3388,10 @@
               }
             },
             {
-              "type": "frame",
-              "id": "x3l0R",
-              "name": "Menu Divider",
-              "width": "fill_container",
-              "height": 1,
-              "fill": "$border"
+              "id": "OogWT",
+              "type": "ref",
+              "ref": "hAjWQ",
+              "name": "Divider"
             },
             {
               "id": "KNRB2",
@@ -3587,12 +3424,10 @@
               }
             },
             {
-              "type": "frame",
-              "id": "NBOhM",
-              "name": "Menu Divider",
-              "width": "fill_container",
-              "height": 1,
-              "fill": "$border"
+              "id": "TC0FG",
+              "type": "ref",
+              "ref": "hAjWQ",
+              "name": "Divider"
             },
             {
               "id": "aczgw",
@@ -3766,7 +3601,7 @@
                               "content": "Due"
                             },
                             "WHT80": {
-                              "content": "Mar 12, 9:00 AM (repeats weekly)"
+                              "content": "Today, 9:00 AM (repeats weekly)"
                             }
                           }
                         },
@@ -4010,32 +3845,38 @@
               "gap": 16,
               "children": [
                 {
-                  "id": "gPDHl",
+                  "id": "AyrlB",
                   "type": "ref",
                   "ref": "pOTNB",
-                  "name": "Email Field"
+                  "name": "Email Field",
+                  "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Email"
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "you@company.com"
+                    }
+                  }
                 },
                 {
-                  "type": "frame",
-                  "id": "Q9siyU",
+                  "id": "awtqg",
+                  "type": "ref",
+                  "ref": "XlJeX",
                   "name": "Password Field",
-                  "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 6,
-                  "children": [
-                    {
-                      "id": "oCrf0",
-                      "type": "ref",
-                      "ref": "t9aVk",
-                      "name": "Label Row"
+                  "descendants": {
+                    "uZ0iI/U7fHr": {
+                      "content": "Password"
                     },
-                    {
-                      "id": "rUPNN",
-                      "type": "ref",
-                      "ref": "J0Agjj",
-                      "name": "Input"
+                    "uZ0iI/lBV1g": {
+                      "enabled": true
+                    },
+                    "A4C0y/JdccD": {
+                      "content": "Enter your password"
+                    },
+                    "a6sHS": {
+                      "enabled": false
                     }
-                  ]
+                  }
                 }
               ]
             },
@@ -4058,7 +3899,7 @@
     {
       "type": "frame",
       "id": "bdhDU",
-      "x": 4680,
+      "x": 3120,
       "y": 2160,
       "name": "Auth — Sign Up",
       "clip": true,
@@ -4121,49 +3962,46 @@
               "gap": 16,
               "children": [
                 {
-                  "type": "frame",
-                  "id": "N9NOjN",
-                  "name": "Full name Field",
-                  "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 6,
-                  "children": [
-                    {
-                      "id": "W9RuIp",
-                      "type": "ref",
-                      "ref": "FXRDe",
-                      "name": "Label Row",
-                      "descendants": {
-                        "U7fHr": {
-                          "content": "Full name"
-                        }
-                      }
-                    },
-                    {
-                      "id": "kTsT4",
-                      "type": "ref",
-                      "ref": "t0jtn",
-                      "name": "Input",
-                      "width": "fill_container",
-                      "descendants": {
-                        "w35lb7": {
-                          "content": "Mara Reyes"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "id": "uZT6r",
+                  "id": "V5LV0",
                   "type": "ref",
                   "ref": "pOTNB",
-                  "name": "Email Field"
+                  "name": "Full name Field",
+                  "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Full name"
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "Your name"
+                    }
+                  }
                 },
                 {
-                  "id": "c2vrm",
+                  "id": "mt3wx",
+                  "type": "ref",
+                  "ref": "pOTNB",
+                  "name": "Email Field",
+                  "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Email"
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "you@company.com"
+                    }
+                  }
+                },
+                {
+                  "id": "NmyT1",
                   "type": "ref",
                   "ref": "XlJeX",
-                  "name": "Password Field"
+                  "name": "Password Field",
+                  "descendants": {
+                    "uZ0iI/U7fHr": {
+                      "content": "Password"
+                    },
+                    "A4C0y/JdccD": {
+                      "content": "Create a password"
+                    }
+                  }
                 }
               ]
             },
@@ -4199,7 +4037,7 @@
     {
       "type": "frame",
       "id": "ANZeb",
-      "x": 6240,
+      "x": 4680,
       "y": 2160,
       "name": "Auth — Sign Up Email Taken",
       "clip": true,
@@ -4262,7 +4100,7 @@
               "gap": 16,
               "children": [
                 {
-                  "id": "IDh0n",
+                  "id": "IS0Qk",
                   "type": "ref",
                   "ref": "pOTNB",
                   "name": "Full name Field",
@@ -4271,21 +4109,50 @@
                       "content": "Full name"
                     },
                     "kJj8j/w35lb7": {
-                      "content": "Mara Reyes"
+                      "content": "Mara Reyes",
+                      "fill": "$text"
                     }
                   }
                 },
                 {
-                  "id": "Imkq2",
+                  "id": "y8ca9Z",
                   "type": "ref",
-                  "ref": "FuXFY",
-                  "name": "Email Field"
+                  "ref": "pOTNB",
+                  "name": "Email Field",
+                  "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Email"
+                    },
+                    "kJj8j": {
+                      "stroke": "$danger",
+                      "strokeWidth": 1.5
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "mara@reyes.studio",
+                      "fill": "$text"
+                    },
+                    "jc8wO": {
+                      "enabled": true
+                    },
+                    "jc8wO/G0EvJ": {
+                      "content": "This email is already in use. Sign in instead or reset your password."
+                    }
+                  }
                 },
                 {
-                  "id": "BpRBj",
+                  "id": "U4Dedz",
                   "type": "ref",
                   "ref": "XlJeX",
-                  "name": "Password Field"
+                  "name": "Password Field",
+                  "descendants": {
+                    "uZ0iI/U7fHr": {
+                      "content": "Password"
+                    },
+                    "A4C0y/JdccD": {
+                      "content": "••••••••••",
+                      "fill": "$text"
+                    }
+                  }
                 }
               ]
             },
@@ -4321,7 +4188,7 @@
     {
       "type": "frame",
       "id": "vJNYt",
-      "x": 7800,
+      "x": 6240,
       "y": 2160,
       "name": "Auth — Sign Up Weak Password",
       "clip": true,
@@ -4384,7 +4251,7 @@
               "gap": 16,
               "children": [
                 {
-                  "id": "UJDTH",
+                  "id": "jQNR6",
                   "type": "ref",
                   "ref": "pOTNB",
                   "name": "Full name Field",
@@ -4393,32 +4260,50 @@
                       "content": "Full name"
                     },
                     "kJj8j/w35lb7": {
-                      "content": "Mara Reyes"
+                      "content": "Mara Reyes",
+                      "fill": "$text"
                     }
                   }
                 },
                 {
-                  "id": "pvCRI",
+                  "id": "k3kyt8",
                   "type": "ref",
                   "ref": "pOTNB",
-                  "name": "Email Field"
+                  "name": "Email Field",
+                  "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Email"
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "mara@reyes.studio",
+                      "fill": "$text"
+                    }
+                  }
                 },
                 {
-                  "id": "oKZ5y",
+                  "id": "FAorx",
                   "type": "ref",
-                  "ref": "FuXFY",
+                  "ref": "XlJeX",
                   "name": "Password Field",
                   "descendants": {
-                    "KdIhN/U7fHr": {
+                    "uZ0iI/U7fHr": {
                       "content": "Password"
                     },
-                    "Fi1oJ/JdccD": {
-                      "content": "••••••"
+                    "A4C0y": {
+                      "stroke": "$danger",
+                      "strokeWidth": 1.5
                     },
-                    "Fi1oJ/jKPiP": {
-                      "icon": "eye-off"
+                    "A4C0y/JdccD": {
+                      "content": "••••••",
+                      "fill": "$text"
                     },
-                    "roAUW": {
+                    "a6sHS": {
+                      "enabled": false
+                    },
+                    "DtwPu": {
+                      "enabled": true
+                    },
+                    "DtwPu/G0EvJ": {
                       "content": "Password is too weak. Use at least 8 characters and add a number or symbol."
                     }
                   }
@@ -4457,8 +4342,8 @@
     {
       "type": "frame",
       "id": "kK0Pv",
-      "x": 0,
-      "y": 3240,
+      "x": 9360,
+      "y": 0,
       "name": "State — User Menu & Sign Out",
       "clip": true,
       "width": 1440,
@@ -4541,7 +4426,7 @@
               "gap": 1,
               "padding": [
                 8,
-                10
+                9
               ],
               "children": [
                 {
@@ -4573,83 +4458,69 @@
               "name": "Divider"
             },
             {
-              "id": "r5h5ek",
+              "id": "CVgHR",
               "type": "ref",
-              "ref": "v0iyTf",
-              "name": "Profile settings Item"
+              "ref": "ZsXwz",
+              "name": "Profile settings Item",
+              "fill": "$bg",
+              "descendants": {
+                "sctil": {
+                  "icon": "user"
+                },
+                "mAcu3": {
+                  "content": "Profile settings"
+                }
+              }
             },
             {
-              "id": "RSiUu",
+              "id": "bXawo",
               "type": "ref",
-              "ref": "v0iyTf",
+              "ref": "ZsXwz",
               "name": "Preferences Item",
               "descendants": {
-                "rCNuo": {
+                "sctil": {
                   "icon": "sliders-horizontal"
                 },
-                "Pmzuc": {
+                "mAcu3": {
                   "content": "Preferences"
                 }
               }
             },
             {
-              "id": "H1Cho2",
+              "id": "maGH3",
               "type": "ref",
-              "ref": "v0iyTf",
+              "ref": "ZsXwz",
               "name": "Keyboard shortcuts Item",
               "descendants": {
-                "rCNuo": {
+                "sctil": {
                   "icon": "command"
                 },
-                "Pmzuc": {
+                "mAcu3": {
                   "content": "Keyboard shortcuts"
                 }
               }
             },
             {
-              "type": "rectangle",
-              "id": "opxyn",
-              "name": "Divider 2",
-              "fill": "$border",
-              "width": "fill_container",
-              "height": 1
+              "id": "tPGQd",
+              "type": "ref",
+              "ref": "hAjWQ",
+              "name": "Divider"
             },
             {
-              "type": "frame",
-              "id": "aSd1v",
+              "id": "orkKb",
+              "type": "ref",
+              "ref": "ZsXwz",
               "name": "Sign Out Item",
-              "width": "fill_container",
-              "cornerRadius": 7,
-              "gap": 10,
-              "padding": [
-                8,
-                10
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon",
-                  "id": "XJbaK",
-                  "name": "Icon",
-                  "width": 16,
-                  "height": 16,
+              "descendants": {
+                "sctil": {
                   "icon": "log-out",
-                  "library": "lucide",
                   "fill": "$danger"
                 },
-                {
-                  "type": "text",
-                  "id": "d8SWA1",
-                  "name": "Label",
-                  "fill": "$danger",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
+                "mAcu3": {
                   "content": "Sign out",
-                  "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "500"
+                  "fill": "$danger"
                 }
-              ]
+              }
             }
           ]
         }
@@ -4713,60 +4584,54 @@
               "gap": 16,
               "children": [
                 {
-                  "id": "K1qNeh",
+                  "id": "TN5fn",
                   "type": "ref",
                   "ref": "pOTNB",
                   "name": "Email Field",
                   "descendants": {
+                    "gklV8/U7fHr": {
+                      "content": "Email"
+                    },
                     "kJj8j": {
                       "stroke": "$danger",
                       "strokeWidth": 1.5
+                    },
+                    "kJj8j/w35lb7": {
+                      "content": "mara@reyes.studio",
+                      "fill": "$text"
                     }
                   }
                 },
                 {
-                  "type": "frame",
-                  "id": "v9s0YF",
+                  "id": "rR8et",
+                  "type": "ref",
+                  "ref": "XlJeX",
                   "name": "Password Field",
-                  "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 6,
-                  "children": [
-                    {
-                      "id": "Cv46J",
-                      "type": "ref",
-                      "ref": "t9aVk",
-                      "name": "Label Row"
+                  "descendants": {
+                    "uZ0iI/U7fHr": {
+                      "content": "Password"
                     },
-                    {
-                      "id": "LI9MD",
-                      "type": "ref",
-                      "ref": "J0Agjj",
-                      "name": "Input",
+                    "uZ0iI/lBV1g": {
+                      "enabled": true
+                    },
+                    "A4C0y": {
                       "stroke": "$danger",
-                      "strokeWidth": 1.5,
-                      "descendants": {
-                        "JdccD": {
-                          "content": "••••••••••",
-                          "fill": "$text"
-                        },
-                        "jKPiP": {
-                          "icon": "eye-off"
-                        }
-                      }
+                      "strokeWidth": 1.5
                     },
-                    {
-                      "id": "MAk87",
-                      "type": "ref",
-                      "ref": "Mu29L",
-                      "name": "Error Row",
-                      "descendants": {
-                        "G0EvJ": {
-                          "content": "Email or password is incorrect."
-                        }
-                      }
+                    "A4C0y/JdccD": {
+                      "content": "••••••••••",
+                      "fill": "$text"
+                    },
+                    "a6sHS": {
+                      "enabled": false
+                    },
+                    "DtwPu": {
+                      "enabled": true
+                    },
+                    "DtwPu/G0EvJ": {
+                      "content": "Email or password is incorrect."
                     }
-                  ]
+                  }
                 }
               ]
             },
@@ -4789,7 +4654,7 @@
     {
       "type": "frame",
       "id": "zOXuX",
-      "x": 1560,
+      "x": 0,
       "y": 3240,
       "name": "Auth — Forgot Password",
       "clip": true,
@@ -4883,7 +4748,7 @@
     {
       "type": "frame",
       "id": "XHrRW",
-      "x": 3120,
+      "x": 1560,
       "y": 3240,
       "name": "Auth — Reset Link Sent",
       "clip": true,
@@ -4992,7 +4857,7 @@
     {
       "type": "frame",
       "id": "yZzKh",
-      "x": 4680,
+      "x": 3120,
       "y": 3240,
       "name": "Auth — Set New Password",
       "clip": true,
@@ -5076,7 +4941,7 @@
     {
       "type": "frame",
       "id": "zkk4Y",
-      "x": 6240,
+      "x": 4680,
       "y": 3240,
       "name": "Auth — Set New Password Expired Link",
       "clip": true,
@@ -5117,70 +4982,39 @@
               "name": "Brand"
             },
             {
+              "type": "frame",
+              "id": "jxymS",
+              "name": "Status Badge",
+              "width": 48,
+              "height": 48,
+              "fill": "$danger-soft",
+              "cornerRadius": 24,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "PLGpo",
+                  "name": "Badge Icon",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "clock-alert",
+                  "library": "lucide",
+                  "fill": "$danger"
+                }
+              ]
+            },
+            {
               "id": "MSghT",
               "type": "ref",
               "ref": "LWmIx",
               "name": "Header",
               "descendants": {
                 "W4fEUA": {
-                  "content": "Set a new password"
+                  "content": "This link has expired"
                 },
                 "v7rzs": {
-                  "content": "Choose a new password for mara@reyes.studio."
-                }
-              }
-            },
-            {
-              "type": "frame",
-              "id": "kSUnt",
-              "name": "Error Banner",
-              "width": "fill_container",
-              "fill": "$danger-soft",
-              "cornerRadius": 8,
-              "stroke": "$danger",
-              "strokeWidth": 1,
-              "gap": 8,
-              "padding": [
-                10,
-                12
-              ],
-              "children": [
-                {
-                  "type": "icon",
-                  "id": "xtKZQ",
-                  "name": "Alert Icon",
-                  "width": 16,
-                  "height": 16,
-                  "icon": "circle-alert",
-                  "library": "lucide",
-                  "fill": "$danger"
-                },
-                {
-                  "type": "text",
-                  "id": "WJDYJ",
-                  "name": "Banner Text",
-                  "fill": "$danger",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "This reset link has expired. Request a new link to continue.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                }
-              ]
-            },
-            {
-              "id": "M8pc1V",
-              "type": "ref",
-              "ref": "Bo1Ci",
-              "name": "Form",
-              "descendants": {
-                "w8BDpA/A4C0y": {
-                  "fill": "$bg"
-                },
-                "gI7Aj/kJj8j": {
-                  "fill": "$bg"
+                  "content": "Reset links are valid for 30 minutes. Request a new one and we'll email it to mara@reyes.studio."
                 }
               }
             },
@@ -5312,87 +5146,38 @@
                       "gap": 18,
                       "children": [
                         {
-                          "type": "frame",
-                          "id": "dMzQh",
+                          "id": "Cv2FX",
+                          "type": "ref",
+                          "ref": "pOTNB",
                           "name": "Full name Field",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 6,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "p3gGs",
-                              "name": "Label",
-                              "fill": "$muted",
-                              "content": "Full name",
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "500"
+                          "descendants": {
+                            "gklV8/U7fHr": {
+                              "content": "Full name"
                             },
-                            {
-                              "id": "PfBMa",
-                              "type": "ref",
-                              "ref": "t0jtn",
-                              "name": "Input",
-                              "descendants": {
-                                "w35lb7": {
-                                  "content": "Mara Reyes",
-                                  "fill": "$text"
-                                }
-                              }
+                            "kJj8j/w35lb7": {
+                              "content": "Mara Reyes",
+                              "fill": "$text"
                             }
-                          ]
+                          }
                         },
                         {
-                          "type": "frame",
-                          "id": "INVw1",
+                          "id": "AbgyX",
+                          "type": "ref",
+                          "ref": "pOTNB",
                           "name": "Email Field",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 6,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "dwb2W",
-                              "name": "Label",
-                              "fill": "$muted",
-                              "content": "Email",
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "500"
+                          "descendants": {
+                            "gklV8/U7fHr": {
+                              "content": "Email"
                             },
-                            {
-                              "id": "nfdAC",
-                              "type": "ref",
-                              "ref": "t0jtn",
-                              "name": "Input",
-                              "flipX": false,
-                              "flipY": false,
-                              "width": "fill_container",
-                              "height": 42,
-                              "x": 0,
-                              "y": 21,
-                              "descendants": {
-                                "w35lb7": {
-                                  "content": "mara@reyes.studio",
-                                  "fill": "$text"
-                                }
-                              }
+                            "kJj8j/w35lb7": {
+                              "content": "mara@reyes.studio",
+                              "fill": "$text"
                             },
-                            {
-                              "type": "text",
-                              "id": "Pc6Ex",
-                              "name": "Hint",
-                              "fill": "$faint",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Changing your email requires confirming the new address.",
-                              "lineHeight": 1.45,
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "normal"
+                            "DCL8r": {
+                              "enabled": true,
+                              "content": "Changing your email requires confirming the new address."
                             }
-                          ]
+                          }
                         },
                         {
                           "type": "frame",
@@ -5441,30 +5226,15 @@
                               ]
                             },
                             {
-                              "type": "frame",
-                              "id": "uRNpL",
+                              "id": "YDcRf",
+                              "type": "ref",
+                              "ref": "Gse5R",
                               "name": "Change Password Button",
-                              "fill": "$surface",
-                              "cornerRadius": 8,
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "padding": [
-                                9,
-                                14
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "rBiz8",
-                                  "name": "Change Password Label",
-                                  "fill": "$text",
-                                  "content": "Change password",
-                                  "fontFamily": "$font",
-                                  "fontSize": 13,
-                                  "fontWeight": "500"
+                              "descendants": {
+                                "m7YXz": {
+                                  "content": "Change password"
                                 }
-                              ]
+                              }
                             }
                           ]
                         }
@@ -5621,22 +5391,38 @@
                           "gap": 16,
                           "children": [
                             {
-                              "id": "LbXIk",
+                              "id": "HqbBb",
                               "type": "ref",
                               "ref": "FWpoq",
-                              "name": "Start of the work day Field"
+                              "name": "Start of the work day Field",
+                              "descendants": {
+                                "Au9vx/U7fHr": {
+                                  "content": "Start of the work day"
+                                },
+                                "B28riJ/kEdv1": {
+                                  "icon": "clock"
+                                },
+                                "B28riJ/jEomn": {
+                                  "content": "9:00 AM",
+                                  "fill": "$text"
+                                }
+                              }
                             },
                             {
-                              "id": "Wn2Gh",
+                              "id": "civEi",
                               "type": "ref",
                               "ref": "FWpoq",
                               "name": "End of the work day Field",
                               "descendants": {
-                                "pEiQO": {
+                                "Au9vx/U7fHr": {
                                   "content": "End of the work day"
                                 },
-                                "O7OyeF/JdccD": {
-                                  "content": "5:30 PM"
+                                "B28riJ/kEdv1": {
+                                  "icon": "clock"
+                                },
+                                "B28riJ/jEomn": {
+                                  "content": "5:30 PM",
+                                  "fill": "$text"
                                 }
                               }
                             }
@@ -5644,153 +5430,116 @@
                         },
                         {
                           "type": "frame",
-                          "id": "nQH0k",
-                          "name": "Default reminder time Field",
+                          "id": "OBD73",
+                          "name": "Reminder Row",
                           "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 6,
+                          "gap": 16,
                           "children": [
                             {
-                              "type": "text",
-                              "id": "rel8J",
-                              "name": "Label",
-                              "fill": "$muted",
-                              "content": "Default reminder time",
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "500"
+                              "id": "d42p5O",
+                              "type": "ref",
+                              "ref": "FWpoq",
+                              "name": "Default reminder Field",
+                              "descendants": {
+                                "Au9vx/U7fHr": {
+                                  "content": "Default reminder"
+                                },
+                                "B28riJ/kEdv1": {
+                                  "icon": "bell"
+                                },
+                                "B28riJ/jEomn": {
+                                  "content": "15 minutes before due time",
+                                  "fill": "$text"
+                                },
+                                "kcyeN": {
+                                  "enabled": true,
+                                  "content": "Applied to new tasks that have a due time."
+                                }
+                              }
                             },
                             {
                               "type": "frame",
-                              "id": "RZ3O5",
-                              "name": "Select",
-                              "width": 340,
-                              "height": 42,
-                              "fill": "$surface",
-                              "cornerRadius": 8,
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "gap": 8,
-                              "padding": [
-                                0,
-                                12
-                              ],
-                              "alignItems": "center",
+                              "id": "A4bSfY",
+                              "name": "Week Starts On Field",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 6,
                               "children": [
                                 {
-                                  "type": "text",
-                                  "id": "OAk4v",
-                                  "name": "Value",
-                                  "fill": "$text",
-                                  "textGrowth": "fixed-width",
-                                  "width": "fill_container",
-                                  "content": "15 minutes before due time",
-                                  "fontFamily": "$font",
-                                  "fontSize": 14,
-                                  "fontWeight": "normal"
+                                  "id": "yICbm",
+                                  "type": "ref",
+                                  "ref": "FXRDe",
+                                  "name": "Label Row",
+                                  "descendants": {
+                                    "U7fHr": {
+                                      "content": "Week starts on"
+                                    }
+                                  }
                                 },
                                 {
-                                  "type": "icon",
-                                  "id": "f60W4h",
-                                  "name": "Chevron Icon",
-                                  "width": 16,
-                                  "height": 16,
-                                  "icon": "chevron-down",
-                                  "library": "lucide",
-                                  "fill": "$faint"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "text",
-                              "id": "IlfLk",
-                              "name": "Hint",
-                              "fill": "$faint",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Applied to new tasks that have a due time.",
-                              "lineHeight": 1.45,
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "A4bSfY",
-                          "name": "Week Starts On Field",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 6,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "C2Jz2B",
-                              "name": "Label",
-                              "fill": "$muted",
-                              "content": "Week starts on",
-                              "fontFamily": "$font",
-                              "fontSize": 12,
-                              "fontWeight": "500"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "D3slK",
-                              "name": "Segmented Control",
-                              "fill": "$bg",
-                              "cornerRadius": 9,
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "gap": 2,
-                              "padding": 4,
-                              "children": [
-                                {
                                   "type": "frame",
-                                  "id": "nH97z",
-                                  "name": "Monday Option",
-                                  "fill": "$surface",
-                                  "cornerRadius": 7,
+                                  "id": "D3slK",
+                                  "name": "Segmented Control",
+                                  "width": "fill_container",
+                                  "fill": "$bg",
+                                  "cornerRadius": 9,
                                   "stroke": "$border",
                                   "strokeWidth": 1,
-                                  "padding": [
-                                    8,
-                                    18
-                                  ],
-                                  "alignItems": "center",
+                                  "gap": 2,
+                                  "padding": 4,
                                   "children": [
                                     {
-                                      "type": "text",
-                                      "id": "ZCaWq",
-                                      "name": "Label",
-                                      "fill": "$text",
-                                      "content": "Monday",
-                                      "fontFamily": "$font",
-                                      "fontSize": 13,
-                                      "fontWeight": "600"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "Z0EVB",
-                                  "name": "Sunday Option",
-                                  "cornerRadius": 7,
-                                  "padding": [
-                                    8,
-                                    18
-                                  ],
-                                  "alignItems": "center",
-                                  "children": [
+                                      "type": "frame",
+                                      "id": "nH97z",
+                                      "name": "Monday Option",
+                                      "width": "fill_container",
+                                      "fill": "$surface",
+                                      "cornerRadius": 7,
+                                      "stroke": "$border",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        8,
+                                        18
+                                      ],
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "ZCaWq",
+                                          "name": "Label",
+                                          "fill": "$text",
+                                          "content": "Monday",
+                                          "fontFamily": "$font",
+                                          "fontSize": 13,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
                                     {
-                                      "type": "text",
-                                      "id": "TFwxP",
-                                      "name": "Label",
-                                      "fill": "$muted",
-                                      "content": "Sunday",
-                                      "fontFamily": "$font",
-                                      "fontSize": 13,
-                                      "fontWeight": "normal"
+                                      "type": "frame",
+                                      "id": "Z0EVB",
+                                      "name": "Sunday Option",
+                                      "width": "fill_container",
+                                      "cornerRadius": 7,
+                                      "padding": [
+                                        8,
+                                        18
+                                      ],
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "TFwxP",
+                                          "name": "Label",
+                                          "fill": "$muted",
+                                          "content": "Sunday",
+                                          "fontFamily": "$font",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
                                     }
                                   ]
                                 }
@@ -5989,6 +5738,26 @@
                               "name": "Divider"
                             },
                             {
+                              "id": "NhI7L",
+                              "type": "ref",
+                              "ref": "S5S1x",
+                              "name": "Open task details Row",
+                              "descendants": {
+                                "ggdis": {
+                                  "content": "Open task details"
+                                },
+                                "wl1am/v4EsK": {
+                                  "content": "Enter"
+                                }
+                              }
+                            },
+                            {
+                              "id": "H0fkO",
+                              "type": "ref",
+                              "ref": "hAjWQ",
+                              "name": "Divider"
+                            },
+                            {
                               "id": "Zc3Lb",
                               "type": "ref",
                               "ref": "S5S1x",
@@ -5998,7 +5767,7 @@
                                   "content": "Edit task title"
                                 },
                                 "wl1am/v4EsK": {
-                                  "content": "Enter"
+                                  "content": "E"
                                 }
                               }
                             },
@@ -6219,8 +5988,8 @@
     {
       "type": "frame",
       "id": "AUZGD",
-      "x": 1560,
-      "y": 4320,
+      "x": 7800,
+      "y": 1080,
       "name": "State — Add Subtask",
       "clip": true,
       "width": 1440,
@@ -6322,57 +6091,10 @@
                       "gap": 10,
                       "children": [
                         {
-                          "id": "r5Kk0",
+                          "id": "W0WYy",
                           "type": "ref",
-                          "ref": "Wk14C",
-                          "name": "Subtask — Audit current welcome flow"
-                        },
-                        {
-                          "id": "ZpHue",
-                          "type": "ref",
-                          "ref": "Wk14C",
-                          "name": "Subtask — Rewrite step 1 headline",
-                          "descendants": {
-                            "Zjhyj": {
-                              "content": "Rewrite step 1 headline"
-                            }
-                          }
-                        },
-                        {
-                          "id": "M911D1",
-                          "type": "ref",
-                          "ref": "Wk14C",
-                          "name": "Subtask — Simplify empty state copy",
-                          "descendants": {
-                            "Zjhyj": {
-                              "content": "Simplify empty state copy",
-                              "fill": "$text"
-                            }
-                          }
-                        },
-                        {
-                          "id": "ckWXY",
-                          "type": "ref",
-                          "ref": "Wk14C",
-                          "name": "Subtask — Get Daniel's sign-off",
-                          "descendants": {
-                            "Zjhyj": {
-                              "content": "Get Daniel's sign-off",
-                              "fill": "$text"
-                            }
-                          }
-                        },
-                        {
-                          "id": "DqSk7",
-                          "type": "ref",
-                          "ref": "Wk14C",
-                          "name": "Subtask — Hand off to localization",
-                          "descendants": {
-                            "Zjhyj": {
-                              "content": "Hand off to localization",
-                              "fill": "$text"
-                            }
-                          }
+                          "ref": "TQUFK",
+                          "name": "Subtasks"
                         },
                         {
                           "type": "frame",
@@ -6751,7 +6473,7 @@
       "width": 260,
       "fill": "$surface",
       "cornerRadius": 8,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 8,
       "padding": [
@@ -6794,7 +6516,7 @@
       "width": "fill_container(772)",
       "fill": "$surface",
       "cornerRadius": 10,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 10,
       "padding": [
@@ -9302,7 +9024,7 @@
       "height": 42,
       "fill": "$surface",
       "cornerRadius": 8,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 8,
       "padding": [
@@ -9330,13 +9052,13 @@
       "id": "J0Agjj",
       "x": 4386,
       "y": -3076,
-      "name": "Input / With Icon",
+      "name": "Input / Password",
       "reusable": true,
       "width": "fill_container(368)",
       "height": 42,
       "fill": "$surface",
       "cornerRadius": 8,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 8,
       "padding": [
@@ -9352,7 +9074,7 @@
           "fill": "$faint",
           "textGrowth": "fixed-width",
           "width": "fill_container",
-          "content": "••••••••",
+          "content": "Enter your password",
           "fontFamily": "$font",
           "fontSize": 14,
           "fontWeight": "normal"
@@ -9453,7 +9175,7 @@
       "name": "Menu Item",
       "reusable": true,
       "width": "fill_container(204)",
-      "fill": "$bg",
+      "fill": "$transparent",
       "cornerRadius": 6,
       "gap": 9,
       "padding": [
@@ -9482,6 +9204,19 @@
           "content": "Set due date",
           "fontFamily": "$font",
           "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "mpIOp",
+          "x": 0,
+          "y": 0,
+          "name": "Shortcut",
+          "enabled": false,
+          "fill": "$faint",
+          "content": "E",
+          "fontFamily": "$font",
+          "fontSize": 11,
           "fontWeight": "normal"
         }
       ]
@@ -9545,32 +9280,6 @@
           "icon": "sun",
           "library": "lucide",
           "fill": "$accent"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "oDo3a",
-      "x": 777,
-      "y": -3304,
-      "name": "Checkbox / Selected",
-      "reusable": true,
-      "width": 19,
-      "height": 19,
-      "fill": "$accent",
-      "cornerRadius": 6,
-      "justifyContent": "center",
-      "alignItems": "center",
-      "children": [
-        {
-          "type": "icon",
-          "id": "JPdpp",
-          "name": "Tick",
-          "width": 12,
-          "height": 12,
-          "icon": "check",
-          "library": "lucide",
-          "fill": "$on-accent"
         }
       ]
     },
@@ -9660,6 +9369,19 @@
           "name": "Label",
           "fill": "$muted",
           "content": "Email",
+          "fontFamily": "$font",
+          "fontSize": 12,
+          "fontWeight": "500"
+        },
+        {
+          "type": "text",
+          "id": "lBV1g",
+          "x": 0,
+          "y": 0,
+          "name": "Aux Link",
+          "enabled": false,
+          "fill": "$accent",
+          "content": "Forgot password?",
           "fontFamily": "$font",
           "fontSize": 12,
           "fontWeight": "500"
@@ -9764,7 +9486,7 @@
       "id": "pOTNB",
       "x": 3352,
       "y": -2819,
-      "name": "Form Field",
+      "name": "Form Field / Text",
       "reusable": true,
       "width": "fill_container(368)",
       "layout": "vertical",
@@ -9781,6 +9503,29 @@
           "type": "ref",
           "ref": "t0jtn",
           "name": "Input"
+        },
+        {
+          "type": "text",
+          "id": "DCL8r",
+          "x": 0,
+          "y": 0,
+          "name": "Hint",
+          "enabled": false,
+          "fill": "$faint",
+          "textGrowth": "fixed-width",
+          "width": "fill_container(0)",
+          "content": "Hint text",
+          "lineHeight": 1.45,
+          "fontFamily": "$font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "id": "jc8wO",
+          "type": "ref",
+          "ref": "Mu29L",
+          "name": "Error Row",
+          "enabled": false
         }
       ]
     },
@@ -9789,7 +9534,7 @@
       "id": "XlJeX",
       "x": 3328,
       "y": -2676,
-      "name": "Form Field / With Hint",
+      "name": "Form Field / Password",
       "reusable": true,
       "width": "fill_container(368)",
       "layout": "vertical",
@@ -9810,7 +9555,12 @@
           "id": "A4C0y",
           "type": "ref",
           "ref": "J0Agjj",
-          "name": "Input"
+          "name": "Input",
+          "descendants": {
+            "JdccD": {
+              "content": "Create a password"
+            }
+          }
         },
         {
           "type": "text",
@@ -9824,6 +9574,13 @@
           "fontFamily": "$font",
           "fontSize": 12,
           "fontWeight": "normal"
+        },
+        {
+          "id": "DtwPu",
+          "type": "ref",
+          "ref": "Mu29L",
+          "name": "Error Row",
+          "enabled": false
         }
       ]
     },
@@ -10562,13 +10319,14 @@
       "name": "Input / Select",
       "reusable": true,
       "width": "fill_container(472)",
+      "height": 42,
       "fill": "$surface",
       "cornerRadius": 8,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 8,
       "padding": [
-        10,
+        0,
         12
       ],
       "alignItems": "center",
@@ -10577,8 +10335,8 @@
           "type": "icon",
           "id": "kEdv1",
           "name": "Input Icon",
-          "width": 15,
-          "height": 15,
+          "width": 16,
+          "height": 16,
           "icon": "calendar",
           "library": "lucide",
           "fill": "$faint"
@@ -10590,17 +10348,17 @@
           "fill": "$text",
           "textGrowth": "fixed-width",
           "width": "fill_container",
-          "content": "March 12, 2025 · 9:00 AM",
+          "content": "Thu, March 14 · 9:00 AM",
           "fontFamily": "$font",
-          "fontSize": 13.5,
-          "fontWeight": "500"
+          "fontSize": 14,
+          "fontWeight": "normal"
         },
         {
           "type": "icon",
           "id": "V1Omcc",
           "name": "Trailing Icon",
-          "width": 15,
-          "height": 15,
+          "width": 16,
+          "height": 16,
           "icon": "chevron-down",
           "library": "lucide",
           "fill": "$faint"
@@ -11102,7 +10860,6 @@
       "y": -2676,
       "name": "Task Row / State",
       "reusable": true,
-      "opacity": 0.75,
       "width": "fill_container(772)",
       "fill": "$transparent",
       "stroke": "$border",
@@ -11176,62 +10933,6 @@
     },
     {
       "type": "frame",
-      "id": "AOMYp",
-      "x": 3343,
-      "y": -3400,
-      "name": "Label Row",
-      "reusable": true,
-      "width": "fill_container(472)",
-      "gap": 6,
-      "alignItems": "center",
-      "children": [
-        {
-          "type": "text",
-          "id": "Zjo0h",
-          "name": "Label",
-          "fill": "$muted",
-          "content": "Due date",
-          "fontFamily": "$font",
-          "fontSize": 12.5,
-          "fontWeight": "600"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "t9aVk",
-      "x": 2915,
-      "y": -3400,
-      "name": "Label Row / 2",
-      "reusable": true,
-      "width": "fill_container(368)",
-      "justifyContent": "space_between",
-      "alignItems": "center",
-      "children": [
-        {
-          "type": "text",
-          "id": "r1pXZ",
-          "name": "Label",
-          "fill": "$muted",
-          "content": "Password",
-          "fontFamily": "$font",
-          "fontSize": 12,
-          "fontWeight": "500"
-        },
-        {
-          "type": "text",
-          "id": "aspYR",
-          "name": "Aux Link",
-          "fill": "$accent",
-          "content": "Forgot password?",
-          "fontFamily": "$font",
-          "fontSize": 12,
-          "fontWeight": "500"
-        }
-      ]
-    },
-    {
-      "type": "frame",
       "id": "Mu29L",
       "x": 0,
       "y": -3192,
@@ -11241,14 +10942,27 @@
       "gap": 6,
       "children": [
         {
-          "type": "icon",
-          "id": "TRPOF",
-          "name": "Error Icon",
-          "width": 14,
-          "height": 14,
-          "icon": "circle-alert",
-          "library": "lucide",
-          "fill": "$danger"
+          "type": "frame",
+          "id": "d3bPq",
+          "name": "Icon Wrap",
+          "padding": [
+            2,
+            0,
+            0,
+            0
+          ],
+          "children": [
+            {
+              "type": "icon",
+              "id": "TRPOF",
+              "name": "Error Icon",
+              "width": 14,
+              "height": 14,
+              "icon": "circle-alert",
+              "library": "lucide",
+              "fill": "$danger"
+            }
+          ]
         },
         {
           "type": "text",
@@ -11257,43 +10971,11 @@
           "fill": "$danger",
           "textGrowth": "fixed-width",
           "width": "fill_container",
-          "content": "This email is already in use. Sign in instead or reset your password.",
+          "content": "Something went wrong. Please try again.",
           "lineHeight": 1.45,
           "fontFamily": "$font",
           "fontSize": 12,
           "fontWeight": "normal"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "nYAPZ",
-      "x": 1388,
-      "y": -3400,
-      "name": "Error Row / 2",
-      "reusable": true,
-      "gap": 6,
-      "alignItems": "center",
-      "children": [
-        {
-          "type": "icon",
-          "id": "Vkldj",
-          "name": "Error Icon",
-          "width": 13,
-          "height": 13,
-          "icon": "circle-alert",
-          "library": "lucide",
-          "fill": "$danger"
-        },
-        {
-          "type": "text",
-          "id": "Xodxr",
-          "name": "Error Text",
-          "fill": "$danger",
-          "content": "Task name can't be empty",
-          "fontFamily": "$font",
-          "fontSize": 12,
-          "fontWeight": "500"
         }
       ]
     },
@@ -11370,131 +11052,62 @@
     },
     {
       "type": "frame",
-      "id": "frNx7",
-      "x": 1264,
-      "y": -3304,
-      "name": "Key Group / 2",
-      "reusable": true,
-      "gap": 4,
-      "alignItems": "center",
-      "children": [
-        {
-          "id": "x4ApE",
-          "type": "ref",
-          "ref": "C5ddfm",
-          "name": "Keycap Space",
-          "descendants": {
-            "v4EsK": {
-              "content": "Space"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "FuXFY",
-      "x": 3756,
-      "y": -2676,
-      "name": "Email Field",
-      "reusable": true,
-      "width": "fill_container(368)",
-      "layout": "vertical",
-      "gap": 6,
-      "children": [
-        {
-          "id": "KdIhN",
-          "type": "ref",
-          "ref": "FXRDe",
-          "name": "Label Row"
-        },
-        {
-          "id": "Fi1oJ",
-          "type": "ref",
-          "ref": "J0Agjj",
-          "name": "Input",
-          "stroke": "$danger",
-          "strokeWidth": 1.5,
-          "descendants": {
-            "JdccD": {
-              "content": "mara@reyes.studio",
-              "fill": "$text"
-            },
-            "jKPiP": {
-              "fill": "$danger",
-              "icon": "circle-alert"
-            }
-          }
-        },
-        {
-          "type": "frame",
-          "id": "nFDpQ",
-          "name": "Error Row",
-          "width": "fill_container",
-          "gap": 6,
-          "children": [
-            {
-              "type": "icon",
-              "id": "l5CvP",
-              "name": "Error Icon",
-              "width": 14,
-              "height": 14,
-              "icon": "circle-alert",
-              "library": "lucide",
-              "fill": "$danger"
-            },
-            {
-              "type": "text",
-              "id": "roAUW",
-              "name": "Error Text",
-              "fill": "$danger",
-              "textGrowth": "fixed-width",
-              "width": "fill_container",
-              "content": "This email is already in use. Sign in instead or reset your password.",
-              "lineHeight": 1.45,
-              "fontFamily": "$font",
-              "fontSize": 12,
-              "fontWeight": "normal"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "frame",
       "id": "FWpoq",
       "x": 2968,
       "y": -2819,
-      "name": "Start of the work day Field",
+      "name": "Form Field / Select",
       "reusable": true,
       "width": "fill_container(324)",
       "layout": "vertical",
       "gap": 6,
       "children": [
         {
-          "type": "text",
-          "id": "pEiQO",
-          "name": "Label",
-          "fill": "$muted",
-          "content": "Start of the work day",
-          "fontFamily": "$font",
-          "fontSize": 12,
-          "fontWeight": "500"
-        },
-        {
-          "id": "O7OyeF",
+          "id": "Au9vx",
           "type": "ref",
-          "ref": "J0Agjj",
-          "name": "Select",
+          "ref": "FXRDe",
+          "name": "Label Row",
           "descendants": {
-            "JdccD": {
-              "content": "9:00 AM",
-              "fill": "$text"
-            },
-            "jKPiP": {
-              "icon": "chevron-down"
+            "U7fHr": {
+              "content": "Start of the work day"
             }
           }
+        },
+        {
+          "id": "B28riJ",
+          "type": "ref",
+          "ref": "BGWVc",
+          "name": "Select",
+          "descendants": {
+            "kEdv1": {
+              "icon": "clock"
+            },
+            "jEomn": {
+              "content": "9:00 AM"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "kcyeN",
+          "x": 0,
+          "y": 0,
+          "name": "Hint",
+          "enabled": false,
+          "fill": "$faint",
+          "textGrowth": "fixed-width",
+          "width": "fill_container(0)",
+          "content": "Hint text",
+          "lineHeight": 1.45,
+          "fontFamily": "$font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "id": "L0cBSM",
+          "type": "ref",
+          "ref": "Mu29L",
+          "name": "Error Row",
+          "enabled": false
         }
       ]
     },
@@ -11509,7 +11122,7 @@
       "width": "fill_container(772)",
       "fill": "$surface",
       "cornerRadius": 10,
-      "stroke": "$border",
+      "stroke": "$border-strong",
       "strokeWidth": 1,
       "gap": 10,
       "padding": [
@@ -11557,7 +11170,7 @@
       "id": "KUWLJ",
       "x": 4405,
       "y": -3192,
-      "name": "Empty State Actions",
+      "name": "Button / Solid Small With Icon",
       "reusable": true,
       "fill": "$accent",
       "cornerRadius": 8,
@@ -11587,47 +11200,6 @@
           "fontFamily": "$font",
           "fontSize": 13,
           "fontWeight": "600"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "v0iyTf",
-      "x": 4420,
-      "y": -3304,
-      "name": "Settings Nav Item",
-      "reusable": true,
-      "width": "fill_container(224)",
-      "fill": "$bg",
-      "cornerRadius": 7,
-      "gap": 10,
-      "padding": [
-        8,
-        10
-      ],
-      "alignItems": "center",
-      "children": [
-        {
-          "type": "icon",
-          "id": "rCNuo",
-          "name": "Icon",
-          "width": 16,
-          "height": 16,
-          "icon": "user",
-          "library": "lucide",
-          "fill": "$muted"
-        },
-        {
-          "type": "text",
-          "id": "Pmzuc",
-          "name": "Label",
-          "fill": "$text",
-          "textGrowth": "fixed-width",
-          "width": "fill_container",
-          "content": "Profile settings",
-          "fontFamily": "$font",
-          "fontSize": 13,
-          "fontWeight": "normal"
         }
       ]
     },
@@ -11876,7 +11448,7 @@
       "gap": 16,
       "children": [
         {
-          "id": "w8BDpA",
+          "id": "w2FETl",
           "type": "ref",
           "ref": "XlJeX",
           "name": "New password Field",
@@ -11885,21 +11457,24 @@
               "content": "New password"
             },
             "A4C0y/JdccD": {
-              "content": "••••••••"
+              "content": "Enter a new password"
             }
           }
         },
         {
-          "id": "gI7Aj",
+          "id": "Xav5y",
           "type": "ref",
-          "ref": "pOTNB",
+          "ref": "XlJeX",
           "name": "Confirm new password Field",
           "descendants": {
-            "gklV8/U7fHr": {
+            "uZ0iI/U7fHr": {
               "content": "Confirm new password"
             },
-            "kJj8j/w35lb7": {
-              "content": "••••••••"
+            "A4C0y/JdccD": {
+              "content": "Re-enter the new password"
+            },
+            "a6sHS": {
+              "enabled": false
             }
           }
         }
@@ -12064,222 +11639,6 @@
           "fontFamily": "$font",
           "fontSize": 13,
           "fontWeight": "normal"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "t3ua37",
-      "x": 2504,
-      "y": -2476,
-      "name": "Sidebar Section",
-      "reusable": true,
-      "width": "fill_container(216)",
-      "layout": "vertical",
-      "gap": 2,
-      "children": [
-        {
-          "type": "text",
-          "id": "BJ7zC",
-          "name": "LISTS Header",
-          "fill": "$faint",
-          "content": "LISTS",
-          "fontFamily": "$font",
-          "fontSize": 11,
-          "fontWeight": "600",
-          "letterSpacing": 0.6
-        },
-        {
-          "type": "frame",
-          "id": "p0gQy",
-          "name": "Spacer",
-          "width": "fill_container",
-          "height": 6
-        },
-        {
-          "id": "YFiFz",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Inbox Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "inbox",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Inbox",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "1.2k",
-              "fill": "$faint"
-            }
-          }
-        },
-        {
-          "id": "UEJZ9",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Today Item",
-          "fill": "$accent-soft",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "sun",
-              "fill": "$accent"
-            },
-            "vPmaO": {
-              "content": "Today",
-              "fill": "$accent",
-              "fontWeight": "600"
-            },
-            "QqRtm": {
-              "content": "248",
-              "fill": "$accent"
-            }
-          }
-        },
-        {
-          "id": "n50uXI",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Upcoming Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "calendar-days",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Upcoming",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "3.4k",
-              "fill": "$faint"
-            }
-          }
-        },
-        {
-          "id": "bnVmJ",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Completed Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "circle-check",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Completed",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "12,481",
-              "fill": "$faint"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "OempT",
-      "x": 2780,
-      "y": -2476,
-      "name": "Sidebar Section / 2",
-      "reusable": true,
-      "width": "fill_container(216)",
-      "layout": "vertical",
-      "gap": 2,
-      "children": [
-        {
-          "type": "text",
-          "id": "sszAI",
-          "name": "PROJECTS Header",
-          "fill": "$faint",
-          "content": "PROJECTS",
-          "fontFamily": "$font",
-          "fontSize": 11,
-          "fontWeight": "600",
-          "letterSpacing": 0.6
-        },
-        {
-          "type": "frame",
-          "id": "FdmcX",
-          "name": "Spacer",
-          "width": "fill_container",
-          "height": 6
-        },
-        {
-          "id": "pmg7X",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Website redesign Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "square-dashed",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Website redesign & content system migration",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "96",
-              "fill": "$faint"
-            }
-          }
-        },
-        {
-          "id": "A4SfO",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Q3 planning Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "square-dashed",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Q3 planning",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "41",
-              "fill": "$faint"
-            }
-          }
-        },
-        {
-          "id": "IS8b1",
-          "type": "ref",
-          "ref": "U00jeJ",
-          "name": "Personal Item",
-          "fill": "$transparent",
-          "descendants": {
-            "YJ7gn": {
-              "icon": "square-dashed",
-              "fill": "$muted"
-            },
-            "vPmaO": {
-              "content": "Personal",
-              "fill": "$text",
-              "fontWeight": "normal"
-            },
-            "QqRtm": {
-              "content": "7",
-              "fill": "$faint"
-            }
-          }
         }
       ]
     },
@@ -12727,7 +12086,7 @@
     },
     "muted": {
       "type": "color",
-      "value": "#6F6E69"
+      "value": "#5A5954"
     },
     "faint": {
       "type": "color",
@@ -12767,7 +12126,7 @@
     },
     "border-strong": {
       "type": "color",
-      "value": "#C9C8C2"
+      "value": "#86857F"
     },
     "border-disabled": {
       "type": "color",
@@ -12892,6 +12251,10 @@
     "shadow-xl": {
       "type": "color",
       "value": "#19191740"
+    },
+    "on-accent-disabled": {
+      "type": "color",
+      "value": "#5A7060"
     }
   },
   "fileToken": "55a3fd38-287a-45d9-85e4-09c8713360ec"
