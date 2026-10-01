@@ -1,11 +1,33 @@
 ---
 type: Convention
 title: Building from the design
-description: How to use the design parts an issue claims and their exact values. Part of the chain; read when an issue has a "## Design" section.
+description: How a pen design file is built, and how to use the design parts an issue claims and their exact values. Part of the chain; read when an issue has a "## Design" section, or when refining or decomposing from a design.
 tags: [design, pen, chain]
 ---
 
 # Building from the design
+
+## How a pen file is built
+
+A `.pen` file is JSON: a tree of elements, each with a stable `id` (it never
+changes when the element is edited or moved) and a `name` that says what it is.
+
+- **Top-level children are frames and components.** A frame is a screen or a
+  state of one ("Auth — Sign In Error"); a component (`"reusable": true`) is a
+  shared part ("Form Field / Text", "Menu Item").
+- **A component is used through a `ref`:** `{"type": "ref", "ref": "<component
+  id>"}` stands where the component appears, with its own `id` and any
+  overrides (`descendants`, keyed by id path). Two screens using the Text field
+  hold two refs with different ids, both pointing at one component. Claim the
+  component to build it, and the screen to build the screen.
+- **Variables are tokens:** `"variables"` maps a name to a value; elements refer
+  to them as `$name`. Each has a theme token in `apps/web/src/index.css`, and a
+  test keeps the two equal, so a token change lands with its theme change.
+- **Scripts** (`.github/scripts/`): `design-part.sh <pen> <id>` prints one part
+  with every component resolved in place; `design-diff.sh <old> <new>` lists
+  what changed, element by element; `design-impact.sh` maps those changes to
+  the issues whose claims they touch, through the components each part uses;
+  `design-claims.sh <pen>` lists every frame with the issues claiming it.
 
 An issue names the design parts it builds under "## Design", as
 `<path>.pen#<id>`. Before you start, those parts are extracted for you:
