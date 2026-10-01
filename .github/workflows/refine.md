@@ -32,6 +32,10 @@ on:
         description: "Override the settling period, in hours. 0 considers every issue, however recently edited. For testing the role without waiting a night."
         required: false
         default: ""
+      design_since:
+        description: "A design change sent these issues back: the commit before it, so the refiner sees what changed (back-to-refinement.yml)."
+        required: false
+        default: ""
   # No event triggers. Refinement is batch work over a backlog that changes
   # slowly; an event trigger would re-run the role over unchanged issues.
   # Pre-activation search, so an empty backlog costs no agent time at all.
@@ -211,6 +215,50 @@ pre-agent-steps:
       done | jq -s '.' > "$DIR/refine-neighbours.json"
       echo "neighbours: $(jq -r 'map("#\(.issue): \(.siblings | length) siblings, blocks \(.blocks | length)") | join("; ")' "$DIR/refine-neighbours.json")"
 
+  # The refiner rewrites issues that claim design parts, so it must see them
+  # (#259): before, it imported no design input at all. The design is read
+  # from develop, where it lands; this checkout is main, which has it only
+  # after a release. For each candidate: the claimed parts' JSON with their
+  # components resolved (design-part.sh), the tokens, and, when a design change
+  # sent the issue back (input design_since), what changed inside its claims.
+  # An index of the file's frames and components lets it re-point a claim whose
+  # part was removed.
+  - name: Give the refiner the design its candidates claim
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SINCE: ${{ github.event.inputs.design_since }}
+    run: |
+      set -euo pipefail
+      DIR=/tmp/gh-aw/agent/design; mkdir -p "$DIR"
+      CANDS=/tmp/gh-aw/agent/refine-candidates.json
+      PENS=$(jq -r '.[].body' "$CANDS" | grep -oE '`[^` ]+\.pen#' | tr -d '`#' | sort -u || true)
+      [ -n "$PENS" ] || { echo "no candidate claims design parts"; exit 0; }
+      raw() { gh api -H "Accept: application/vnd.github.raw" "repos/$REPO/contents/$1?ref=$2"; }
+      for PEN in $PENS; do
+        SLUG=$(tr '/' '_' <<<"$PEN")
+        raw "$PEN" develop > "$DIR/$SLUG"
+        jq '.variables // {}' "$DIR/$SLUG" > "$DIR/${SLUG%.pen}.variables.json"
+        jq -r '(.children // [])[] | "\(.id)\t\(.name)\t\(if .reusable then "component" else "frame" end)"' "$DIR/$SLUG" \
+          > "$DIR/${SLUG%.pen}.index.tsv"
+        for N in $(jq -r '.[].number' "$CANDS"); do
+          for ID in $(jq -r --argjson n "$N" '.[] | select(.number == $n) | .body' "$CANDS" \
+                        | { grep -oE "\`$PEN#[A-Za-z0-9_-]+\`" || true; } | sed -E 's/.*#([A-Za-z0-9_-]+)`/\1/' | sort -u); do
+            mkdir -p "$DIR/$N"
+            bash .github/scripts/design-part.sh "$DIR/$SLUG" "$ID" > "$DIR/$N/$ID.json" 2>/dev/null \
+              || { rm -f "$DIR/$N/$ID.json"; echo "$ID" >> "$DIR/$N/removed.txt"; }
+          done
+        done
+        if [ -n "${SINCE:-}" ]; then
+          raw "$PEN" "$SINCE" > "$DIR/old.pen" 2>/dev/null || echo '{"children": []}' > "$DIR/old.pen"
+          jq '[.[] | {number, title, state: "open", body}]' "$CANDS" > "$DIR/cands.json"
+          bash .github/scripts/design-impact.sh "$PEN" "$DIR/old.pen" "$DIR/$SLUG" "$DIR/cands.json" > "$DIR/${SLUG%.pen}.changes.json"
+          rm -f "$DIR/old.pen" "$DIR/cands.json"
+        fi
+      done
+      echo "design for: $(ls -d "$DIR"/[0-9]* 2>/dev/null | xargs -n1 basename | sed 's/^/#/' | tr '\n' ' ')"
+      cat "$DIR"/*/removed.txt 2>/dev/null | sed 's/^/claim no longer in the design: /' || true
+
 tools:
   cli-proxy: true
   github:
@@ -326,6 +374,22 @@ other sub-issues of its epic (number, title, stage labels, the start of "What")
 and the issues it blocks. Use it for "Out of scope": name the nearby work each
 neighbour owns, by number, as `issues.md` ("Boundaries") says. An issue whose
 "Out of scope" names no neighbour it plausibly overlaps is not refined yet.
+
+`/tmp/gh-aw/agent/design/` holds the design for candidates that claim parts
+(`.github/conventions/chain/design.md` says how a pen file is built):
+`<issue>/<id>.json` is each claimed part with its components resolved;
+`<issue>/removed.txt` lists claims whose part no longer exists; `*.index.tsv`
+lists the file's frames and components (id, name, kind); `*.variables.json` is
+its tokens; `*.changes.json`, when present, is what a design change altered
+inside each candidate's claims. An issue describes behaviour and claims parts;
+it does not copy sizes, colours or text from them (`issues.md`, "Design
+claims"). So when the design changed:
+- If the change is only visual, the issue still holds: mark it `refined` and
+  remove any design values it copied.
+- If behaviour changed (a state added or removed, an element gone), rewrite what
+  the issue asks for to match.
+- Re-point a removed claim to the part that replaced it (same name, or found in
+  the index). If none clearly did, ask the author.
 
 **When the run was asked for on an epic,** the candidates are that epic and its
 pieces that are not refined or ready yet. Read the epic first: its goal, sources and "Out

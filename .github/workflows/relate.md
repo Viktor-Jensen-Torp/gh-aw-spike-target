@@ -83,18 +83,25 @@ pre-agent-steps:
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
-      MAX_ISSUES: "60"
+      MAX_ISSUES: "120"
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
-      gh issue list --repo "$REPO" --state open --limit "$MAX_ISSUES" \
+      # Filter first, then cap: capping the listing first let merged and [aw]
+      # issues use up the 60, so older open issues (#111, #55) were never
+      # considered (run 36732579456, #252). Newest first, as before. 120, because
+      # 60 left out the 7 oldest of 67 open issues (2026-10-01); at 1,200
+      # characters an issue that is about 36K tokens.
+      gh issue list --repo "$REPO" --state open --limit 1000 \
         --json number,title,body,labels,createdAt \
         --jq "[ .[]
                 | select([.labels[].name] | any(. == \"agentic-workflows\" or . == \"merged\") | not)
                 | select(.title | startswith(\"[aw]\") | not)
                 | {number, title, labels: [.labels[].name],
                    body: (.body // \"\")[0:1200]} ]" \
+        | jq --argjson max "$MAX_ISSUES" '.[0:$max]' \
         > /tmp/gh-aw/agent/backlog.json
+      echo "backlog: $(jq length /tmp/gh-aw/agent/backlog.json) open issues (cap $MAX_ISSUES)"
 
       # Each existing edge, with who added it (GitHub's timeline records the
       # actor: `github-actions` is this pipeline, anyone else is a person) and

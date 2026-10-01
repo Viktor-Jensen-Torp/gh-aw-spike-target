@@ -114,11 +114,14 @@ check "a story that turns the accessibility check off is a breach" \
 WF="$HERE/../../workflows"
 # A fake gh that prints its arguments one per line, to read what would be sent.
 mkdir -p "$WORK/bin"; printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@"\n' > "$WORK/bin/gh"; chmod +x "$WORK/bin/gh"
-sent() { PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" "$@" | sed -n 's/^aw_context=//p'; }
+sent() { PATH="$WORK/bin:$PATH" REPO=o/r GITHUB_RUN_ID=9 GITHUB_RUN_ATTEMPT=1 GITHUB_WORKFLOW_REF=o/r/.github/workflows/sweeper.yml@refs/heads/main \
+           bash "$SCRIPTS/dispatch.sh" "$@" | sed -n 's/^aw_context=//p'; }
 check "dispatch.sh: a pull request carries its aw_context" \
-  '{"item_type":"pull_request","item_number":"136","event_type":"pull_request","repo":"o/r"}' "$(sent rework.lock.yml pr 136 sha=abc)"
+  '{"item_type":"pull_request","item_number":"136","event_type":"pull_request","repo":"o/r","run_id":"9","run_attempt":"1","workflow_id":"o/r/.github/workflows/sweeper.yml@refs/heads/main"}' "$(sent rework.lock.yml pr 136 sha=abc)"
 check "dispatch.sh: an issue is an issues event" \
-  '{"item_type":"issue","item_number":"7","event_type":"issues","repo":"o/r"}' "$(sent implement.lock.yml issue 7)"
+  '{"item_type":"issue","item_number":"7","event_type":"issues","repo":"o/r","run_id":"9","run_attempt":"1","workflow_id":"o/r/.github/workflows/sweeper.yml@refs/heads/main"}' "$(sent implement.lock.yml issue 7)"
+check "dispatch.sh: carries every field gh-aw requires (#248)" "true" \
+  "$(sent review.lock.yml pr 1 | jq -c 'has("repo") and has("run_id") and has("workflow_id")')"
 check "dispatch.sh: inputs and ref as given" "main pr=136 sha=abc" \
   "$(PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" rework.lock.yml pr 136 sha=abc | grep -E '^(main|pr=|sha=)' | tr '\n' ' ' | sed 's/ $//')"
 REPO=o/r DRY_RUN=1 bash "$SCRIPTS/dispatch.sh" x.lock.yml pr 12a >/dev/null 2>&1
@@ -230,6 +233,42 @@ check "design-part: a descendant with a type replaces the part, resolved too" \
 check "design-part: other instances of the component are untouched" '"Default"' \
   "$(part screen | jq -c '.children[2].children[1].content')"
 part missing >/dev/null 2>&1; check "design-part: an absent id is an error" "nonzero" "$([ $? -ne 0 ] && echo nonzero || echo zero)"
+
+# --- design-impact.sh: which issues a design change touches (#259) -----------------
+# fixtures/design-refs.pen: Screen uses Row (refs) which uses Icon Circle. Change
+# the Icon Circle's glyph: the screen's issue is touched through two components.
+jq '(.. | objects | select(.id? == "glyph") | .icon) = "x"' "$FIX/design-refs.pen" > "$WORK/glyph.pen"
+printf '%s' '[{"number":1,"title":"Screen","state":"open","body":"`d.pen#screen` Screen"},
+  {"number":2,"title":"Icon circle","state":"closed","body":"`d.pen#icon` Icon Circle"},
+  {"number":3,"title":"Other","state":"open","body":"`other.pen#screen` Screen"}]' > "$WORK/claims.json"
+impact() { bash "$SCRIPTS/design-impact.sh" d.pen "$FIX/design-refs.pen" "$1" "$2"; }
+check "design-impact: a component change touches the screen that uses it" "1" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq -r '[.hits[] | select(.state == "open") | .number] | join(",")')"
+check "design-impact: another file's claims are not touched" "false" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq '[.hits[].number] | index(3) != null')"
+check "design-impact: a closed issue whose change an open one covers needs no follow-up" "[]" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq -c '.hits[] | select(.number == 2) | .unowned')"
+printf '%s' '[{"number":2,"title":"Icon circle","state":"closed","body":"`d.pen#icon` Icon Circle"}]' > "$WORK/closed.json"
+check "design-impact: a closed issue alone gets its changed parts as a follow-up" '["changed Glyph"]' \
+  "$(impact "$WORK/glyph.pen" "$WORK/closed.json" | jq -c '.hits[0].unowned')"
+printf '%s' '[]' > "$WORK/none.json"
+check "design-impact: a change no issue claims is uncovered" '[{"name":"Icon Circle","count":1}]' \
+  "$(impact "$WORK/glyph.pen" "$WORK/none.json" | jq -c '.uncovered')"
+
+# --- review-rows.sh with cited lines (#244) -----------------------------------------
+printf 'apps/web/src/components/Menu/Menu.stories.tsx\t215\napps/web/src/features/auth/routes.ts\tabsent\napps/web/src/components/Menu\tdir\n' > "$WORK/cited.tsv"
+printf 'apps/web/src/components/Menu/Menu.stories.tsx\n' > "$WORK/menu-files.txt"
+cited() { rows "$(review "$(row C1 met "none found")" "$(row U1 met "$1")")" "$REQ_COMPONENT" "$WORK/menu-files.txt" "$WORK/cited.tsv" | grep '^U1:'; }
+check "replay #213: a line past the end of the file is refused" "U1: met-cites-a-missing-line" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:260")"
+check "a range inside the file passes"                          "U1: met" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:25-55")"
+check "replay #232: a path that does not exist is refused"      "U1: met-cites-a-missing-line" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:16, apps/web/src/features/auth/routes.ts:50-57")"
+check "a folder holding a changed file passes"                  "U1: met" "$(cited "apps/web/src/components/Menu/")"
+check "without the table nothing is looked up"                  "U1: met" \
+  "$(rows "$(review "$(row C1 met x)" "$(row U1 met "apps/web/src/components/Menu/Menu.stories.tsx:999")")" "$REQ_COMPONENT" "$WORK/menu-files.txt" | grep '^U1:')"
+mkdir -p "$WORK/ws/apps/a"; seq 10 > "$WORK/ws/apps/a/f.ts"
+printf '{"requirements":[{"id":"U1","status":"met","evidence":"apps/a/f.ts:3, apps/a/, apps/b/g.ts"}]}' > "$WORK/cite.json"
+check "cited-lines.sh: lines, folders and absent paths" "$(printf 'apps/a\tdir\napps/a/f.ts\t10\napps/b/g.ts\tabsent')" \
+  "$(ROOT="$WORK/ws" bash "$SCRIPTS/cited-lines.sh" "$WORK/cite.json")"
 
 # --- check-issue.sh: "Out of scope" names its neighbours (#227) --------------------
 body() { # <out-of-scope text, or "-" for no heading> -> a work-item body

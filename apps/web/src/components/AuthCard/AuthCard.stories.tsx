@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within, userEvent } from 'storybook/test';
-import { vi } from 'vitest';
+import { expect, fn, within, userEvent } from 'storybook/test';
 import { AuthCard } from './AuthCard.tsx';
 import { TextField } from '../TextField/TextField.tsx';
 
@@ -103,7 +102,7 @@ export const FormSubmitHandler: Story = {
     footerText: "Don't have an account?",
     footerLinkText: 'Create one',
     footerLinkHref: '/signup',
-    onSubmit: vi.fn((e) => {
+    onSubmit: fn((e) => {
       e.preventDefault();
     }),
     children: (

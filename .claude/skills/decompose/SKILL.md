@@ -30,7 +30,12 @@ For a design file, the ids decide what is new, not your reading:
 with the issues whose claim covers it. `UNCLAIMED` frames are the new work;
 claimed ones are already an issue, open or built. After a design change,
 `bash .github/scripts/design-diff.sh <old.pen> <new.pen>` (the old version from
-`git show <rev>:<path>`) lists exactly which parts changed.
+`git show <rev>:<path>`) lists exactly which parts changed. A change inside a
+built issue's claims already has a draft follow-up, titled "Design changed: …"
+and saying "Follows #N" (`back-to-refinement.yml`). Read those too: they are
+that change's issue, so do not create a second one for it. How a pen file is
+built: `.github/conventions/chain/design.md`. Issues claim parts and do not
+copy their values (`issues.md`, "Design claims").
 
 Done when you can list every behaviour the source asks for, and mark each one
 as already built, already an issue (by number), or new.

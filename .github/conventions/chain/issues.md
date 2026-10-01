@@ -45,6 +45,14 @@ per line, as `` `path#id` `` and the part's name. Carry claims over exactly when
 rewriting: they are how a design change finds the issue. Add or change one only
 when the design moved.
 
+Describe behaviour; do not copy the design's values. Sizes, spacing, colours,
+tokens and exact text belong to the claimed parts, which the implementer gets as
+JSON when it builds (`chain/design.md`). An issue that repeats "19 by 19, radius
+6, `$border-strong`" goes stale with every design tweak; one that says "a task
+checkbox and a subtask checkbox, unchecked and checked" does not. Name a value
+only when the behaviour depends on it ("at most 200 characters"), or when the
+design does not have it.
+
 ## Dependencies
 
 When an issue cannot finish without another, say so under "Details" as a line
