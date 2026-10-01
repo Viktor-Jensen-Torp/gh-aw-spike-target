@@ -24,7 +24,7 @@ function validatePassword(password: string): boolean {
 /** Request body for POST /api/auth/sign-up */
 export const SignUpRequest = z.object({
   fullName: z.string().trim().min(1, 'Full name is required'),
-  email: z.string().trim().toLowerCase().email('Email must be a valid address'),
+  email: z.string().trim().toLowerCase().email('Email is required.'),
   password: z
     .string()
     .min(
@@ -46,8 +46,8 @@ export type SignUpResponse = z.infer<typeof SignUpResponse>;
 
 /** Request body for POST /api/sign-in */
 export const SignInRequest = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(1),
+  email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
+  password: z.string().min(1, 'Enter your password.'),
 });
 export type SignInRequest = z.infer<typeof SignInRequest>;
 

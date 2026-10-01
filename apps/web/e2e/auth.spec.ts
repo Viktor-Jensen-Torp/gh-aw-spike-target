@@ -202,3 +202,61 @@ test('Given I am on the sign-in screen, when I choose "Create one", then I see t
   // Should navigate to sign-up page
   await expect(page).toHaveURL('/sign-up');
 });
+
+test('Given I am on the sign-in screen, when I submit with an empty password, then the password field says "Enter your password."', async ({
+  page,
+}) => {
+  await page.goto('/sign-in');
+
+  // Fill in email but leave password empty
+  await page.getByLabel('Email').fill('test@example.com');
+  // Password field is empty by default
+
+  // Submit
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // Error message should be shown on the password field
+  await expect(page.getByText('Enter your password.')).toBeVisible();
+
+  // Should still be on sign-in page
+  await expect(page).toHaveURL('/sign-in');
+});
+
+test('Given I am on the sign-in screen, when I submit with "mara@reyes", then the email field says "Enter a valid email address."', async ({
+  page,
+}) => {
+  await page.goto('/sign-in');
+
+  // Fill in invalid email
+  await page.getByLabel('Email').fill('mara@reyes');
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+
+  // Submit
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // Error message should be shown on the email field
+  await expect(page.getByText('Enter a valid email address.')).toBeVisible();
+
+  // Should still be on sign-in page
+  await expect(page).toHaveURL('/sign-in');
+});
+
+test('Given I am on the sign-up screen, when I submit with an empty email, then the email field says "Email is required."', async ({
+  page,
+}) => {
+  await page.goto('/sign-up');
+
+  // Fill in other fields but leave email empty
+  await page.getByLabel('Full name').fill('Test User');
+  // Email field is empty by default
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+
+  // Submit
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Error message should be shown on the email field
+  await expect(page.getByText('Email is required.')).toBeVisible();
+
+  // Should still be on sign-up page
+  await expect(page).toHaveURL('/sign-up');
+});
