@@ -3,6 +3,10 @@ emoji: 🛠️
 description: Implements a dispatched issue as a pull request with tests.
 intent: Turn an accepted issue into a reviewable pull request that passes the repository's checks, without a person writing the code.
 
+# Above shared/budget.md's 100: successful implement runs reach 70 AIC (10-70
+# over the last 20 runs, 2026-10-01), so 100 left little room for a real large
+# task; a loop is still cut off at $1.50.
+max-ai-credits: 150
 
 inlined-imports: true
 
