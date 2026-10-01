@@ -62,10 +62,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     // Determine the actual input type (show password if toggled)
     const actualType = isPassword && showPassword ? 'text' : type;
 
-    // Determine which icon to show: password toggle or error icon
-    const showTrailingIcon = isPassword || !!error;
-    const showPasswordToggle = isPassword;
-    const showErrorIcon = !isPassword && !!error;
+    // Determine which icon to show: only password toggle, no error icon inside field
+    const showTrailingIcon = isPassword;
 
     // Determine if field is marked as invalid
     const isInvalid = !!error || !!invalidWithoutError;
@@ -100,7 +98,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             'h-[42px]',
             // Background and border
             'bg-surface',
-            isInvalid ? 'border-1.5 border-danger' : 'border border-border',
+            isInvalid ? 'border border-danger' : 'border border-border-strong',
             // Disabled state
             disabled && 'opacity-50 cursor-not-allowed',
           )}
@@ -132,28 +130,21 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             {...props}
           />
 
-          {/* Trailing icon: password toggle or error icon */}
-          {showTrailingIcon &&
-            (showPasswordToggle ? (
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="flex-shrink-0 text-faint hover:text-text hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent"
-              >
-                {showPassword ? (
-                  <EyeOff size={16} strokeWidth={2} />
-                ) : (
-                  <Eye size={16} strokeWidth={2} />
-                )}
-              </button>
-            ) : (
-              showErrorIcon && (
-                <div className="flex-shrink-0 text-danger">
-                  <CircleAlert size={16} strokeWidth={2} />
-                </div>
-              )
-            ))}
+          {/* Trailing icon: password toggle only, eye icon same color in error state */}
+          {showTrailingIcon && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="flex-shrink-0 text-faint hover:text-text hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent"
+            >
+              {showPassword ? (
+                <EyeOff size={16} strokeWidth={2} />
+              ) : (
+                <Eye size={16} strokeWidth={2} />
+              )}
+            </button>
+          )}
         </div>
 
         {/* Hint or error message below input */}

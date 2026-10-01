@@ -138,7 +138,7 @@ export const WithLabelLink: Story = {
   },
 };
 
-/** A text input field with an error message shown below. The input is invalid and described by the error text. */
+/** A text input field with an error message shown below. The input is invalid and described by the error text. No icon inside the field. */
 export const WithError: Story = {
   args: {
     label: 'Email',
@@ -171,9 +171,11 @@ export const WithError: Story = {
       }
     }
 
-    // Error icon should be visible in the trailing position
-    const errorIcon = canvasElement.querySelector('svg[class*="text-danger"]');
-    await expect(!!errorIcon).toBe(true);
+    // Error icon should appear only below the input in the error row, not inside the field
+    // The input row should not contain any trailing icon
+    const inputRow = input.closest('div[class*="h-\\["]');
+    const trailingButton = inputRow?.querySelector('button');
+    await expect(!trailingButton).toBe(true);
   },
 };
 
@@ -214,7 +216,7 @@ export const WithHintAndError: Story = {
   },
 };
 
-/** A password field with an error message. The input is invalid, with error icon and message shown below. */
+/** A password field with an error message. The input is invalid, with error shown below. The eye icon remains visible and the same colour as without error. */
 export const PasswordWithError: Story = {
   args: {
     label: 'Password',
@@ -235,11 +237,13 @@ export const PasswordWithError: Story = {
     const error = page.getByText('Email or password is incorrect.');
     await expect(error).toBeVisible();
 
-    // The password toggle should still be available (not replaced by error icon)
+    // The password toggle (eye icon) should still be available and same colour as without error
     const passwordToggle = page.getByRole('button', {
       name: 'Show password',
     });
     await expect(passwordToggle).toBeVisible();
+    // Icon should have text-faint class (same colour as without error)
+    await expect(passwordToggle).toHaveClass('text-faint');
   },
 };
 
