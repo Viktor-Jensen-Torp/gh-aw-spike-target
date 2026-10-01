@@ -29,8 +29,14 @@ case "$KIND" in
   *) echo "dispatch.sh: kind must be issue or pr, not '$KIND'" >&2; exit 2 ;;
 esac
 
+# gh-aw keeps aw_context only with repo, run_id and workflow_id present
+# (generate_aw_info.cjs:185, v0.89.21): without them activation logged "Ignoring
+# aw_context", comment memory was skipped and replies lost the thread (#248).
+# They name the dispatching run, as gh-aw's own buildAwContext does; empty when
+# a person runs this from a terminal.
 CONTEXT=$(jq -cn --arg t "$TYPE" --arg n "$N" --arg e "$EVENT" --arg r "$REPO" \
-  '{item_type: $t, item_number: $n, event_type: $e, repo: $r}')
+  --arg run "${GITHUB_RUN_ID:-}" --arg att "${GITHUB_RUN_ATTEMPT:-}" --arg wf "${GITHUB_WORKFLOW_REF:-}" \
+  '{item_type: $t, item_number: $n, event_type: $e, repo: $r, run_id: $run, run_attempt: $att, workflow_id: $wf}')
 ARGS=(workflow run "$WF" --repo "$REPO" --ref main -f "$INPUT=$N" -f "aw_context=$CONTEXT")
 for KV in "$@"; do ARGS+=(-f "$KV"); done
 

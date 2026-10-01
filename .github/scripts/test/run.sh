@@ -114,11 +114,14 @@ check "a story that turns the accessibility check off is a breach" \
 WF="$HERE/../../workflows"
 # A fake gh that prints its arguments one per line, to read what would be sent.
 mkdir -p "$WORK/bin"; printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@"\n' > "$WORK/bin/gh"; chmod +x "$WORK/bin/gh"
-sent() { PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" "$@" | sed -n 's/^aw_context=//p'; }
+sent() { PATH="$WORK/bin:$PATH" REPO=o/r GITHUB_RUN_ID=9 GITHUB_RUN_ATTEMPT=1 GITHUB_WORKFLOW_REF=o/r/.github/workflows/sweeper.yml@refs/heads/main \
+           bash "$SCRIPTS/dispatch.sh" "$@" | sed -n 's/^aw_context=//p'; }
 check "dispatch.sh: a pull request carries its aw_context" \
-  '{"item_type":"pull_request","item_number":"136","event_type":"pull_request","repo":"o/r"}' "$(sent rework.lock.yml pr 136 sha=abc)"
+  '{"item_type":"pull_request","item_number":"136","event_type":"pull_request","repo":"o/r","run_id":"9","run_attempt":"1","workflow_id":"o/r/.github/workflows/sweeper.yml@refs/heads/main"}' "$(sent rework.lock.yml pr 136 sha=abc)"
 check "dispatch.sh: an issue is an issues event" \
-  '{"item_type":"issue","item_number":"7","event_type":"issues","repo":"o/r"}' "$(sent implement.lock.yml issue 7)"
+  '{"item_type":"issue","item_number":"7","event_type":"issues","repo":"o/r","run_id":"9","run_attempt":"1","workflow_id":"o/r/.github/workflows/sweeper.yml@refs/heads/main"}' "$(sent implement.lock.yml issue 7)"
+check "dispatch.sh: carries every field gh-aw requires (#248)" "true" \
+  "$(sent review.lock.yml pr 1 | jq -c 'has("repo") and has("run_id") and has("workflow_id")')"
 check "dispatch.sh: inputs and ref as given" "main pr=136 sha=abc" \
   "$(PATH="$WORK/bin:$PATH" REPO=o/r bash "$SCRIPTS/dispatch.sh" rework.lock.yml pr 136 sha=abc | grep -E '^(main|pr=|sha=)' | tr '\n' ' ' | sed 's/ $//')"
 REPO=o/r DRY_RUN=1 bash "$SCRIPTS/dispatch.sh" x.lock.yml pr 12a >/dev/null 2>&1
