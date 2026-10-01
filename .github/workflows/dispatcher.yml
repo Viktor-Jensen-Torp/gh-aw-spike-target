@@ -30,7 +30,9 @@ name: Dispatcher
 
 on:
   # As soon as something may have become startable or a slot may have freed:
-  # an issue made ready, a link changed, a run finished, a pull request merged.
+  # a pull request merged, a run finished. An issue made ready wakes it through
+  # ready-wake.yml; Implement and Refine wake it themselves when they finish,
+  # because a run started with GITHUB_TOKEN fires no `workflow_run`.
   # The schedule is only a backstop: GitHub delays and drops scheduled runs
   # (the 30-minute sweeper ran at 12:22, 16:37, 19:36 on 2026-09-26).
   workflow_run:

@@ -1,0 +1,40 @@
+name: Ready wake
+
+# Wakes the dispatcher when a person marks an issue `ready`, once they have
+# stopped: a debounce. Each new `ready` cancels the waiting run and starts the
+# minute again, so marking ten issues wakes the dispatcher once, and a label
+# added by mistake and removed within the minute starts nothing (the dispatcher
+# reads the labels as they are when it runs).
+#
+# It starts no work itself, so "no label starts a workflow that does work"
+# holds: the dispatcher still decides what starts. Kept apart from the
+# dispatcher so a cancelled wait can never cut short a dispatcher run.
+#
+# Before this, `ready` started nothing: no workflow listens to labels, and the
+# dispatcher's schedule runs every few hours, not every 30 minutes (2-5 a day,
+# investigate/2026-10-01).
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  actions: write   # dispatch the dispatcher
+
+jobs:
+  wake:
+    if: github.event.label.name == 'ready'
+    # On the job, not the workflow: a run for any other label is skipped before
+    # it joins the group, so it cannot cancel a waiting `ready`.
+    concurrency:
+      group: ready-wake
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for the labelling to stop
+        run: sleep 60
+      - name: Wake the dispatcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh workflow run dispatcher.yml --repo "$REPO" --ref main
