@@ -106,3 +106,73 @@ test('Given the user menu is open, when I hover "Sign out", then only "Sign out"
   // The menu item gets highlighted with bg-bg when hovered (data-[highlighted]:bg-bg)
   await expect(signOutItem).toHaveAttribute('data-highlighted');
 });
+
+test('Given I am signed in, when I open the user menu, then its trigger is announced as expanded', async ({
+  page,
+}) => {
+  // First, sign up
+  await page.goto('/sign-up');
+  const email = `mara${Date.now()}@reyes.studio`;
+  await page.getByLabel('Full name').fill('Mara Reyes');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Should be redirected to the start page and signed in
+  await expect(page).toHaveURL('/');
+
+  // Get the user card button trigger
+  const trigger = page.locator('button[aria-label="Mara Reyes"]');
+
+  // Before opening, aria-expanded should be false
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+  // Open the user card menu
+  await trigger.click();
+
+  // Wait for the menu to open
+  await expect(page.getByRole('menu')).toBeVisible();
+
+  // After opening, aria-expanded should be true (set by Radix)
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+});
+
+test('Given signing out fails, when I choose "Sign out", then I stay on the page and see that signing out failed', async ({
+  page,
+}) => {
+  // First, sign up
+  await page.goto('/sign-up');
+  const email = `mara${Date.now()}@reyes.studio`;
+  await page.getByLabel('Full name').fill('Mara Reyes');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Should be redirected to the start page and signed in
+  await expect(page).toHaveURL('/');
+
+  // Intercept the sign-out request and make it fail
+  await page.route(
+    (url) => url.pathname.includes('sign-out'),
+    (route) => {
+      route.abort('timedout');
+    },
+  );
+
+  // Open the user card menu and click sign out
+  await page.getByRole('button', { name: 'Mara Reyes' }).first().click();
+
+  // Wait for the menu to be visible
+  await expect(page.getByRole('menu')).toBeVisible();
+
+  // Click sign out
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
+
+  // Should stay on the page (URL should still be /)
+  await expect(page).toHaveURL('/');
+
+  // Should see the error message
+  await expect(
+    page.getByText('Signing out failed. Please try again.'),
+  ).toBeVisible({ timeout: 10000 });
+});
