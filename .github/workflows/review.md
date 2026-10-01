@@ -203,8 +203,11 @@ jobs:
           # Only what routing calls: it reads the PR, its reviews, files, check
           # runs, the issue's type and a requirements file, and sets PR labels.
           # Unscoped, the token gets everything the App has (zizmor github-app).
+          # pull-requests: write, because removing a pull request's label needs
+          # it: with read, clearing strike:1 got "Resource not accessible by
+          # integration" (HTTP 403) on #214 and #229 (#251).
           permission-contents: read
-          permission-pull-requests: read
+          permission-pull-requests: write
           permission-checks: read
           permission-issues: write
       # Route on the CHECK RUN, not the review state. On run 35598277469 the
@@ -335,8 +338,11 @@ jobs:
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
               for L in $(gh api "repos/$REPO/issues/$PR/labels" \
                            --jq '.[].name | select(startswith("strike:"))'); do
-                gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent || true
-                echo "-> cleared $L"
+                if gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent; then
+                  echo "-> cleared $L"
+                else
+                  echo "::warning::could not clear $L on #$PR; it stays until removed by hand"
+                fi
               done ;;
             none)
               echo "-> no verdict on this commit; nothing to route" ;;
