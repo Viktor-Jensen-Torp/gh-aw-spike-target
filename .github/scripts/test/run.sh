@@ -234,6 +234,27 @@ check "design-part: other instances of the component are untouched" '"Default"' 
   "$(part screen | jq -c '.children[2].children[1].content')"
 part missing >/dev/null 2>&1; check "design-part: an absent id is an error" "nonzero" "$([ $? -ne 0 ] && echo nonzero || echo zero)"
 
+# --- design-impact.sh: which issues a design change touches (#259) -----------------
+# fixtures/design-refs.pen: Screen uses Row (refs) which uses Icon Circle. Change
+# the Icon Circle's glyph: the screen's issue is touched through two components.
+jq '(.. | objects | select(.id? == "glyph") | .icon) = "x"' "$FIX/design-refs.pen" > "$WORK/glyph.pen"
+printf '%s' '[{"number":1,"title":"Screen","state":"open","body":"`d.pen#screen` Screen"},
+  {"number":2,"title":"Icon circle","state":"closed","body":"`d.pen#icon` Icon Circle"},
+  {"number":3,"title":"Other","state":"open","body":"`other.pen#screen` Screen"}]' > "$WORK/claims.json"
+impact() { bash "$SCRIPTS/design-impact.sh" d.pen "$FIX/design-refs.pen" "$1" "$2"; }
+check "design-impact: a component change touches the screen that uses it" "1" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq -r '[.hits[] | select(.state == "open") | .number] | join(",")')"
+check "design-impact: another file's claims are not touched" "false" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq '[.hits[].number] | index(3) != null')"
+check "design-impact: a closed issue whose change an open one covers needs no follow-up" "[]" \
+  "$(impact "$WORK/glyph.pen" "$WORK/claims.json" | jq -c '.hits[] | select(.number == 2) | .unowned')"
+printf '%s' '[{"number":2,"title":"Icon circle","state":"closed","body":"`d.pen#icon` Icon Circle"}]' > "$WORK/closed.json"
+check "design-impact: a closed issue alone gets its changed parts as a follow-up" '["changed Glyph"]' \
+  "$(impact "$WORK/glyph.pen" "$WORK/closed.json" | jq -c '.hits[0].unowned')"
+printf '%s' '[]' > "$WORK/none.json"
+check "design-impact: a change no issue claims is uncovered" '[{"name":"Icon Circle","count":1}]' \
+  "$(impact "$WORK/glyph.pen" "$WORK/none.json" | jq -c '.uncovered')"
+
 # --- review-rows.sh with cited lines (#244) -----------------------------------------
 printf 'apps/web/src/components/Menu/Menu.stories.tsx\t215\napps/web/src/features/auth/routes.ts\tabsent\napps/web/src/components/Menu\tdir\n' > "$WORK/cited.tsv"
 printf 'apps/web/src/components/Menu/Menu.stories.tsx\n' > "$WORK/menu-files.txt"
