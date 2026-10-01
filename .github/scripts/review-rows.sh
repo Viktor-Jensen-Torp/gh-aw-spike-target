@@ -8,6 +8,8 @@
 #   data.json          the review's "Structured data" ({requirements:[{id,status,evidence}]})
 #   requirements.md    .github/conventions/chain/requirements/<type>.md, from the base
 #   changed-files.txt  the pull request's changed files, one per line
+#   cited.tsv          optional: cited-lines.sh's "path<TAB>lines|dir|absent"
+#                      for every path the evidence cites (#244)
 # Prints one "ID: status" line per row: C1, then every row of the file. A row
 # passes only as `met` or `n/a`. Exit 2 when the requirements file has no rows.
 set -euo pipefail
@@ -15,6 +17,7 @@ set -euo pipefail
 DATA="${1:?usage: review-rows.sh data.json requirements.md changed-files.txt}"
 REQ="${2:?missing requirements.md}"
 FILES="${3:?missing changed-files.txt}"
+CITED="${4:-}"
 
 IDS=$(sed -nE 's/^\| *([A-Z][0-9]+) *\|.*/\1/p' "$REQ")
 [ -n "$IDS" ] || { echo "review-rows.sh: no requirement rows in $REQ" >&2; exit 2; }
@@ -37,12 +40,35 @@ names_a_changed_file() { # <evidence>
   return 1
 }
 
+# A met row's proof must exist: every cited path, and every cited line within
+# its file. On #213 a review cited lines 260 and 300 of a 215-line file (review
+# 36707098843); on #232 a path that does not exist (36710354765). Needs the
+# looked-up table; without it nothing is checked.
+cites_a_missing_line() { # <evidence> -> 0 when some citation points at nothing
+  [ -n "$CITED" ] && [ -f "$CITED" ] || return 1
+  local tok p range n a b
+  while read -r tok; do
+    [ -n "$tok" ] || continue
+    p="${tok%%:*}"; p="${p%/}"; range=""; [ "$tok" != "${tok#*:}" ] && range="${tok#*:}"
+    n=$(awk -F'\t' -v p="$p" '$1 == p { print $2; exit }' "$CITED")
+    [ -n "$n" ] || continue
+    [ "$n" = absent ] && return 0
+    [ -n "$range" ] && [ "$n" != dir ] || continue
+    a="${range%%-*}"; b="${range#*-}"
+    { [ "$a" -gt "$n" ] || [ "$b" -gt "$n" ]; } 2>/dev/null && return 0
+  done < <(grep -oE '[A-Za-z0-9_.@-]+(/[A-Za-z0-9_.@-]+)+/?(:[0-9]+(-[0-9]+)?)?' <<<"$1")
+  return 1
+}
+
 for ID in C1 $IDS; do
   S=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .status // "missing"' "$DATA")
   E=$(jq -r --arg id "$ID" '[.requirements[] | select(.id == $id)] | last | .evidence // ""' "$DATA")
   # C1 is exempt: its proof of "no defect" is "none found".
   if [ "$S" = met ] && [ "$ID" != C1 ] && ! names_a_changed_file "$E"; then
     S="met-without-a-changed-file"
+  fi
+  if [ "$S" = met ] && cites_a_missing_line "$E"; then
+    S="met-cites-a-missing-line"
   fi
   if [ "$S" = "n/a" ] && ! grep -qx "$ID" <<<"$NA_OK"; then
     S="n/a-not-allowed"

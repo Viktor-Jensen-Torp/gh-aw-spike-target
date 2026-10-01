@@ -203,8 +203,11 @@ jobs:
           # Only what routing calls: it reads the PR, its reviews, files, check
           # runs, the issue's type and a requirements file, and sets PR labels.
           # Unscoped, the token gets everything the App has (zizmor github-app).
+          # pull-requests: write, because removing a pull request's label needs
+          # it: with read, clearing strike:1 got "Resource not accessible by
+          # integration" (HTTP 403) on #214 and #229 (#251).
           permission-contents: read
-          permission-pull-requests: read
+          permission-pull-requests: write
           permission-checks: read
           permission-issues: write
       # Route on the CHECK RUN, not the review state. On run 35598277469 the
@@ -283,7 +286,11 @@ jobs:
             gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$T/files.txt"
             # Every row must be `met` with a changed path as proof, or an allowed
             # `n/a` (.github/scripts/review-rows.sh).
-            ROWS=$(bash .github/scripts/review-rows.sh "$T/data.json" "$T/req.md" "$T/files.txt")
+            # Every cited path and line must exist at the head (#244): looked up
+            # through the API, since this job checks out no pull request files.
+            CITED_FROM=api REPO="$REPO" SHA="$SHA" bash .github/scripts/cited-lines.sh "$T/data.json" > "$T/cited.tsv" \
+              || { echo "::warning::could not look up the cited lines; not checked"; : > "$T/cited.tsv"; }
+            ROWS=$(bash .github/scripts/review-rows.sh "$T/data.json" "$T/req.md" "$T/files.txt" "$T/cited.tsv")
             sed 's/^/  /' <<<"$ROWS"
             ROWS_FAILED=$(awk '$2 != "met" && $2 != "n/a" { printf "%s%s ", $1, $2 }' <<<"$ROWS")
             [ -z "$ROWS_FAILED" ] || echo "requirements not met: $ROWS_FAILED"
@@ -331,8 +338,11 @@ jobs:
               # Strikes are CONSECUTIVE (ADR 0009): accepted work resets them.
               for L in $(gh api "repos/$REPO/issues/$PR/labels" \
                            --jq '.[].name | select(startswith("strike:"))'); do
-                gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent || true
-                echo "-> cleared $L"
+                if gh api -X DELETE "repos/$REPO/issues/$PR/labels/$L" --silent; then
+                  echo "-> cleared $L"
+                else
+                  echo "::warning::could not clear $L on #$PR; it stays until removed by hand"
+                fi
               done ;;
             none)
               echo "-> no verdict on this commit; nothing to route" ;;
