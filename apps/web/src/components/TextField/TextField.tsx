@@ -14,6 +14,8 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
   /** Optional error message shown below the input and makes it invalid. */
   error?: string;
+  /** When true, the field is marked invalid (red border) without showing an error message. */
+  invalidWithoutError?: boolean;
 }
 
 /**
@@ -29,7 +31,8 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
  * Password field's trailing icon is a button showing/hiding the value,
  * named "Show password" / "Hide password".
  * Non-password field with error has circle-alert icon replacing the trailing icon.
- * Error replaces hint.
+ * Error replaces hint. The field can be marked invalid without an error message
+ * using the `invalidWithoutError` prop.
  */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
@@ -38,6 +41,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       link,
       hint,
       error,
+      invalidWithoutError,
       type = 'text',
       id,
       className,
@@ -62,6 +66,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     const showTrailingIcon = isPassword || !!error;
     const showPasswordToggle = isPassword;
     const showErrorIcon = !isPassword && !!error;
+
+    // Determine if field is marked as invalid
+    const isInvalid = !!error || !!invalidWithoutError;
 
     // Error message ID for aria-describedby
     const errorId = error ? `${fieldId}-error` : undefined;
@@ -93,7 +100,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             'h-[42px]',
             // Background and border
             'bg-surface',
-            error ? 'border-1.5 border-danger' : 'border border-border',
+            isInvalid ? 'border-1.5 border-danger' : 'border border-border',
             // Disabled state
             disabled && 'opacity-50 cursor-not-allowed',
           )}
@@ -104,7 +111,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             id={fieldId}
             type={actualType}
             disabled={disabled}
-            {...(error && { 'aria-invalid': true })}
+            {...(isInvalid && { 'aria-invalid': true })}
             aria-describedby={errorId || hintId}
             className={cn(
               // Layout
