@@ -243,7 +243,12 @@ pre-agent-steps:
         SLUG=$(tr '/' '_' <<<"$PEN")
         raw "$PEN" develop > "$DIR/$SLUG"
         jq '.variables // {}' "$DIR/$SLUG" > "$DIR/${SLUG%.pen}.variables.json"
-        jq -r '(.children // [])[] | "\(.id)\t\(.name)\t\(if .reusable then "component" else "frame" end)"' "$DIR/$SLUG" \
+        # Frames and components, and the named parts up to three levels inside
+        # them: a claim is often a part within a screen (the User Menu, #260).
+        jq -r 'def walk_named($d; $top): select(type == "object") | select(.name and .id) |
+                 "\(.id)\t\(.name)\t\(if .reusable then "component" elif $d == 0 then "frame" else "part of \($top)" end)",
+                 (if $d < 3 then (.children // [])[] | walk_named($d + 1; $top) else empty end);
+               (.children // [])[] | . as $f | walk_named(0; $f.name)' "$DIR/$SLUG" \
           > "$DIR/${SLUG%.pen}.index.tsv"
         for N in $(jq -r '.[].number' "$CANDS"); do
           for ID in $(jq -r --argjson n "$N" '.[] | select(.number == $n) | .body' "$CANDS" \
@@ -383,7 +388,8 @@ neighbour owns, by number, as `issues.md` ("Boundaries") says. An issue whose
 (`.github/conventions/chain/design.md` says how a pen file is built):
 `<issue>/<id>.json` is each claimed part with its components resolved;
 `<issue>/removed.txt` lists claims whose part no longer exists; `*.index.tsv`
-lists the file's frames and components (id, name, kind); `*.variables.json` is
+lists the file's frames, components and the named parts inside them (id, name,
+kind); `*.variables.json` is
 its tokens; `*.changes.json`, when present, is what a design change altered
 inside each candidate's claims. An issue describes behaviour and claims parts;
 it does not copy sizes, colours or text from them (`issues.md`, "Design
@@ -394,6 +400,12 @@ claims"). So when the design changed:
   the issue asks for to match.
 - Re-point a removed claim to the part that replaced it (same name, or found in
   the index). If none clearly did, ask the author.
+- Keep what was decided. When the design now shows something the issue, or the
+  issue it follows ("Follows #N"), put under "Out of scope", it stays out: the
+  design draws the whole product, an issue builds a decided slice of it. If the
+  change looks like it reverses that decision on purpose, ask the author
+  (`needs-shape`); never widen the issue yourself. On #260 a rewrite added three
+  menu items #178 had left out, with nowhere for them to go.
 
 **When the run was asked for on an epic,** the candidates are that epic and its
 pieces that are not refined or ready yet. Read the epic first: its goal, sources and "Out
