@@ -13,8 +13,6 @@ import {
 import { signUp, signIn, getUserBySession, signOut } from './service.ts';
 import { ApiError } from '../../lib/errors.ts';
 
-const SECURE = process.env.NODE_ENV !== 'development';
-
 function setCookie(
   reply: FastifyReply,
   name: string,
@@ -22,7 +20,8 @@ function setCookie(
   maxAge: number,
 ): void {
   const flags = ['HttpOnly', `SameSite=Lax`];
-  if (SECURE) {
+  const secure = process.env.NODE_ENV === 'production';
+  if (secure) {
     flags.push('Secure');
   }
   const cookieValue = `${name}=${value}; Path=/; Max-Age=${maxAge}; ${flags.join('; ')}`;
