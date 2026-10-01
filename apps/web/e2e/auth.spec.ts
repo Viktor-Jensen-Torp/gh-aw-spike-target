@@ -145,6 +145,16 @@ test('Given an account for mara@reyes.studio, when I sign in with a wrong passwo
       .getByText('Email or password is incorrect.'),
   ).toBeVisible();
 
+  // Both fields should be marked invalid
+  await expect(page.getByLabel('Email')).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  );
+  await expect(page.getByRole('textbox', { name: 'Password' })).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  );
+
   // Should still be on sign-in page
   await expect(page).toHaveURL('/sign-in');
 });
@@ -166,6 +176,16 @@ test('Given no account for nobody@example.com, when I sign in with it, then I se
       .last()
       .getByText('Email or password is incorrect.'),
   ).toBeVisible();
+
+  // Both fields should be marked invalid
+  await expect(page.getByLabel('Email')).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  );
+  await expect(page.getByRole('textbox', { name: 'Password' })).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  );
 
   // Should still be on sign-in page
   await expect(page).toHaveURL('/sign-in');
