@@ -13,7 +13,7 @@ import {
 import { signUp, signIn, getUserBySession, signOut } from './service.ts';
 import { ApiError } from '../../lib/errors.ts';
 
-const SECURE = process.env.NODE_ENV !== 'development';
+const SECURE = process.env.NODE_ENV === 'production';
 
 function setCookie(
   reply: FastifyReply,

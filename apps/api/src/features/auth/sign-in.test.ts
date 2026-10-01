@@ -104,4 +104,43 @@ describe('Auth: POST /api/auth/sign-in', () => {
       });
     });
   });
+
+  describe('the session cookie in development', () => {
+    it('is marked HttpOnly and SameSite=Lax but not Secure', async () => {
+      // Sign in to get a session cookie
+      await app.inject({
+        method: 'POST',
+        url: '/api/auth/sign-up',
+        payload: {
+          fullName: 'Test User',
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      });
+
+      const signInResponse = await app.inject({
+        method: 'POST',
+        url: '/api/auth/sign-in',
+        payload: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      });
+
+      expect(signInResponse.statusCode).toBe(200);
+
+      // Get the Set-Cookie header
+      const setCookieHeader = signInResponse.headers['set-cookie'];
+      const setCookieStr = Array.isArray(setCookieHeader)
+        ? setCookieHeader[0]
+        : (setCookieHeader as string | undefined);
+
+      expect(setCookieStr).toBeDefined();
+      // In development (NODE_ENV not 'production'), Secure should not be set
+      expect(setCookieStr).not.toContain('Secure');
+      // But HttpOnly and SameSite=Lax should always be set
+      expect(setCookieStr).toContain('HttpOnly');
+      expect(setCookieStr).toContain('SameSite=Lax');
+    });
+  });
 });

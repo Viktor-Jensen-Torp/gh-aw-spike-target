@@ -48,7 +48,7 @@ screen (features/<f>/*.tsx)
 | Unit and API tests | Vitest (API through Fastify `inject`) | `npm test` |
 | Component tests | Vitest + Testing Library (jsdom) | `npm test` |
 | Shared components | Storybook stories, each run as a test in Chromium with the accessibility check (Vitest's Storybook addon) | `npm test` |
-| Browser tests | Playwright (Chromium) against the running app | `npm test` |
+| Browser tests | Playwright (Chromium) against the running app; WebKit not available in the sandbox | `npm test` |
 
 `bash .github/scripts/verify.sh` runs typecheck, lint, all tests and the
 conventions check. `npm run dev` starts the web app and the API together; the web
