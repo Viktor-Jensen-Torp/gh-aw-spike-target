@@ -39,6 +39,9 @@ export function SignInPage() {
           value={email}
           onChange={(e) => setEmail(e.currentTarget.value)}
           {...(fieldErrors.email && { error: fieldErrors.email })}
+          {...(fieldErrors.emailInvalidWithoutError && {
+            invalidWithoutError: fieldErrors.emailInvalidWithoutError,
+          })}
           disabled={isLoading}
         />
         <TextField

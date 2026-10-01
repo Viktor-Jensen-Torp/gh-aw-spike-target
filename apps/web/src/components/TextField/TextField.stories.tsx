@@ -246,3 +246,29 @@ export const PasswordWithError: Story = {
     await expect(passwordToggle).toHaveClass('text-faint');
   },
 };
+
+/** A text input field marked as invalid without showing an error message. */
+export const InvalidWithoutError: Story = {
+  args: {
+    label: 'Email',
+    value: 'mara@reyes.studio',
+    invalidWithoutError: true,
+  },
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement);
+    const input = page.getByRole('textbox', { name: 'Email' });
+    await expect(input).toBeVisible();
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+
+    // Error message should NOT be visible
+    const errorElements = canvasElement.querySelectorAll('[id*="error"]');
+    let errorFound = false;
+    for (const el of errorElements) {
+      if (el.textContent?.length) {
+        errorFound = true;
+        break;
+      }
+    }
+    await expect(!errorFound).toBe(true);
+  },
+};

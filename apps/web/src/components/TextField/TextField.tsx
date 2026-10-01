@@ -14,6 +14,8 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
   /** Optional error message shown below the input and makes it invalid. */
   error?: string;
+  /** When true, the field is marked invalid (red border) without showing an error message. */
+  invalidWithoutError?: boolean;
 }
 
 /**
@@ -29,7 +31,8 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
  * Password field's trailing icon is a button showing/hiding the value,
  * named "Show password" / "Hide password".
  * Non-password field with error has circle-alert icon replacing the trailing icon.
- * Error replaces hint.
+ * Error replaces hint. The field can be marked invalid without an error message
+ * using the `invalidWithoutError` prop.
  */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
@@ -38,6 +41,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       link,
       hint,
       error,
+      invalidWithoutError,
       type = 'text',
       id,
       className,
@@ -60,6 +64,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     // Determine which icon to show: only password toggle, no error icon inside field
     const showTrailingIcon = isPassword;
+
+    // Determine if field is marked as invalid
+    const isInvalid = !!error || !!invalidWithoutError;
 
     // Error message ID for aria-describedby
     const errorId = error ? `${fieldId}-error` : undefined;
@@ -91,7 +98,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             'h-[42px]',
             // Background and border
             'bg-surface',
-            error ? 'border border-danger' : 'border border-border-strong',
+            isInvalid ? 'border border-danger' : 'border border-border-strong',
             // Disabled state
             disabled && 'opacity-50 cursor-not-allowed',
           )}
@@ -102,7 +109,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             id={fieldId}
             type={actualType}
             disabled={disabled}
-            {...(error && { 'aria-invalid': true })}
+            {...(isInvalid && { 'aria-invalid': true })}
             aria-describedby={errorId || hintId}
             className={cn(
               // Layout

@@ -6,6 +6,7 @@ import { ZodError } from 'zod';
 interface FieldErrors {
   email?: string;
   password?: string;
+  emailInvalidWithoutError?: boolean;
 }
 
 export function useSignIn() {
@@ -36,8 +37,10 @@ export function useSignIn() {
         const errors: FieldErrors = {};
         for (const issue of error.issues) {
           const path = issue.path.join('.');
-          if (path === 'email' || path === 'password') {
-            errors[path as keyof FieldErrors] = issue.message;
+          if (path === 'email') {
+            errors.email = issue.message;
+          } else if (path === 'password') {
+            errors.password = issue.message;
           }
         }
         setFieldErrors(errors);
@@ -45,7 +48,7 @@ export function useSignIn() {
         // Handle API errors - show under password field and mark both fields invalid
         if (error.status === 401 && error.code === 'invalid_credentials') {
           setFieldErrors({
-            email: error.message,
+            emailInvalidWithoutError: true,
             password: error.message,
           });
         } else {
