@@ -121,8 +121,9 @@ jobs:
                 for N in $(jq -r '.hits[] | select(.state == "open") | .number' <<<"$IMPACT"); do
                   P=$(jq -c --argjson n "$N" '.hits[] | select(.number == $n) | .parts' <<<"$IMPACT" | parts)
                   unready "$N" "the design changed where this issue claims it (\`$PEN\` at ${AFTER:0:8}): $P."
+                  # Its epic, or the issue itself when it has none: refine takes either.
                   E=$(gh api "repos/$REPO/issues/$N" --jq '.parent_issue_url // "" | split("/") | last')
-                  [ -z "$E" ] || EPICS="$EPICS $E"
+                  EPICS="$EPICS ${E:-$N}"
                 done
 
                 # Built issues: the code no longer follows the design. One open
@@ -174,7 +175,8 @@ jobs:
               done
 
               # Refine what went back now, not tonight, with the design diff:
-              # one dispatch per epic (refine takes an epic's pieces).
+              # one dispatch per epic (refine takes an epic's pieces), or per
+              # issue that has no epic.
               for E in $(tr ' ' '\n' <<<"$EPICS" | grep . | sort -u); do
                 GH_TOKEN="$ACTIONS_TOKEN" bash .github/scripts/dispatch.sh refine.lock.yml issue "$E" design_since="$BEFORE" \
                   || echo "::warning::could not dispatch refine on #$E"
