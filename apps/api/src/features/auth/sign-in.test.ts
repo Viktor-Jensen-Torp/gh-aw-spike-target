@@ -143,4 +143,61 @@ describe('Auth: POST /api/auth/sign-in', () => {
       expect(setCookieStr).toContain('SameSite=Lax');
     });
   });
+
+  describe('the session cookie in production', () => {
+    it('is marked Secure, HttpOnly and SameSite=Lax when NODE_ENV=production', async () => {
+      // Save the original NODE_ENV
+      const originalEnv = process.env.NODE_ENV;
+
+      try {
+        // Set NODE_ENV to production for this test
+        process.env.NODE_ENV = 'production';
+
+        // Create a fresh app instance (now with NODE_ENV=production in effect)
+        const prodApp = await testApp();
+
+        try {
+          // Sign up first
+          await prodApp.inject({
+            method: 'POST',
+            url: '/api/auth/sign-up',
+            payload: {
+              fullName: 'Test User',
+              email: 'prod@example.com',
+              password: 'password123',
+            },
+          });
+
+          // Sign in to get a session cookie
+          const signInResponse = await prodApp.inject({
+            method: 'POST',
+            url: '/api/auth/sign-in',
+            payload: {
+              email: 'prod@example.com',
+              password: 'password123',
+            },
+          });
+
+          expect(signInResponse.statusCode).toBe(200);
+
+          // Get the Set-Cookie header
+          const setCookieHeader = signInResponse.headers['set-cookie'];
+          const setCookieStr = Array.isArray(setCookieHeader)
+            ? setCookieHeader[0]
+            : (setCookieHeader as string | undefined);
+
+          expect(setCookieStr).toBeDefined();
+          // In production (NODE_ENV='production'), all three flags should be set
+          expect(setCookieStr).toContain('Secure');
+          expect(setCookieStr).toContain('HttpOnly');
+          expect(setCookieStr).toContain('SameSite=Lax');
+        } finally {
+          await prodApp.close();
+        }
+      } finally {
+        // Restore the original NODE_ENV
+        process.env.NODE_ENV = originalEnv;
+      }
+    });
+  });
 });
