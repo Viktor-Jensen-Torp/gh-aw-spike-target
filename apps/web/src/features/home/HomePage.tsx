@@ -15,7 +15,7 @@ import { LogOut } from 'lucide-react';
 export function HomePage() {
   const { status } = useHealth();
   const { user, isLoading, isSignedIn } = useMe();
-  const { signOut } = useSignOut();
+  const { signOut, error: signOutError } = useSignOut();
   const healthText = status === 'ok' ? 'API: ok' : 'API: unavailable';
 
   // Show loading state or unsigned-in state
@@ -45,16 +45,10 @@ export function HomePage() {
 
         {/* User Card at the foot with Menu */}
         {user && (
-          <div className="flex-shrink-0 p-2">
+          <div className="flex-shrink-0 flex flex-col gap-2 p-2">
             <Menu
               width={236}
-              trigger={
-                <UserCard
-                  name={user.fullName}
-                  plan="Free plan"
-                  aria-expanded="false"
-                />
-              }
+              trigger={<UserCard name={user.fullName} plan="Free plan" />}
             >
               <MenuHeader title={user.fullName} detail={user.email} />
               <MenuDivider />
@@ -66,6 +60,11 @@ export function HomePage() {
                 onSelect={signOut}
               />
             </Menu>
+            {signOutError && (
+              <div className="rounded-md border border-danger px-2.5 py-2 text-[13px] text-danger">
+                {signOutError}
+              </div>
+            )}
           </div>
         )}
       </div>
