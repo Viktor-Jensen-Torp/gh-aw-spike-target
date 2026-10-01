@@ -1,0 +1,224 @@
+dispatch	Set up job	﻿2026-10-01T08:21:57.4331246Z Current runner version: '2.337.0'
+dispatch	Set up job	2026-10-01T08:21:57.4369160Z ##[group]Runner Image Provisioner
+dispatch	Set up job	2026-10-01T08:21:57.4370387Z Hosted Compute Agent
+dispatch	Set up job	2026-10-01T08:21:57.4371285Z Version: 20260901.588
+dispatch	Set up job	2026-10-01T08:21:57.4372253Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+dispatch	Set up job	2026-10-01T08:21:57.4373232Z Build Date: 2026-09-01T19:56:44Z
+dispatch	Set up job	2026-10-01T08:21:57.4374177Z Worker ID: {06bb48b3-6494-49a7-b15e-80a5876f1b0f}
+dispatch	Set up job	2026-10-01T08:21:57.4375147Z Azure Region: centralus
+dispatch	Set up job	2026-10-01T08:21:57.4375927Z ##[endgroup]
+dispatch	Set up job	2026-10-01T08:21:57.4377777Z ##[group]Operating System
+dispatch	Set up job	2026-10-01T08:21:57.4378939Z Ubuntu
+dispatch	Set up job	2026-10-01T08:21:57.4379748Z 24.04.5
+dispatch	Set up job	2026-10-01T08:21:57.4380517Z LTS
+dispatch	Set up job	2026-10-01T08:21:57.4381261Z ##[endgroup]
+dispatch	Set up job	2026-10-01T08:21:57.4382033Z ##[group]Runner Image
+dispatch	Set up job	2026-10-01T08:21:57.4382895Z Image: ubuntu-24.04
+dispatch	Set up job	2026-10-01T08:21:57.4383746Z Version: 20260927.320.1
+dispatch	Set up job	2026-10-01T08:21:57.4385035Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+dispatch	Set up job	2026-10-01T08:21:57.4387041Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+dispatch	Set up job	2026-10-01T08:21:57.4388262Z ##[endgroup]
+dispatch	Set up job	2026-10-01T08:21:57.4390052Z ##[group]GITHUB_TOKEN Permissions
+dispatch	Set up job	2026-10-01T08:21:57.4393048Z Actions: write
+dispatch	Set up job	2026-10-01T08:21:57.4393914Z Contents: read
+dispatch	Set up job	2026-10-01T08:21:57.4394673Z Metadata: read
+dispatch	Set up job	2026-10-01T08:21:57.4395500Z ##[endgroup]
+dispatch	Set up job	2026-10-01T08:21:57.4398153Z Secret source: Actions
+dispatch	Set up job	2026-10-01T08:21:57.4399793Z Cache mode: write
+dispatch	Set up job	2026-10-01T08:21:57.4401071Z Prepare workflow directory
+dispatch	Set up job	2026-10-01T08:21:57.4752247Z Prepare all required actions
+dispatch	Set up job	2026-10-01T08:21:57.4825676Z Getting action download info
+dispatch	Set up job	2026-10-01T08:21:57.8039988Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+dispatch	Set up job	2026-10-01T08:21:57.9419891Z Download action repository 'actions/create-github-app-token@v3' (SHA:bcd2ba49218906704ab6c1aa796996da409d3eb1)
+dispatch	Set up job	2026-10-01T08:21:58.4455622Z Complete job name: dispatch
+dispatch	Run actions/checkout@v5	﻿2026-10-01T08:21:58.5323512Z ##[group]Run actions/checkout@v5
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5324770Z with:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5325516Z   sparse-checkout: .github/scripts
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5326358Z   persist-credentials: false
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5327253Z   repository: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5331925Z   token: ***
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5332669Z   ssh-strict: true
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5333414Z   ssh-user: git
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5334105Z   clean: true
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5334814Z   sparse-checkout-cone-mode: true
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5335606Z   fetch-depth: 1
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5336289Z   fetch-tags: false
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5336990Z   show-progress: true
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5337694Z   lfs: false
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5338387Z   submodules: false
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5339170Z   set-safe-directory: true
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5339933Z   allow-unsafe-pr-checkout: false
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.5341045Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6412610Z Syncing repository: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6415959Z ##[group]Getting Git version info
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6417345Z Working directory is '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6419169Z [command]/usr/bin/git version
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6499299Z git version 2.55.0
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6529260Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6548351Z Temporarily overriding HOME='/home/runner/work/_temp/3e2395a0-7cc6-47dc-be57-357cb4e56863' before making global git config changes
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6552646Z Adding repository directory to the temporary git global config as a safe directory
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6556095Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6609079Z Deleting the contents of '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6614554Z ##[group]Initializing the repository
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6619795Z [command]/usr/bin/git init /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6739198Z hint: Using 'master' as the name for the initial branch. This default branch name
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6741974Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6744234Z hint: to use in all of your new repositories, which will suppress this warning,
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6746482Z hint: call:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6747589Z hint:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6749115Z hint: 	git config --global init.defaultBranch <name>
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6750877Z hint:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6752407Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6754200Z hint: 'development'. The just-created branch can be renamed via this command:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6755757Z hint:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6757002Z hint: 	git branch -m <name>
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6758316Z hint:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6760760Z hint: Disable this message with "git config set advice.defaultBranchName false"
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6763730Z Initialized empty Git repository in /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6766886Z [command]/usr/bin/git remote add origin https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6816681Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6819287Z ##[group]Disabling automatic garbage collection
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6821506Z [command]/usr/bin/git config --local gc.auto 0
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6862643Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6865348Z ##[group]Setting up auth
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6870707Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.6908649Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7321555Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7377695Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7597349Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7628242Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7807338Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7845743Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7847197Z ##[group]Fetching the repository
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:58.7856240Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +de198674479de83afc84c5cd7c89ae627285d96c:refs/remotes/origin/main
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0861619Z From https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0864640Z  * [new ref]         de198674479de83afc84c5cd7c89ae627285d96c -> origin/main
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0870895Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0873182Z ##[group]Determining the checkout info
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0875693Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0879226Z ##[group]Setting up sparse checkout
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0881088Z [command]/usr/bin/git sparse-checkout set .github/scripts
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0933406Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0936875Z ##[group]Checking out the ref
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.0940314Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5031329Z Switched to a new branch 'main'
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5036205Z branch 'main' set up to track 'origin/main'.
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5059111Z ##[endgroup]
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5104887Z [command]/usr/bin/git log -1 --format=%H
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5151100Z de198674479de83afc84c5cd7c89ae627285d96c
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5164520Z ##[group]Removing auth
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5167921Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5191282Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5407695Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5439344Z http.https://github.com/.extraheader
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5449415Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5484945Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5663674Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5689720Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	Run actions/checkout@v5	2026-10-01T08:21:59.5869637Z ##[endgroup]
+dispatch	Run actions/create-github-app-token@v3	﻿2026-10-01T08:21:59.6483314Z ##[group]Run actions/create-github-app-token@v3
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6484980Z with:
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6486219Z   client-id: Iv23lidwbDbnN0P1RJsx
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6512860Z   private-key: ***
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6514342Z   permission-organization-projects: read
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6516059Z   permission-issues: read
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6517462Z   permission-pull-requests: read
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6519036Z   skip-token-revoke: false
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6520491Z   github-api-url: https://api.github.com
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.6522046Z ##[endgroup]
+dispatch	Run actions/create-github-app-token@v3	2026-10-01T08:21:59.7338766Z Inputs 'owner' and 'repositories' are not set. Creating token for this repository (Viktor-Jensen-Torp/gh-aw-spike-target).
+dispatch	Start the next ready issues	﻿2026-10-01T08:22:00.3476557Z ##[group]Run set -euo pipefail
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3478280Z ^[[36;1mset -euo pipefail^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3480071Z ^[[36;1msay() { echo "$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3481798Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3483541Z ^[[36;1m# The reviewer App can read the organisation's projects; GITHUB_TOKEN cannot.^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3485913Z ^[[36;1mCUR=$(bash .github/scripts/current-sprint.sh "${REPO%/*}" "$PROJECT")^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3488132Z ^[[36;1mSPRINT=$(jq -r .title <<<"$CUR"); IN_SPRINT=$(jq -c .issues <<<"$CUR")^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3490751Z ^[[36;1m[ -n "$SPRINT" ] || { say "No current sprint (no Sprint iteration covers today); nothing to start."; exit 0; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3492887Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3494438Z ^[[36;1m# A run whose gate stopped it (agent job skipped) is not work; a run^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3496646Z ^[[36;1m# still deciding counts as real, which errs towards starting less.^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3499411Z ^[[36;1mruns() { GH_TOKEN="$ACTIONS_TOKEN" gh run list --repo "$REPO" --workflow implement.lock.yml --limit 100 \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3502035Z ^[[36;1m           --json databaseId,status,conclusion,displayTitle "$@"; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3504369Z ^[[36;1mreal() { GH_TOKEN="$ACTIONS_TOKEN" gh run view "$1" --repo "$REPO" --json jobs \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3506880Z ^[[36;1m           --jq '[.jobs[] | select(.name == "agent")] | (length == 0 or (.[0].conclusion != "skipped"))'; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3509607Z ^[[36;1mcount_real() { local n=0; for R in $(jq -r '.[] | select(.conclusion != "skipped") | .databaseId'); do^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3511990Z ^[[36;1m                 [ "$(real "$R")" = "true" ] && n=$((n + 1)); done; echo "$n"; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3513667Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3515253Z ^[[36;1m# Work in flight: open agent pull requests, plus real implement runs not^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3517428Z ^[[36;1m# finished yet (they have not opened their pull request).^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3519880Z ^[[36;1mOPEN_PRS=$(gh pr list --repo "$REPO" --state open --label agent --json number --jq 'length')^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3522365Z ^[[36;1mRUNNING=$(runs --jq '[.[] | select(.status != "completed")]' | count_real)^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3524654Z ^[[36;1mSLOTS=$(( MAX_OPEN - OPEN_PRS - RUNNING ))^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3526569Z ^[[36;1mTODAY=$(runs --created ">=$(date -u +%Y-%m-%d)" | count_real)^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3528405Z ^[[36;1mLEFT_TODAY=$(( MAX_PER_DAY - TODAY ))^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3530223Z ^[[36;1m[ "$LEFT_TODAY" -lt "$SLOTS" ] && SLOTS="$LEFT_TODAY"^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3532681Z ^[[36;1msay "Sprint \`$SPRINT\`: $OPEN_PRS open agent PR(s), $RUNNING run(s) in flight, $TODAY started today; $SLOTS slot(s)."^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3534966Z ^[[36;1m[ "$SLOTS" -gt 0 ] || exit 0^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3536377Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3537953Z ^[[36;1m# Issues an open pull request says it fixes, and issues an implement run^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3540298Z ^[[36;1m# is still working on (its run name is "Implement #N").^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3542640Z ^[[36;1mFIXING=$( { gh pr list --repo "$REPO" --state open --limit 200 --json body --jq '.[].body // ""' \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3544955Z ^[[36;1m              | { grep -oiE '(fixes|closes|resolves) #[0-9]+' || true; }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3547126Z ^[[36;1m            runs --jq '.[] | select(.status != "completed") | .displayTitle' \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3549401Z ^[[36;1m              | { grep -oE '^Implement #[0-9]+' || true; }; } \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3551356Z ^[[36;1m  | { grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -sc 'unique')^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3553062Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3554883Z ^[[36;1mCANDIDATES=$(gh api graphql --paginate -F owner="${REPO%/*}" -F name="${REPO#*/}" -f query='^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3557621Z ^[[36;1m  query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3560233Z ^[[36;1m    issues(states: OPEN, labels: ["ready"], first: 100, after: $endCursor) {^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3562421Z ^[[36;1m      pageInfo { hasNextPage endCursor }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3564037Z ^[[36;1m      nodes { number title createdAt^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3565579Z ^[[36;1m        issueType { name }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3567110Z ^[[36;1m        labels(first: 30) { nodes { name } }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3569328Z ^[[36;1m        issueFieldValues(first: 10) { nodes { ... on IssueFieldSingleSelectValue {^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3571561Z ^[[36;1m          name field { ... on IssueFieldSingleSelect { name } } } } }^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3573929Z ^[[36;1m        blockedBy(first: 50) { nodes { number state labels(first: 30) { nodes { name } } } } } } } }' \^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3576742Z ^[[36;1m  --jq '.data.repository.issues.nodes[]' | jq -s -c --argjson sprint "$IN_SPRINT" --argjson fixing "$FIXING" '^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3579213Z ^[[36;1m    map({number, title, createdAt,^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3580815Z ^[[36;1m         type: (.issueType.name // ""),^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3582437Z ^[[36;1m         labels: [.labels.nodes[].name],^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3584603Z ^[[36;1m         priority: ([.issueFieldValues.nodes[] | select(.field.name? == "Priority") | .name][0] // ""),^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3587575Z ^[[36;1m         waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3590114Z ^[[36;1m    | map(select((.number as $n | $sprint | index($n))^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3591966Z ^[[36;1m                 and (.type != "Epic" and .type != "Spike")^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3594300Z ^[[36;1m                 and ([.labels[] | select(. == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3596653Z ^[[36;1m                 and (.number as $n | $fixing | index($n) | not)^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3598385Z ^[[36;1m                 and (.waiting | length == 0)))^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3600447Z ^[[36;1m    | sort_by([({"High": 0, "Medium": 1, "Low": 2}[.priority] // 3), .createdAt])')^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3603356Z ^[[36;1msay "Startable: $(jq -r 'map("#\(.number)" + (if .priority != "" then " (\(.priority))" else "" end)) | join(", ") | if . == "" then "none" else . end' <<<"$CANDIDATES")"^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3606011Z ^[[36;1m^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3607618Z ^[[36;1mfor N in $(jq -r --argjson k "$SLOTS" '.[:$k][].number' <<<"$CANDIDATES"); do^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3609797Z ^[[36;1m  if [ "$DRY_RUN" = "true" ]; then say "would start #$N"; continue; fi^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3612241Z ^[[36;1m  GH_TOKEN="$ACTIONS_TOKEN" bash .github/scripts/dispatch.sh implement.lock.yml issue "$N" >/dev/null^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3614355Z ^[[36;1m  say "started #$N"^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3615825Z ^[[36;1mdone^[[0m
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3849190Z shell: /usr/bin/bash -e {0}
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3850658Z env:
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3859130Z   GH_TOKEN: ***
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3866831Z   ACTIONS_TOKEN: ***
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3868229Z   REPO: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3869972Z   PROJECT: 2
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3871153Z   MAX_OPEN: 2
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3872357Z   MAX_PER_DAY: 30
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3873604Z   DRY_RUN: false
+dispatch	Start the next ready issues	2026-10-01T08:22:00.3874828Z ##[endgroup]
+dispatch	Start the next ready issues	2026-10-01T08:22:08.7261493Z Sprint `Sprint 1`: 0 open agent PR(s), 0 run(s) in flight, 0 started today; 2 slot(s).
+dispatch	Start the next ready issues	2026-10-01T08:22:12.2895797Z Startable: #236, #255, #260
+dispatch	Start the next ready issues	2026-10-01T08:22:14.0966663Z started #236
+dispatch	Start the next ready issues	2026-10-01T08:22:16.6847002Z started #255
+dispatch	Post Run actions/create-github-app-token@v3	﻿2026-10-01T08:22:16.7089604Z Post job cleanup.
+dispatch	Post Run actions/create-github-app-token@v3	2026-10-01T08:22:17.0963627Z Token revoked
+dispatch	Post Run actions/checkout@v5	﻿2026-10-01T08:22:17.1433444Z Post job cleanup.
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2390200Z [command]/usr/bin/git version
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2460642Z git version 2.55.0
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2486060Z Temporarily overriding HOME='/home/runner/work/_temp/74e4f703-ddbc-47d4-89d3-0b86d57fae8c' before making global git config changes
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2487642Z Adding repository directory to the temporary git global config as a safe directory
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2494312Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2542799Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2581013Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2789052Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.2824018Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.3082838Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	Post Run actions/checkout@v5	2026-10-01T08:22:17.3123336Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	Complete job	﻿2026-10-01T08:22:17.3562497Z Cleaning up orphan processes

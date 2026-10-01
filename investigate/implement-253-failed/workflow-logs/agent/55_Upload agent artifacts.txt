@@ -1,0 +1,69 @@
+﻿2026-10-01T09:25:35.9953619Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-10-01T09:25:35.9954059Z with:
+2026-10-01T09:25:35.9954271Z   name: agent
+2026-10-01T09:25:35.9956578Z   path: /tmp/gh-aw/aw-prompts/prompt.txt
+/tmp/gh-aw/agent_execution.json
+/tmp/gh-aw/pi-streaming.jsonl
+/tmp/gh-aw/redacted-urls.log
+/tmp/gh-aw/mcp-logs/
+/tmp/gh-aw/agent_usage.json
+/tmp/gh-aw/agent-stdio.log
+/tmp/gh-aw/pre-agent-audit.txt
+/tmp/gh-aw/github_rate_limits.jsonl
+/tmp/gh-aw/otel.jsonl
+/tmp/gh-aw/otlp-export-errors.jsonl
+/tmp/gh-aw/safeoutputs.jsonl
+/tmp/gh-aw/agent_output.json
+/tmp/gh-aw/aw-*.patch
+/tmp/gh-aw/aw-*.bundle
+/tmp/gh-aw/awf-config.json
+/tmp/gh-aw/sandbox/firewall/logs/
+/tmp/gh-aw/sandbox/firewall/audit/
+/tmp/gh-aw/sandbox/firewall/awf-reflect.json
+
+2026-10-01T09:25:35.9958659Z   if-no-files-found: ignore
+2026-10-01T09:25:35.9958928Z   compression-level: 6
+2026-10-01T09:25:35.9959165Z   overwrite: false
+2026-10-01T09:25:35.9959407Z   include-hidden-files: false
+2026-10-01T09:25:35.9959670Z   archive: true
+2026-10-01T09:25:35.9959913Z env:
+2026-10-01T09:25:35.9960129Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:25:35.9960408Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:25:35.9961192Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:25:35.9961974Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:25:35.9962274Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:25:35.9962596Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:25:35.9962862Z   DEFAULT_BRANCH: main
+2026-10-01T09:25:35.9963103Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:25:35.9963365Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:25:35.9963606Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:25:35.9963907Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:25:35.9964226Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:25:35.9964491Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:25:35.9964763Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:25:35.9965019Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:25:35.9965273Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:25:35.9965521Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:25:35.9965771Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:25:35.9966312Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:25:35.9966749Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:25:35.9967081Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:25:35.9967462Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:25:35.9967793Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:25:35.9968135Z   GH_AW_AGENT_OUTPUT: /tmp/gh-aw/agent_output.json
+2026-10-01T09:25:35.9968444Z   GH_AW_AIC: 101.077665
+2026-10-01T09:25:35.9968692Z   GH_AW_AMBIENT_CONTEXT: 739
+2026-10-01T09:25:35.9968981Z   GH_AW_PRIMARY_MODEL: claude-haiku-4-5-20251001
+2026-10-01T09:25:35.9969292Z ##[endgroup]
+2026-10-01T09:25:36.1545917Z With the provided path, there will be 31 files uploaded
+2026-10-01T09:25:36.1551769Z Artifact name is valid!
+2026-10-01T09:25:36.1552323Z Root directory input is valid!
+2026-10-01T09:25:36.3532435Z Uploading artifact: agent.zip
+2026-10-01T09:25:36.3574250Z Beginning upload of artifact content to blob storage
+2026-10-01T09:25:36.5923215Z Uploaded bytes 723153
+2026-10-01T09:25:36.6050321Z Finished uploading artifact content to blob storage!
+2026-10-01T09:25:36.6051814Z SHA256 digest of uploaded artifact is e7b9999d920a3ea3f1ed8ca5231cf26767befbb3f8c5a4d2fb970170875e8e3b
+2026-10-01T09:25:36.6053004Z Finalizing artifact upload
+2026-10-01T09:25:36.8437528Z Artifact agent successfully finalized. Artifact ID 11151836823
+2026-10-01T09:25:36.8439468Z Artifact agent has been successfully uploaded! Final size is 723153 bytes. Artifact ID is 11151836823
+2026-10-01T09:25:36.8441731Z Artifact download URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856/artifacts/11151836823

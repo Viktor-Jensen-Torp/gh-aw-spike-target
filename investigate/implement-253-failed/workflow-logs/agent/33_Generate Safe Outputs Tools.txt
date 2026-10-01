@@ -1,0 +1,183 @@
+﻿2026-10-01T09:06:15.3633148Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:06:15.3633907Z with:
+2026-10-01T09:06:15.3636352Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'generate_safe_outputs_tools.cjs'));
+await main();
+
+2026-10-01T09:06:15.3643396Z   github-token: ***
+2026-10-01T09:06:15.3643875Z   debug: false
+2026-10-01T09:06:15.3644300Z   user-agent: actions/github-script
+2026-10-01T09:06:15.3644817Z   result-encoding: json
+2026-10-01T09:06:15.3645222Z   retries: 0
+2026-10-01T09:06:15.3645706Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:06:15.3646483Z env:
+2026-10-01T09:06:15.3646872Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:06:15.3647417Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:06:15.3648831Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:06:15.3650333Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:06:15.3650869Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:06:15.3651708Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:06:15.3652160Z   DEFAULT_BRANCH: main
+2026-10-01T09:06:15.3652581Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:06:15.3653042Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:06:15.3653463Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:06:15.3653983Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:06:15.3654546Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:06:15.3655002Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:06:15.3655458Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:06:15.3655892Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:06:15.3656648Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:06:15.3657071Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:06:15.3657489Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:06:15.3657945Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:06:15.3658471Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:06:15.3659035Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:06:15.3659716Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:06:15.3660273Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:06:15.3662036Z   GH_AW_TOOLS_META_JSON: {
+  "description_suffixes": {
+    "create_pull_request": " CONSTRAINTS: Maximum 1 pull request(s) can be created. Title will be prefixed with \"[implementer] \". Labels [\"agent\"] will be automatically added."
+  },
+  "repo_params": {},
+  "dynamic_tools": []
+}
+
+2026-10-01T09:06:15.3676660Z   GH_AW_VALIDATION_JSON: {
+  "create_pull_request": {
+    "defaultMax": 1,
+    "fields": {
+      "base": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 128
+      },
+      "body": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 65000
+      },
+      "branch": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      },
+      "dependencies": {
+        "type": "array",
+        "itemType": "string",
+        "itemSanitize": true,
+        "itemMaxLength": 256
+      },
+      "draft": {
+        "type": "boolean"
+      },
+      "labels": {
+        "type": "array",
+        "itemType": "string",
+        "itemSanitize": true,
+        "itemMaxLength": 128
+      },
+      "repo": {
+        "type": "string",
+        "maxLength": 256
+      },
+      "stack_position": {
+        "optionalPositiveInteger": true
+      },
+      "stack_root": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      },
+      "temporary_id": {
+        "type": "string",
+        "pattern": "^#?aw_[A-Za-z0-9_]{3,12}$"
+      },
+      "title": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 128
+      }
+    }
+  },
+  "missing_data": {
+    "defaultMax": 20,
+    "fields": {
+      "alternatives": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      },
+      "context": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      },
+      "data_type": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 128
+      },
+      "reason": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      }
+    }
+  },
+  "missing_tool": {
+    "defaultMax": 20,
+    "fields": {
+      "alternatives": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 512
+      },
+      "reason": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 256
+      },
+      "tool": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 128
+      }
+    }
+  },
+  "noop": {
+    "defaultMax": 1,
+    "fields": {
+      "message": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 65000
+      }
+    }
+  },
+  "report_incomplete": {
+    "defaultMax": 5,
+    "fields": {
+      "details": {
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 65000
+      },
+      "reason": {
+        "required": true,
+        "type": "string",
+        "sanitize": true,
+        "maxLength": 1024
+      }
+    }
+  }
+}
+
+2026-10-01T09:06:15.3690087Z ##[endgroup]

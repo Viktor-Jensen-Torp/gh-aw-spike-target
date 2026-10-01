@@ -1,0 +1,127 @@
+﻿2026-10-01T09:27:25.1329313Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-01T09:27:25.1330250Z with:
+2026-10-01T09:27:25.1330791Z   persist-credentials: false
+2026-10-01T09:27:25.1331374Z   sparse-checkout: .
+2026-10-01T09:27:25.1332013Z   repository: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:27:25.1336844Z   token: ***
+2026-10-01T09:27:25.1337363Z   ssh-strict: true
+2026-10-01T09:27:25.1337873Z   ssh-user: git
+2026-10-01T09:27:25.1338351Z   clean: true
+2026-10-01T09:27:25.1338857Z   sparse-checkout-cone-mode: true
+2026-10-01T09:27:25.1339439Z   fetch-depth: 1
+2026-10-01T09:27:25.1339932Z   fetch-tags: false
+2026-10-01T09:27:25.1340436Z   show-progress: true
+2026-10-01T09:27:25.1340962Z   lfs: false
+2026-10-01T09:27:25.1341435Z   submodules: false
+2026-10-01T09:27:25.1341942Z   set-safe-directory: true
+2026-10-01T09:27:25.1342545Z   allow-unsafe-pr-checkout: false
+2026-10-01T09:27:25.1343153Z env:
+2026-10-01T09:27:25.1343643Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:25.1344238Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:25.1346075Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:25.1347592Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:25.1348203Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:25.1349154Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:25.1349738Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:25.1350395Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:25.1351172Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: ae6b12ce15a2be57
+2026-10-01T09:27:25.1351878Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846845068
+2026-10-01T09:27:25.1352507Z ##[endgroup]
+2026-10-01T09:27:25.5675036Z Syncing repository: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:27:25.5684227Z ##[group]Getting Git version info
+2026-10-01T09:27:25.5685427Z Working directory is '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+2026-10-01T09:27:25.5687189Z [command]/usr/bin/git version
+2026-10-01T09:27:25.6829628Z git version 2.55.0
+2026-10-01T09:27:25.6885879Z ##[endgroup]
+2026-10-01T09:27:25.6970313Z Temporarily overriding HOME='/home/runner/work/_temp/a9ddd4a6-2674-4362-8871-de925bd3297f' before making global git config changes
+2026-10-01T09:27:25.6983579Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T09:27:25.7034998Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+2026-10-01T09:27:25.7183246Z Deleting the contents of '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+2026-10-01T09:27:25.7221746Z ##[group]Determining repository object format
+2026-10-01T09:27:25.7231779Z ##[endgroup]
+2026-10-01T09:27:25.7236678Z ##[group]Initializing the repository
+2026-10-01T09:27:25.7244925Z [command]/usr/bin/git init /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+2026-10-01T09:27:25.7690807Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-01T09:27:25.7706779Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-01T09:27:25.7716294Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-01T09:27:25.7718987Z hint: call:
+2026-10-01T09:27:25.7721870Z hint:
+2026-10-01T09:27:25.7726433Z hint: 	git config --global init.defaultBranch <name>
+2026-10-01T09:27:25.7727230Z hint:
+2026-10-01T09:27:25.7727899Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-01T09:27:25.7728965Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-01T09:27:25.7729816Z hint:
+2026-10-01T09:27:25.7730754Z hint: 	git branch -m <name>
+2026-10-01T09:27:25.7731753Z hint:
+2026-10-01T09:27:25.7732807Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-01T09:27:25.7762787Z Initialized empty Git repository in /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/
+2026-10-01T09:27:25.7777001Z [command]/usr/bin/git remote add origin https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:27:25.7922062Z ##[endgroup]
+2026-10-01T09:27:25.7923949Z ##[group]Disabling automatic garbage collection
+2026-10-01T09:27:25.7940487Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-01T09:27:25.8027811Z ##[endgroup]
+2026-10-01T09:27:25.8029464Z ##[group]Setting up auth
+2026-10-01T09:27:25.8031102Z Removing SSH command configuration
+2026-10-01T09:27:25.8044939Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T09:27:25.8103342Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T09:27:25.9290130Z Removing HTTP extra header
+2026-10-01T09:27:25.9307381Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T09:27:25.9362513Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T09:27:26.0060625Z Removing includeIf entries pointing to credentials config files
+2026-10-01T09:27:26.0079141Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T09:27:26.0239019Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T09:27:26.0824814Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-01T09:27:26.0883754Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git.path /home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:26.0926385Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:26.1233191Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:26.1297147Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:26.1691328Z ##[endgroup]
+2026-10-01T09:27:26.1692886Z ##[group]Fetching the repository
+2026-10-01T09:27:26.1710283Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +de198674479de83afc84c5cd7c89ae627285d96c:refs/remotes/origin/main
+2026-10-01T09:27:26.8937653Z From https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:27:26.8939516Z  * [new ref]         de198674479de83afc84c5cd7c89ae627285d96c -> origin/main
+2026-10-01T09:27:26.8964271Z [command]/usr/bin/git branch --list --remote origin/main
+2026-10-01T09:27:26.8992355Z   origin/main
+2026-10-01T09:27:26.9011717Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2026-10-01T09:27:26.9052178Z de198674479de83afc84c5cd7c89ae627285d96c
+2026-10-01T09:27:26.9068552Z ##[endgroup]
+2026-10-01T09:27:26.9105463Z ##[group]Determining the checkout info
+2026-10-01T09:27:26.9106859Z ##[endgroup]
+2026-10-01T09:27:26.9107640Z ##[group]Setting up sparse checkout
+2026-10-01T09:27:26.9108300Z [command]/usr/bin/git sparse-checkout set .
+2026-10-01T09:27:26.9204866Z ##[endgroup]
+2026-10-01T09:27:26.9207369Z ##[group]Checking out the ref
+2026-10-01T09:27:26.9219195Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-01T09:27:27.5710062Z Switched to a new branch 'main'
+2026-10-01T09:27:27.5721822Z branch 'main' set up to track 'origin/main'.
+2026-10-01T09:27:27.5739061Z ##[endgroup]
+2026-10-01T09:27:27.5809761Z [command]/usr/bin/git log -1 --format=%H
+2026-10-01T09:27:27.5849068Z de198674479de83afc84c5cd7c89ae627285d96c
+2026-10-01T09:27:27.5882891Z ##[group]Removing auth
+2026-10-01T09:27:27.5884612Z Removing SSH command configuration
+2026-10-01T09:27:27.5898510Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T09:27:27.5959645Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T09:27:27.6202506Z Removing HTTP extra header
+2026-10-01T09:27:27.6216255Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T09:27:27.6270496Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T09:27:27.6481037Z Removing includeIf entries pointing to credentials config files
+2026-10-01T09:27:27.6485416Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T09:27:27.6510789Z includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git.path
+2026-10-01T09:27:27.6514486Z includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/worktrees/*.path
+2026-10-01T09:27:27.6520134Z includeif.gitdir:/github/workspace/.git.path
+2026-10-01T09:27:27.6526506Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-01T09:27:27.6557095Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git.path
+2026-10-01T09:27:27.6579087Z /home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:27.7259735Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-7141d40b\-a6e2\-4d1d\-8640\-9b8c3b396d6b\.config
+2026-10-01T09:27:27.7267862Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/worktrees/*.path
+2026-10-01T09:27:27.7271722Z /home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:27.7278429Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-7141d40b\-a6e2\-4d1d\-8640\-9b8c3b396d6b\.config
+2026-10-01T09:27:27.7284951Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-01T09:27:27.7287906Z /github/runner_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:27.7293476Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-7141d40b\-a6e2\-4d1d\-8640\-9b8c3b396d6b\.config
+2026-10-01T09:27:27.7306265Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-01T09:27:27.7309735Z /github/runner_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config
+2026-10-01T09:27:27.7315393Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-7141d40b\-a6e2\-4d1d\-8640\-9b8c3b396d6b\.config
+2026-10-01T09:27:27.7321714Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T09:27:27.7327318Z Removing credentials config '/home/runner/work/_temp/git-credentials-7141d40b-a6e2-4d1d-8640-9b8c3b396d6b.config'
+2026-10-01T09:27:27.7331124Z ##[endgroup]

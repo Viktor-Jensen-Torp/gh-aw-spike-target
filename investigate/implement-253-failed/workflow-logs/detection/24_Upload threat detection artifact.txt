@@ -1,0 +1,41 @@
+﻿2026-10-01T09:26:05.4464312Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-10-01T09:26:05.4465085Z with:
+2026-10-01T09:26:05.4465313Z   name: detection
+2026-10-01T09:26:05.4466395Z   path: /tmp/gh-aw/threat-detection/detection_result.json
+/tmp/gh-aw/threat-detection/execution.json
+/tmp/gh-aw/threat-detection/detection_usage.json
+/tmp/gh-aw/threat-detection/detection_usage.jsonl
+/tmp/gh-aw/threat-detection/sandbox/firewall/logs/
+/tmp/gh-aw/threat-detection/sandbox/firewall/audit/
+
+2026-10-01T09:26:05.4467539Z   if-no-files-found: ignore
+2026-10-01T09:26:05.4467799Z   compression-level: 6
+2026-10-01T09:26:05.4468036Z   overwrite: false
+2026-10-01T09:26:05.4468263Z   include-hidden-files: false
+2026-10-01T09:26:05.4468528Z   archive: true
+2026-10-01T09:26:05.4468741Z env:
+2026-10-01T09:26:05.4468951Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:26:05.4469232Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:26:05.4469967Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:26:05.4470739Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:26:05.4471036Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:26:05.4471348Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:26:05.4471611Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:26:05.4471914Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:26:05.4472276Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 767fb979fc5431fc
+2026-10-01T09:26:05.4472599Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846748591
+2026-10-01T09:26:05.4472881Z ##[endgroup]
+2026-10-01T09:26:05.6039082Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-01T09:26:05.6043136Z The least common ancestor is /tmp/gh-aw/threat-detection. This will be the root directory of the artifact
+2026-10-01T09:26:05.6044579Z With the provided path, there will be 3 files uploaded
+2026-10-01T09:26:05.6046819Z Artifact name is valid!
+2026-10-01T09:26:05.6047911Z Root directory input is valid!
+2026-10-01T09:26:05.9264439Z Uploading artifact: detection.zip
+2026-10-01T09:26:05.9305572Z Beginning upload of artifact content to blob storage
+2026-10-01T09:26:06.2146560Z Uploaded bytes 570
+2026-10-01T09:26:06.2827109Z Finished uploading artifact content to blob storage!
+2026-10-01T09:26:06.2828397Z SHA256 digest of uploaded artifact is d754d5330fbc6f30668b6c8a36f7c9f0246efa43377b75f72cfcc535e061d3cf
+2026-10-01T09:26:06.2829338Z Finalizing artifact upload
+2026-10-01T09:26:06.6546358Z Artifact detection successfully finalized. Artifact ID 11151911529
+2026-10-01T09:26:06.6547764Z Artifact detection has been successfully uploaded! Final size is 570 bytes. Artifact ID is 11151911529
+2026-10-01T09:26:06.6549744Z Artifact download URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856/artifacts/11151911529

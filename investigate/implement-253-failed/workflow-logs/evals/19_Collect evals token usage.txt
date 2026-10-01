@@ -1,0 +1,21 @@
+﻿2026-10-01T09:27:00.7055718Z ##[group]Run for root in "/tmp/gh-aw/sandbox/firewall/audit" "/tmp/gh-aw/sandbox/firewall/logs"; do
+2026-10-01T09:27:00.7057125Z [36;1mfor root in "/tmp/gh-aw/sandbox/firewall/audit" "/tmp/gh-aw/sandbox/firewall/logs"; do[0m
+2026-10-01T09:27:00.7058035Z [36;1m  source="$root/api-proxy-logs/token-usage.jsonl"[0m
+2026-10-01T09:27:00.7058821Z [36;1m  if [ -s "$source" ]; then cp "$source" /tmp/gh-aw/evals_token_usage.jsonl; fi[0m
+2026-10-01T09:27:00.7059504Z [36;1mdone[0m
+2026-10-01T09:27:00.7138591Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:27:00.7138993Z env:
+2026-10-01T09:27:00.7139324Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:00.7139759Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:00.7141110Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:00.7142464Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:00.7142937Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:00.7143477Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:00.7143888Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:00.7144388Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:00.7145214Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a2376259fc9e750c
+2026-10-01T09:27:00.7145743Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846778209
+2026-10-01T09:27:00.7146268Z   GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:27:00.7147016Z   GH_AW_AIC: 0.5877
+2026-10-01T09:27:00.7147379Z   GH_AW_AMBIENT_CONTEXT: 2227
+2026-10-01T09:27:00.7147781Z ##[endgroup]

@@ -1,0 +1,83 @@
+﻿2026-10-01T09:05:34.7269103Z ##[group]Run set -euo pipefail
+2026-10-01T09:05:34.7269473Z [36;1mset -euo pipefail[0m
+2026-10-01T09:05:34.7269736Z [36;1mDIR=/tmp/gh-aw/agent[0m
+2026-10-01T09:05:34.7270002Z [36;1mmkdir -p "$DIR"[0m
+2026-10-01T09:05:34.7270356Z [36;1m# The issue: the triggering one, or the one a pull request fixes.[0m
+2026-10-01T09:05:34.7270744Z [36;1mN="${ISSUE:-}"[0m
+2026-10-01T09:05:34.7271093Z [36;1m# A dispatched run has the pull request's number but not its body.[0m
+2026-10-01T09:05:34.7271743Z [36;1mif [ -z "$N" ] && [ -z "${PR_BODY:-}" ] && [ -n "${PR:-}" ]; then[0m
+2026-10-01T09:05:34.7272173Z [36;1m  PR_BODY=$(gh api "repos/$REPO/pulls/$PR" --jq '.body // ""')[0m
+2026-10-01T09:05:34.7272524Z [36;1mfi[0m
+2026-10-01T09:05:34.7272742Z [36;1mif [ -z "$N" ]; then[0m
+2026-10-01T09:05:34.7273218Z [36;1m  N=$(printf '%s' "${PR_BODY:-}" | grep -oiE '(fixes|closes|resolves) #[0-9]+' | grep -oE '[0-9]+' | head -1 || true)[0m
+2026-10-01T09:05:34.7273703Z [36;1mfi[0m
+2026-10-01T09:05:34.7274029Z [36;1m# The paths the change touches, for the conventions: a pull request's[0m
+2026-10-01T09:05:34.7274542Z [36;1m# changed files, or for a new change the paths its issue names.[0m
+2026-10-01T09:05:34.7274923Z [36;1mconventions() { # <issue body>[0m
+2026-10-01T09:05:34.7275207Z [36;1m  TMP=$(mktemp -d)[0m
+2026-10-01T09:05:34.7275472Z [36;1m  if [ -n "${PR:-}" ]; then[0m
+2026-10-01T09:05:34.7276135Z [36;1m    gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$TMP/paths.txt"[0m
+2026-10-01T09:05:34.7276650Z [36;1m  else[0m
+2026-10-01T09:05:34.7277078Z [36;1m    printf '%s' "$1" | grep -oE '`(apps|packages|docs)/[^` ]+`' | tr -d '`' | sort -u > "$TMP/paths.txt" || true[0m
+2026-10-01T09:05:34.7277549Z [36;1m  fi[0m
+2026-10-01T09:05:34.7277801Z [36;1m  printf '%s' "$1" > "$TMP/issue-body.md"[0m
+2026-10-01T09:05:34.7278342Z [36;1m  bash .github/scripts/agent-context.sh "$TMP/paths.txt" "$TMP/issue-body.md" "$DIR/conventions.md"[0m
+2026-10-01T09:05:34.7278834Z [36;1m  rm -rf "$TMP"[0m
+2026-10-01T09:05:34.7279070Z [36;1m}[0m
+2026-10-01T09:05:34.7279280Z [36;1mif [ -z "$N" ]; then[0m
+2026-10-01T09:05:34.7279549Z [36;1m  if [ "$REQUIRED" = "false" ]; then[0m
+2026-10-01T09:05:34.7279843Z [36;1m    conventions ""[0m
+2026-10-01T09:05:34.7280195Z [36;1m    echo "No linked issue; reviewing without requirements."; exit 0[0m
+2026-10-01T09:05:34.7280562Z [36;1m  fi[0m
+2026-10-01T09:05:34.7280975Z [36;1m  echo "::error::No issue: not an issue event, and the pull request names none with 'Fixes #N'."; exit 1[0m
+2026-10-01T09:05:34.7281465Z [36;1mfi[0m
+2026-10-01T09:05:34.7281695Z [36;1mgh api "repos/$REPO/issues/$N" \[0m
+2026-10-01T09:05:34.7282229Z [36;1m  --jq '{number, title, type: (.type.name // null), labels: [.labels[].name], body: (.body // "")}' > "$DIR/issue.json"[0m
+2026-10-01T09:05:34.7282861Z [36;1mjq -e '.body | test("\\S")' "$DIR/issue.json" >/dev/null \[0m
+2026-10-01T09:05:34.7283413Z [36;1m  || { echo "::error::#$N has no body; there is nothing to build or check against."; exit 1; }[0m
+2026-10-01T09:05:34.7283980Z [36;1m# The requirements for the issue's type. .github/ is the base branch's[0m
+2026-10-01T09:05:34.7284488Z [36;1m# copy here (restore_base_github_folders.sh), so a pull request cannot[0m
+2026-10-01T09:05:34.7284891Z [36;1m# change the bar it is judged by.[0m
+2026-10-01T09:05:34.7285279Z [36;1mTYPE=$(jq -r '.type // ""' "$DIR/issue.json" | tr '[:upper:]' '[:lower:]')[0m
+2026-10-01T09:05:34.7285742Z [36;1mREQ=".github/conventions/chain/requirements/$TYPE.md"[0m
+2026-10-01T09:05:34.7286435Z [36;1m[ -n "$TYPE" ] && [ -f "$REQ" ] \[0m
+2026-10-01T09:05:34.7286868Z [36;1m  || { echo "::error::#$N has type '${TYPE:-none}', and there is no $REQ for it."; exit 1; }[0m
+2026-10-01T09:05:34.7287314Z [36;1mcp "$REQ" "$DIR/requirements.md"[0m
+2026-10-01T09:05:34.7287757Z [36;1mjq -r '"#\(.number) (\(.type)): \(.title) — \(.body | length) characters"' "$DIR/issue.json"[0m
+2026-10-01T09:05:34.7288316Z [36;1mecho "requirements: $REQ ($(grep -cE '^\| *[A-Z][0-9]+ *\|' "$REQ") rows)"[0m
+2026-10-01T09:05:34.7288979Z [36;1mconventions "$(jq -r .body "$DIR/issue.json")"[0m
+2026-10-01T09:05:34.7351519Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:05:34.7351796Z env:
+2026-10-01T09:05:34.7352014Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:05:34.7352297Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:05:34.7353091Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:05:34.7354049Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:05:34.7354340Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:05:34.7354658Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:05:34.7354912Z   DEFAULT_BRANCH: main
+2026-10-01T09:05:34.7355148Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:05:34.7355396Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:05:34.7355636Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:05:34.7356189Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:05:34.7356528Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:05:34.7356790Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:05:34.7357043Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:05:34.7357325Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:05:34.7357569Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:05:34.7357796Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:05:34.7358020Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:05:34.7358264Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:05:34.7358566Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:05:34.7358882Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:05:34.7359250Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:05:34.7359574Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:05:34.7362211Z   GH_TOKEN: ***
+2026-10-01T09:05:34.7362443Z   ISSUE: 253
+2026-10-01T09:05:34.7362645Z   PR: 
+2026-10-01T09:05:34.7362840Z   PR_BODY: 
+2026-10-01T09:05:34.7363086Z   REPO: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:05:34.7363394Z   REQUIRED: true
+2026-10-01T09:05:34.7363607Z ##[endgroup]
+2026-10-01T09:05:35.0717000Z #253 (Bug): User menu: aria-expanded, failed sign-out, one /api/me per page — 1151 characters
+2026-10-01T09:05:35.0734551Z requirements: .github/conventions/chain/requirements/bug.md (5 rows)
+2026-10-01T09:05:35.1449010Z conventions: .github/conventions/chain/principles.md .github/conventions/chain/structure.md .github/conventions/chain/testing.md docs/architecture.md .github/conventions/web.md (11006 bytes)

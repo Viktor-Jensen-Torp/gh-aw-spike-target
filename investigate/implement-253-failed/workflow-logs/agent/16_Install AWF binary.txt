@@ -1,0 +1,38 @@
+﻿2026-10-01T09:04:36.1556539Z ##[group]Run bash "${RUNNER_TEMP}/gh-aw/actions/install_awf_binary.sh" v0.28.23 --rootless
+2026-10-01T09:04:36.1557362Z [36;1mbash "${RUNNER_TEMP}/gh-aw/actions/install_awf_binary.sh" v0.28.23 --rootless[0m
+2026-10-01T09:04:36.1621511Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:04:36.1621784Z env:
+2026-10-01T09:04:36.1622000Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:36.1622294Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:36.1623088Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:36.1623871Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:36.1624163Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:36.1624477Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:36.1624734Z   DEFAULT_BRANCH: main
+2026-10-01T09:04:36.1624979Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:04:36.1625239Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:04:36.1625523Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:04:36.1625830Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:04:36.1626428Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:04:36.1626696Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:04:36.1626953Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:04:36.1627204Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:04:36.1627447Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:04:36.1627681Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:04:36.1627912Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:36.1628166Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:04:36.1628459Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:04:36.1628773Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:36.1629147Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:04:36.1629466Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:04:36.1629750Z ##[endgroup]
+2026-10-01T09:04:36.1757378Z Installing awf with checksum verification (version: v0.28.23, os: Linux, arch: x86_64)
+2026-10-01T09:04:36.1786344Z Cleaning up stale AWF chroot directories...
+2026-10-01T09:04:36.2082831Z Downloading checksums from 'https://github.com/github/gh-aw-firewall/releases/download/v0.28.23/checksums.txt'...
+2026-10-01T09:04:36.2888690Z Node.js >= 20 detected (v24.21.0), using lightweight bundle...
+2026-10-01T09:04:36.2889583Z Downloading bundle from 'https://github.com/github/gh-aw-firewall/releases/download/v0.28.23/awf-bundle.js'...
+2026-10-01T09:04:36.3778541Z Verifying SHA256 checksum for awf-bundle.js...
+2026-10-01T09:04:36.3865856Z ✓ Checksum verification passed for awf-bundle.js
+2026-10-01T09:04:36.3921081Z ✓ Installed awf bundle to /home/runner/.local/lib/awf/awf-bundle.js
+2026-10-01T09:04:36.6888924Z 0.28.23
+2026-10-01T09:04:36.6960797Z ✓ AWF installation complete

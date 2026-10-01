@@ -1,0 +1,38 @@
+﻿2026-10-01T09:27:53.4709218Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:27:53.4711763Z with:
+2026-10-01T09:27:53.4723560Z   github-token: ***
+2026-10-01T09:27:53.4729775Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'report_failed_jobs.cjs'));
+await main();
+
+2026-10-01T09:27:53.4736217Z   debug: false
+2026-10-01T09:27:53.4737706Z   user-agent: actions/github-script
+2026-10-01T09:27:53.4739526Z   result-encoding: json
+2026-10-01T09:27:53.4741021Z   retries: 0
+2026-10-01T09:27:53.4742568Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:27:53.4744421Z env:
+2026-10-01T09:27:53.4745799Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:53.4747652Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:53.4751673Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:53.4755757Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:53.4757689Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:53.4759578Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:53.4761223Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:53.4763042Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:53.4765215Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 5d139c37ca1b9167
+2026-10-01T09:27:53.4767338Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846863923
+2026-10-01T09:27:53.4769306Z   GH_AW_AGENT_OUTPUT: /tmp/gh-aw/agent_output.json
+2026-10-01T09:27:53.4771221Z   GH_AW_WORKFLOW_NAME: Implement
+2026-10-01T09:27:53.4774326Z   GH_AW_WORKFLOW_SOURCE_URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/blob/main/.github/workflows/implement.md
+2026-10-01T09:27:53.4778489Z   GH_AW_RUN_URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856
+2026-10-01T09:27:53.4781189Z   GH_AW_REPORT_FAILED_JOBS: true
+2026-10-01T09:27:53.4782851Z ##[endgroup]
+2026-10-01T09:27:53.5957223Z Checking GitHub API rate limit before querying jobs
+2026-10-01T09:27:53.8347996Z Querying jobs for workflow run 36840260856
+2026-10-01T09:27:54.2831278Z Page 1: retrieved 8 jobs
+2026-10-01T09:27:54.2834912Z Skipping builtin job: detection (already reported by agent failure handler)
+2026-10-01T09:27:54.2838811Z Checking GitHub API rate limit after querying jobs
+2026-10-01T09:27:54.3806419Z No failed non-builtin jobs found, skipping issue creation

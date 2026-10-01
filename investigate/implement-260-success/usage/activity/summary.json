@@ -1,0 +1,111 @@
+{
+  "schema": "usage-activity-summary/v1",
+  "firewall": {
+    "total_requests": 112,
+    "allowed_requests": 112,
+    "blocked_requests": 0,
+    "allowed_domains": [
+      "api.anthropic.com:443"
+    ],
+    "blocked_domains": [],
+    "requests_by_domain": {
+      "api.anthropic.com:443": {
+        "allowed": 112,
+        "blocked": 0
+      }
+    }
+  },
+  "gateway": {
+    "total_calls": 2,
+    "failed_calls": 0,
+    "total_input_size": 1871,
+    "total_output_size": 0,
+    "max_input_size": 1832,
+    "max_output_size": 0,
+    "total_duration_ms": 0,
+    "max_duration_ms": 0,
+    "tool_calls": [
+      {
+        "tool_call_id": "call-1",
+        "timestamp": "2026-10-01T08:50:52.055Z",
+        "server_name": "safeoutputs",
+        "tool_name": "create_pull_request",
+        "request_size": 39,
+        "response_size": 0,
+        "duration_ms": 0,
+        "outcome": "incomplete"
+      },
+      {
+        "tool_call_id": "call-2",
+        "timestamp": "2026-10-01T08:51:44.785Z",
+        "server_name": "safeoutputs",
+        "tool_name": "create_pull_request",
+        "request_size": 1832,
+        "response_size": 0,
+        "duration_ms": 0,
+        "outcome": "incomplete"
+      }
+    ],
+    "servers": [
+      {
+        "server_name": "safeoutputs",
+        "request_count": 2,
+        "tool_call_count": 2,
+        "failed_calls": 0,
+        "total_input_size": 1871,
+        "total_output_size": 0,
+        "total_duration_ms": 0,
+        "avg_duration_ms": 0
+      }
+    ],
+    "tools": [
+      {
+        "server_name": "safeoutputs",
+        "tool_name": "create_pull_request",
+        "call_count": 2,
+        "failed_calls": 0,
+        "total_input_size": 1871,
+        "total_output_size": 0,
+        "max_input_size": 1832,
+        "max_output_size": 0,
+        "total_duration_ms": 0,
+        "max_duration_ms": 0,
+        "avg_duration_ms": 0
+      }
+    ]
+  },
+  "safe_outputs": {
+    "total_items": 1,
+    "items_by_type": {
+      "create_pull_request": 1
+    },
+    "items": [
+      {
+        "type": "create_pull_request",
+        "url": "https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/pull/271",
+        "number": 271,
+        "repo": "Viktor-Jensen-Torp/gh-aw-spike-target",
+        "provider": "github",
+        "id": 4701487904,
+        "target": {
+          "provider": "github",
+          "repository": "Viktor-Jensen-Torp/gh-aw-spike-target",
+          "number": 271
+        },
+        "temporaryId": "aw_MQI9irD5",
+        "metadata": {
+          "node_id": "PR_kwDOUhexgc8AAAABGDsDIA"
+        },
+        "timestamp": "2026-10-01T08:53:58.983Z"
+      }
+    ]
+  },
+  "working_set": {
+    "measurement_state": "measured",
+    "cumulative_input_tokens": 253,
+    "peak_input_tokens": 7,
+    "rebuild_excess_tokens": 246,
+    "invocations": 43,
+    "rebuild_factor": 36.142857142857146
+  }
+}

@@ -1,0 +1,25 @@
+﻿2026-10-01T09:26:00.8511390Z ##[group]Run bash "${RUNNER_TEMP}/gh-aw/actions/install_awf_binary.sh" v0.28.23 --rootless
+2026-10-01T09:26:00.8512010Z [36;1mbash "${RUNNER_TEMP}/gh-aw/actions/install_awf_binary.sh" v0.28.23 --rootless[0m
+2026-10-01T09:26:00.8544345Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:26:00.8544624Z env:
+2026-10-01T09:26:00.8545047Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:26:00.8545333Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:26:00.8546112Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:26:00.8546867Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:26:00.8547163Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:26:00.8547484Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:26:00.8547745Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:26:00.8548066Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:26:00.8548436Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 767fb979fc5431fc
+2026-10-01T09:26:00.8548791Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846748591
+2026-10-01T09:26:00.8549073Z ##[endgroup]
+2026-10-01T09:26:00.8629900Z Installing awf with checksum verification (version: v0.28.23, os: Linux, arch: x86_64)
+2026-10-01T09:26:00.8650005Z Cleaning up stale AWF chroot directories...
+2026-10-01T09:26:00.8870578Z Downloading checksums from 'https://github.com/github/gh-aw-firewall/releases/download/v0.28.23/checksums.txt'...
+2026-10-01T09:26:01.2061738Z Node.js >= 20 detected (v22.23.2), using lightweight bundle...
+2026-10-01T09:26:01.2062709Z Downloading bundle from 'https://github.com/github/gh-aw-firewall/releases/download/v0.28.23/awf-bundle.js'...
+2026-10-01T09:26:01.5893496Z Verifying SHA256 checksum for awf-bundle.js...
+2026-10-01T09:26:01.5960092Z ✓ Checksum verification passed for awf-bundle.js
+2026-10-01T09:26:01.6004089Z ✓ Installed awf bundle to /home/runner/.local/lib/awf/awf-bundle.js
+2026-10-01T09:26:01.8735625Z 0.28.23
+2026-10-01T09:26:01.8780323Z ✓ AWF installation complete

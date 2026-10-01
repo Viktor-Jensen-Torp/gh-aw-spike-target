@@ -1,0 +1,34 @@
+﻿2026-10-01T09:04:17.2693468Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:17.2701560Z with:
+2026-10-01T09:04:17.2728009Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'check_version_updates.cjs'));
+await main();
+
+2026-10-01T09:04:17.2783840Z   github-token: ***
+2026-10-01T09:04:17.2786580Z   debug: false
+2026-10-01T09:04:17.2787758Z   user-agent: actions/github-script
+2026-10-01T09:04:17.2790416Z   result-encoding: json
+2026-10-01T09:04:17.2793181Z   retries: 0
+2026-10-01T09:04:17.2795066Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:17.2797383Z env:
+2026-10-01T09:04:17.2800148Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:17.2803158Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:17.2812403Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:17.2820883Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:17.2822559Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:17.2824041Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:17.2825684Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:17.2867177Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:17.2868843Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:17.2870610Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:17.2872176Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:17.2873623Z   GH_AW_COMPILED_VERSION: v0.89.21
+2026-10-01T09:04:17.2875153Z   GH_AW_BLOCKED_VERSION_REPORT_AS_ISSUE: true
+2026-10-01T09:04:17.2876547Z   GH_AW_WORKFLOW_NAME: Implement
+2026-10-01T09:04:17.2880343Z ##[endgroup]
+2026-10-01T09:04:17.8934731Z Checking compile-agentic version: v0.89.21
+2026-10-01T09:04:17.8985896Z Fetching update configuration from: https://raw.githubusercontent.com/github/gh-aw-actions/main/.github/aw/compat.json
+2026-10-01T09:04:18.1538987Z ✅ Version check passed: v0.89.21

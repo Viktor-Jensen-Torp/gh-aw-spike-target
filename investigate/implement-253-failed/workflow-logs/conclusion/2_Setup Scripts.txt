@@ -1,0 +1,34 @@
+﻿2026-10-01T09:27:41.7642446Z ##[group]Run github/gh-aw-actions/setup@924af5fdc64061cfbf66fb584c8b07e2ac230c60
+2026-10-01T09:27:41.7643824Z with:
+2026-10-01T09:27:41.7644538Z   destination: /home/runner/work/_temp/gh-aw/actions
+2026-10-01T09:27:41.7645370Z   job-name: conclusion
+2026-10-01T09:27:41.7646419Z   trace-id: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:41.7647222Z   parent-span-id: fd735d279bdaa5ff
+2026-10-01T09:27:41.7647983Z   safe-output-artifact-client: false
+2026-10-01T09:27:41.7648979Z env:
+2026-10-01T09:27:41.7649600Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:41.7650330Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:41.7651917Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:41.7653529Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:41.7654276Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:41.7655077Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:41.7655799Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:41.7656783Z   GH_AW_SETUP_WORKFLOW_NAME: Implement
+2026-10-01T09:27:41.7658040Z   GH_AW_CURRENT_WORKFLOW_REF: Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/implement.lock.yml@refs/heads/main
+2026-10-01T09:27:41.7659263Z   GH_AW_INFO_VERSION: 0.87.0
+2026-10-01T09:27:41.7659951Z   GH_AW_INFO_AWF_VERSION: v0.28.23
+2026-10-01T09:27:41.7660670Z   GH_AW_INFO_ENGINE_ID: pi
+2026-10-01T09:27:41.7661327Z ##[endgroup]
+2026-10-01T09:27:43.6401807Z Successfully copied 515 files to /home/runner/work/_temp/gh-aw/actions
+2026-10-01T09:27:43.9966216Z [info] [otlp] INPUT_TRACE_ID=78bd5c44fe8cb81f476f21df20fa0d20 (will reuse activation trace)
+2026-10-01T09:27:43.9967860Z [info] [otlp] INPUT_PARENT_SPAN_ID=fd735d279bdaa5ff (will parent setup span)
+2026-10-01T09:27:43.9969041Z [info] [otlp] no OTLP endpoints have usable credentials, skipping setup span
+2026-10-01T09:27:43.9970114Z [info] [otlp] resolved trace-id=78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:43.9971236Z [info] [otlp] trace-id=78bd5c44fe8cb81f476f21df20fa0d20 written to GITHUB_OUTPUT
+2026-10-01T09:27:43.9972326Z [info] [otlp] span-id=5d139c37ca1b9167 written to GITHUB_OUTPUT
+2026-10-01T09:27:43.9973346Z [info] [otlp] parent-span-id=fd735d279bdaa5ff written to GITHUB_OUTPUT
+2026-10-01T09:27:43.9974343Z [info] [otlp] GITHUB_AW_OTEL_TRACE_ID written to GITHUB_ENV
+2026-10-01T09:27:43.9975312Z [info] [otlp] GITHUB_AW_OTEL_PARENT_SPAN_ID written to GITHUB_ENV
+2026-10-01T09:27:43.9976549Z [info] [otlp] GITHUB_AW_OTEL_JOB_START_MS written to GITHUB_ENV
+2026-10-01T09:27:43.9977693Z Successfully copied 26 mcp-scripts files to /home/runner/work/_temp/gh-aw/mcp-scripts
+2026-10-01T09:27:43.9978994Z Successfully copied 88 safe-outputs files to /home/runner/work/_temp/gh-aw/safeoutputs

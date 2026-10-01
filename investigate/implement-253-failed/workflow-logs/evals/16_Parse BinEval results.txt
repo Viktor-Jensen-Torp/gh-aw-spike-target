@@ -1,0 +1,38 @@
+﻿2026-10-01T09:27:00.2861511Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:27:00.2861946Z with:
+2026-10-01T09:27:00.2863076Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'run_evals.cjs'));
+await main();
+
+2026-10-01T09:27:00.2866823Z   github-token: ***
+2026-10-01T09:27:00.2867068Z   debug: false
+2026-10-01T09:27:00.2867294Z   user-agent: actions/github-script
+2026-10-01T09:27:00.2867574Z   result-encoding: json
+2026-10-01T09:27:00.2867806Z   retries: 0
+2026-10-01T09:27:00.2868042Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:27:00.2868345Z env:
+2026-10-01T09:27:00.2868549Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:00.2868829Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:00.2869601Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:00.2870413Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:00.2870713Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:00.2871023Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:00.2871282Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:00.2871581Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:00.2871949Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a2376259fc9e750c
+2026-10-01T09:27:00.2872268Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846778209
+2026-10-01T09:27:00.2872599Z   GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:27:00.2872902Z   GH_AW_AIC: 0.5877
+2026-10-01T09:27:00.2873130Z   GH_AW_AMBIENT_CONTEXT: 2227
+2026-10-01T09:27:00.2874121Z   GH_AW_EVALS_QUESTIONS: [{"id":"tests_added","question":"Were new or updated tests added for the behaviour this change introduces or fixes?"},{"id":"stayed_in_scope","question":"Does the change stay within what the triggering issue asked for, without touching unrelated code?"}]
+2026-10-01T09:27:00.2875182Z   GH_AW_EVALS_MODEL: anthropic/claude-haiku-4-5-20251001
+2026-10-01T09:27:00.2875519Z   GH_AW_EVALS_PHASE: parse
+2026-10-01T09:27:00.2875761Z   GITHUB_RUN_ID: 36840260856
+2026-10-01T09:27:00.2876009Z ##[endgroup]
+2026-10-01T09:27:00.3901440Z Parsing evals log: /tmp/gh-aw/evals/evals.log (67810 bytes)
+2026-10-01T09:27:00.3915594Z Q[tests_added]: UNKNOWN
+2026-10-01T09:27:00.3917621Z Q[stayed_in_scope]: UNKNOWN
+2026-10-01T09:27:00.3919139Z BinEval results written to /tmp/gh-aw/evals.jsonl (2 record(s))

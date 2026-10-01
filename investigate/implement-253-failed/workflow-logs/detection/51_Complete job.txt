@@ -1,0 +1,5 @@
+﻿2026-10-01T09:26:06.8159432Z Evaluate and set job outputs
+2026-10-01T09:26:06.8164691Z Set output 'detection_conclusion'
+2026-10-01T09:26:06.8166774Z Set output 'detection_reason'
+2026-10-01T09:26:06.8167569Z Set output 'detection_success'
+2026-10-01T09:26:06.8168441Z Cleaning up orphan processes

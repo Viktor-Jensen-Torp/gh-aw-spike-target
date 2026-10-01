@@ -1,0 +1,60 @@
+﻿2026-10-01T09:25:35.3191044Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-10-01T09:25:35.3207418Z with:
+2026-10-01T09:25:35.3207710Z   name: agent-output-fallback
+2026-10-01T09:25:35.3209106Z   path: /tmp/gh-aw/agent_output.json
+/tmp/gh-aw/safeoutputs.jsonl
+/tmp/gh-aw/agent_execution.json
+/tmp/gh-aw/agent_usage.jsonl
+/tmp/gh-aw/agent_usage.json
+/tmp/gh-aw/sandbox/firewall-audit-logs/api-proxy-logs/token-usage.jsonl
+/tmp/gh-aw/sandbox/firewall/logs/api-proxy-logs/token-usage.jsonl
+/tmp/gh-aw/sandbox/firewall/audit/api-proxy-logs/token-usage.jsonl
+
+2026-10-01T09:25:35.3210504Z   if-no-files-found: ignore
+2026-10-01T09:25:35.3210768Z   compression-level: 6
+2026-10-01T09:25:35.3211004Z   overwrite: false
+2026-10-01T09:25:35.3211244Z   include-hidden-files: false
+2026-10-01T09:25:35.3211504Z   archive: true
+2026-10-01T09:25:35.3211713Z env:
+2026-10-01T09:25:35.3211921Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:25:35.3212203Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:25:35.3212998Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:25:35.3213830Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:25:35.3214133Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:25:35.3214452Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:25:35.3214714Z   DEFAULT_BRANCH: main
+2026-10-01T09:25:35.3214955Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:25:35.3215202Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:25:35.3215434Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:25:35.3215729Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:25:35.3216343Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:25:35.3216614Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:25:35.3216881Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:25:35.3217169Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:25:35.3217590Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:25:35.3217909Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:25:35.3218223Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:25:35.3218562Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:25:35.3218962Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:25:35.3219392Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:25:35.3219878Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:25:35.3220527Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:25:35.3220968Z   GH_AW_AGENT_OUTPUT: /tmp/gh-aw/agent_output.json
+2026-10-01T09:25:35.3221335Z   GH_AW_AIC: 101.077665
+2026-10-01T09:25:35.3221568Z   GH_AW_AMBIENT_CONTEXT: 739
+2026-10-01T09:25:35.3221856Z   GH_AW_PRIMARY_MODEL: claude-haiku-4-5-20251001
+2026-10-01T09:25:35.3222168Z ##[endgroup]
+2026-10-01T09:25:35.4725924Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-01T09:25:35.4730138Z The least common ancestor is /tmp/gh-aw. This will be the root directory of the artifact
+2026-10-01T09:25:35.4731155Z With the provided path, there will be 4 files uploaded
+2026-10-01T09:25:35.4735452Z Artifact name is valid!
+2026-10-01T09:25:35.4736941Z Root directory input is valid!
+2026-10-01T09:25:35.6738290Z Uploading artifact: agent-output-fallback.zip
+2026-10-01T09:25:35.6785601Z Beginning upload of artifact content to blob storage
+2026-10-01T09:25:35.7473525Z Uploaded bytes 8871
+2026-10-01T09:25:35.7590546Z Finished uploading artifact content to blob storage!
+2026-10-01T09:25:35.7592451Z SHA256 digest of uploaded artifact is ffb760b15bdd49799408d08927aefd9ea3bd20d3d4955357c30bf742dc3f62f2
+2026-10-01T09:25:35.7593452Z Finalizing artifact upload
+2026-10-01T09:25:35.9811646Z Artifact agent-output-fallback successfully finalized. Artifact ID 11151861612
+2026-10-01T09:25:35.9813735Z Artifact agent-output-fallback has been successfully uploaded! Final size is 8871 bytes. Artifact ID is 11151861612
+2026-10-01T09:25:35.9817469Z Artifact download URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856/artifacts/11151861612

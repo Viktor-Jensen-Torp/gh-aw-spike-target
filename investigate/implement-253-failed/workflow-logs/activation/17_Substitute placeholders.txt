@@ -1,0 +1,59 @@
+﻿2026-10-01T09:04:19.2082499Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:19.2085952Z with:
+2026-10-01T09:04:19.2105948Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+
+const substitutePlaceholders = require(path.join(actionsDir, 'substitute_placeholders.cjs'));
+
+// Call the substitution function
+return await substitutePlaceholders({
+  file: process.env.GH_AW_PROMPT,
+  substitutions: {
+    GH_AW_EXPR_1A3A194A: process.env.GH_AW_EXPR_1A3A194A,
+    GH_AW_EXPR_463A214A: process.env.GH_AW_EXPR_463A214A,
+    GH_AW_EXPR_802A9F6A: process.env.GH_AW_EXPR_802A9F6A,
+    GH_AW_EXPR_FF1D34CE: process.env.GH_AW_EXPR_FF1D34CE,
+    GH_AW_GITHUB_ACTOR: process.env.GH_AW_GITHUB_ACTOR,
+    GH_AW_GITHUB_EVENT_INPUTS_ISSUE: process.env.GH_AW_GITHUB_EVENT_INPUTS_ISSUE,
+    GH_AW_GITHUB_REPOSITORY: process.env.GH_AW_GITHUB_REPOSITORY,
+    GH_AW_GITHUB_RUN_ID: process.env.GH_AW_GITHUB_RUN_ID,
+    GH_AW_GITHUB_WORKSPACE: process.env.GH_AW_GITHUB_WORKSPACE,
+    GH_AW_MCP_CLI_SERVERS_LIST: process.env.GH_AW_MCP_CLI_SERVERS_LIST,
+    GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED: process.env.GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED
+  }
+});
+
+2026-10-01T09:04:19.2156291Z   github-token: ***
+2026-10-01T09:04:19.2157513Z   debug: false
+2026-10-01T09:04:19.2158525Z   user-agent: actions/github-script
+2026-10-01T09:04:19.2162505Z   result-encoding: json
+2026-10-01T09:04:19.2188184Z   retries: 0
+2026-10-01T09:04:19.2189232Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:19.2190437Z env:
+2026-10-01T09:04:19.2191951Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:19.2193063Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:19.2196421Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:19.2200953Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:19.2207874Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:19.2211459Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:19.2212633Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:19.2213696Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:19.2215079Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:19.2217814Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:19.2219275Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:19.2220699Z   GH_AW_PROMPT: /home/runner/work/_temp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:04:19.2222554Z   GH_AW_EXPR_1A3A194A: false
+2026-10-01T09:04:19.2225445Z   GH_AW_EXPR_463A214A: false
+2026-10-01T09:04:19.2227563Z   GH_AW_EXPR_802A9F6A: 253
+2026-10-01T09:04:19.2228576Z   GH_AW_EXPR_FF1D34CE: 
+2026-10-01T09:04:19.2229570Z   GH_AW_GITHUB_ACTOR: github-actions[bot]
+2026-10-01T09:04:19.2230749Z   GH_AW_GITHUB_EVENT_INPUTS_ISSUE: 253
+2026-10-01T09:04:19.2232136Z   GH_AW_GITHUB_REPOSITORY: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:04:19.2233530Z   GH_AW_GITHUB_RUN_ID: 36840260856
+2026-10-01T09:04:19.2236395Z   GH_AW_GITHUB_WORKSPACE: /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+2026-10-01T09:04:19.2238603Z   GH_AW_MCP_CLI_SERVERS_LIST: - `safeoutputs` — run `safeoutputs --help` to see available tools
+2026-10-01T09:04:19.2240436Z   GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED: true
+2026-10-01T09:04:19.2241681Z ##[endgroup]
+2026-10-01T09:04:19.4885300Z [substitutePlaceholders] /home/runner/work/_temp/gh-aw/aw-prompts/prompt.txt (11 substitution(s))

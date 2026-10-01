@@ -1,0 +1,30 @@
+﻿2026-10-01T09:03:41.3325342Z ##[group]Run github/gh-aw-actions/setup@924af5fdc64061cfbf66fb584c8b07e2ac230c60
+2026-10-01T09:03:41.3326541Z with:
+2026-10-01T09:03:41.3327090Z   destination: /home/runner/work/_temp/gh-aw/actions
+2026-10-01T09:03:41.3327774Z   job-name: pre_activation
+2026-10-01T09:03:41.3328321Z   safe-output-artifact-client: false
+2026-10-01T09:03:41.3329497Z env:
+2026-10-01T09:03:41.3329997Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:03:41.3330567Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:03:41.3331934Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:03:41.3333299Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:03:41.3333877Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:03:41.3334507Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:03:41.3335052Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:03:41.3335589Z   GH_AW_SETUP_WORKFLOW_NAME: Implement
+2026-10-01T09:03:41.3336659Z   GH_AW_CURRENT_WORKFLOW_REF: Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/implement.lock.yml@refs/heads/main
+2026-10-01T09:03:41.3337685Z   GH_AW_INFO_VERSION: 0.87.0
+2026-10-01T09:03:41.3338224Z   GH_AW_INFO_AWF_VERSION: v0.28.23
+2026-10-01T09:03:41.3338777Z   GH_AW_INFO_ENGINE_ID: pi
+2026-10-01T09:03:41.3339520Z ##[endgroup]
+2026-10-01T09:03:43.2435097Z Successfully copied 515 files to /home/runner/work/_temp/gh-aw/actions
+2026-10-01T09:03:43.4717313Z Successfully copied 26 mcp-scripts files to /home/runner/work/_temp/gh-aw/mcp-scripts
+2026-10-01T09:03:43.5711541Z Successfully copied 88 safe-outputs files to /home/runner/work/_temp/gh-aw/safeoutputs
+2026-10-01T09:03:43.6122363Z [info] [otlp] INPUT_TRACE_ID not set, a new trace ID will be generated
+2026-10-01T09:03:43.6129901Z [info] [otlp] no OTLP endpoints have usable credentials, skipping setup span
+2026-10-01T09:03:43.6164773Z [info] [otlp] resolved trace-id=78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:03:43.6171621Z [info] [otlp] trace-id=78bd5c44fe8cb81f476f21df20fa0d20 written to GITHUB_OUTPUT
+2026-10-01T09:03:43.6176602Z [info] [otlp] span-id=fd735d279bdaa5ff written to GITHUB_OUTPUT
+2026-10-01T09:03:43.6180746Z [info] [otlp] GITHUB_AW_OTEL_TRACE_ID written to GITHUB_ENV
+2026-10-01T09:03:43.6184265Z [info] [otlp] GITHUB_AW_OTEL_PARENT_SPAN_ID written to GITHUB_ENV
+2026-10-01T09:03:43.6188055Z [info] [otlp] GITHUB_AW_OTEL_JOB_START_MS written to GITHUB_ENV

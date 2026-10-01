@@ -1,0 +1,118 @@
+﻿2026-10-01T09:04:18.7910669Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:18.7912919Z with:
+2026-10-01T09:04:18.7918205Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'interpolate_prompt.cjs'));
+await main();
+
+2026-10-01T09:04:18.7930538Z   github-token: ***
+2026-10-01T09:04:18.7931502Z   debug: false
+2026-10-01T09:04:18.7932438Z   user-agent: actions/github-script
+2026-10-01T09:04:18.7933569Z   result-encoding: json
+2026-10-01T09:04:18.7934737Z   retries: 0
+2026-10-01T09:04:18.7935736Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:18.7937301Z env:
+2026-10-01T09:04:18.7938289Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:18.7940324Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:18.7943170Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:18.7947169Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:18.7948337Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:18.7961795Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:18.7962897Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:18.7963997Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:18.7965913Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:18.7967768Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:18.7969508Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:18.7972209Z   GH_AW_PROMPT: /home/runner/work/_temp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:04:18.7973636Z   GH_AW_ENGINE_ID: pi
+2026-10-01T09:04:18.7974836Z   GH_AW_GITHUB_EVENT_INPUTS_ISSUE: 253
+2026-10-01T09:04:18.7976503Z   GH_AW_GITHUB_REPOSITORY: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:04:18.8002484Z ##[endgroup]
+2026-10-01T09:04:19.0965047Z ========================================
+2026-10-01T09:04:19.0971161Z [main] Starting interpolate_prompt processing
+2026-10-01T09:04:19.0977485Z ========================================
+2026-10-01T09:04:19.0981331Z [main] Prompt path: /home/runner/work/_temp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:04:19.0985958Z [main] Workspace directory: /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+2026-10-01T09:04:19.0991568Z [main] Reading prompt file...
+2026-10-01T09:04:19.0999039Z [main] Original content length: 20624 characters
+2026-10-01T09:04:19.1010793Z [main] First 200 characters: <system>\nImmutable security policy. Sandbox, firewall, credentials, and tool limits are physical boundaries. Do not bypass, weaken, test, or evade them.\n\nNever do: container escape, privilege escalati
+2026-10-01T09:04:19.1023361Z [main] Writing raw template to: /home/runner/work/_temp/gh-aw/aw-prompts/prompt-template.txt
+2026-10-01T09:04:19.1061170Z 
+2026-10-01T09:04:19.1061732Z ========================================
+2026-10-01T09:04:19.1121035Z [main] STEP 1: Runtime Imports
+2026-10-01T09:04:19.1123118Z ========================================
+2026-10-01T09:04:19.1126923Z No runtime import macros found, skipping runtime import processing
+2026-10-01T09:04:19.1146567Z [main] Writing import tree to: /home/runner/work/_temp/gh-aw/aw-prompts/prompt-import-tree.json
+2026-10-01T09:04:19.1148056Z 
+2026-10-01T09:04:19.1148462Z ========================================
+2026-10-01T09:04:19.1149618Z [main] STEP 1.5: Inline Sub-Agent Extraction
+2026-10-01T09:04:19.1150811Z ========================================
+2026-10-01T09:04:19.1151980Z No inline sub-agent markers found, skipping
+2026-10-01T09:04:19.1152801Z 
+2026-10-01T09:04:19.1153203Z ========================================
+2026-10-01T09:04:19.1165974Z [main] STEP 1.6: Inline Skill Extraction
+2026-10-01T09:04:19.1167276Z ========================================
+2026-10-01T09:04:19.1168429Z No inline skill markers found, skipping
+2026-10-01T09:04:19.1176865Z 
+2026-10-01T09:04:19.1177323Z ========================================
+2026-10-01T09:04:19.1178963Z [main] STEP 2: Variable Interpolation
+2026-10-01T09:04:19.1180100Z ========================================
+2026-10-01T09:04:19.1226931Z No expression variables found, skipping interpolation
+2026-10-01T09:04:19.1229444Z 
+2026-10-01T09:04:19.1230115Z ========================================
+2026-10-01T09:04:19.1265602Z [main] STEP 2.5: Experiment Placeholder Substitution
+2026-10-01T09:04:19.1266920Z ========================================
+2026-10-01T09:04:19.1268116Z No experiment placeholders found in prompt
+2026-10-01T09:04:19.1268908Z 
+2026-10-01T09:04:19.1269303Z ========================================
+2026-10-01T09:04:19.1270425Z [main] STEP 3: Template Rendering
+2026-10-01T09:04:19.1271479Z ========================================
+2026-10-01T09:04:19.1272638Z Processing 8 conditional template block(s)
+2026-10-01T09:04:19.1273972Z [renderMarkdownTemplate] Starting template rendering
+2026-10-01T09:04:19.1277722Z [renderMarkdownTemplate] Input length: 20624 characters
+2026-10-01T09:04:19.1279574Z [renderMarkdownTemplate] Preserved 5 fenced code block(s) from template processing
+2026-10-01T09:04:19.1281774Z [renderMarkdownTemplate] Found 8 block conditional(s) and 0 inline conditional(s)
+2026-10-01T09:04:19.1283930Z [renderMarkdownTemplate] Block 1: condition="github.actor" -> evaluating branches
+2026-10-01T09:04:19.1286290Z [renderMarkdownTemplate]   Body preview: "- **actor**: __GH_AW_GITHUB_ACTOR__\n"
+2026-10-01T09:04:19.1288957Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=true
+2026-10-01T09:04:19.1291256Z [renderMarkdownTemplate] Block 2: condition="github.repository" -> evaluating branches
+2026-10-01T09:04:19.1293554Z [renderMarkdownTemplate]   Body preview: "- **repository**: __GH_AW_GITHUB_REPOSITORY__\n"
+2026-10-01T09:04:19.1316680Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1319066Z [renderMarkdownTemplate] Block 3: condition="github.workspace" -> evaluating branches
+2026-10-01T09:04:19.1321362Z [renderMarkdownTemplate]   Body preview: "- **workspace**: __GH_AW_GITHUB_WORKSPACE__\n"
+2026-10-01T09:04:19.1323639Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1531123Z [renderMarkdownTemplate] Block 4: condition="github.event.issue.number || (github.aw.context.item_type == 'issue' && github.aw.context.item_number)" -> evaluating branches
+2026-10-01T09:04:19.1535434Z [renderMarkdownTemplate]   Body preview: "- **issue-number**: #__GH_AW_EXPR_802A9F6A__\n"
+2026-10-01T09:04:19.1537969Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1541563Z [renderMarkdownTemplate] Block 5: condition="github.event.discussion.number || (github.aw.context.item_type == 'discussion' && github.aw.context.item_number)" -> evaluating branches
+2026-10-01T09:04:19.1545258Z [renderMarkdownTemplate]   Body preview: "- **discussion-number**: #__GH_AW_EXPR_1A3A194A__\n"
+2026-10-01T09:04:19.1547604Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1551433Z [renderMarkdownTemplate] Block 6: condition="github.event.pull_request.number || (github.aw.context.item_type == 'pull_request' && github.aw.context.item_number)" -> evaluating branches
+2026-10-01T09:04:19.1559097Z [renderMarkdownTemplate]   Body preview: "- **pull-request-number**: #__GH_AW_EXPR_463A214A__\n"
+2026-10-01T09:04:19.1561495Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1564537Z [renderMarkdownTemplate] Block 7: condition="github.event.comment.id || github.aw.context.comment_id" -> evaluating branches
+2026-10-01T09:04:19.1611844Z [renderMarkdownTemplate]   Body preview: "- **comment-id**: __GH_AW_EXPR_FF1D34CE__\n"
+2026-10-01T09:04:19.1614426Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1617174Z [renderMarkdownTemplate] Block 8: condition="github.run_id" -> evaluating branches
+2026-10-01T09:04:19.1619459Z [renderMarkdownTemplate]   Body preview: "- **workflow-run-id**: __GH_AW_GITHUB_RUN_ID__\n"
+2026-10-01T09:04:19.1621761Z [renderMarkdownTemplate]   Action: Keeping selected branch with leading newline=false
+2026-10-01T09:04:19.1623965Z [renderMarkdownTemplate] First pass complete: 8 kept, 0 removed
+2026-10-01T09:04:19.1626088Z [renderMarkdownTemplate] Second pass complete: 0 kept, 0 removed
+2026-10-01T09:04:19.1627968Z [renderMarkdownTemplate] Cleaned up 1 excessive blank line sequence(s)
+2026-10-01T09:04:19.1630326Z [renderMarkdownTemplate] Length change from cleanup: 19426 -> 19425 characters
+2026-10-01T09:04:19.1632358Z [renderMarkdownTemplate] Final output length: 20044 characters
+2026-10-01T09:04:19.1633779Z Template rendered successfully
+2026-10-01T09:04:19.1635252Z Content length change: 20624 -> 20044 (-580)
+2026-10-01T09:04:19.1636204Z 
+2026-10-01T09:04:19.1636613Z ========================================
+2026-10-01T09:04:19.1637839Z [main] STEP 4: Writing Output
+2026-10-01T09:04:19.1647190Z ========================================
+2026-10-01T09:04:19.1657150Z Writing processed content back to: /home/runner/work/_temp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:04:19.1658929Z Final content length: 20044 characters
+2026-10-01T09:04:19.1660113Z Total length change: 20624 -> 20044 (-580)
+2026-10-01T09:04:19.1675765Z Last 200 characters:  `apps/`, `packages/` and `docs/architecture.md`, and do\nnot change any `package.json`, lockfile or anything under `.github/`. If the work\nneeds a new dependency, say so in the pull request instead.\n\n
+2026-10-01T09:04:19.1679157Z ========================================
+2026-10-01T09:04:19.1680315Z [main] Processing complete - SUCCESS
+2026-10-01T09:04:19.1682325Z ========================================

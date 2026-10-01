@@ -1,0 +1,3481 @@
+{
+  "schema_version": 2,
+  "cache_source": "full",
+  "overview": {
+    "run_id": 36840260856,
+    "workflow_name": "Implement #253",
+    "status": "completed",
+    "conclusion": "failure",
+    "created_at": "2026-10-01T09:03:34Z",
+    "started_at": "2026-10-01T09:03:34Z",
+    "updated_at": "2026-10-01T09:27:58Z",
+    "duration": "24.4m",
+    "event": "workflow_dispatch",
+    "branch": "main",
+    "url": "https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856",
+    "logs_path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856",
+    "context": {
+      "repo": "Viktor-Jensen-Torp/gh-aw-spike-target",
+      "run_id": "36840225915",
+      "workflow_id": "Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/dispatcher.yml@refs/heads/main",
+      "event_type": "issues",
+      "item_type": "issue",
+      "item_number": "253"
+    }
+  },
+  "comparison": {
+    "baseline_found": true,
+    "baseline": {
+      "run_id": 36837903914,
+      "workflow_name": "Implement #260",
+      "conclusion": "success",
+      "created_at": "2026-10-01T08:41:33Z",
+      "selection": "cohort_match",
+      "matched_on": [
+        "event",
+        "task_domain",
+        "execution_style",
+        "actuation_style",
+        "tool_breadth"
+      ]
+    },
+    "delta": {
+      "turns": {
+        "before": 0,
+        "after": 0,
+        "changed": false
+      },
+      "posture": {
+        "before": "write_capable",
+        "after": "read_only",
+        "changed": true
+      },
+      "blocked_requests": {
+        "before": 0,
+        "after": 0,
+        "changed": false
+      }
+    },
+    "classification": {
+      "label": "risky",
+      "reason_codes": [
+        "posture_changed",
+        "run_unsuccessful"
+      ]
+    },
+    "recommendation": {
+      "action": "Investigate failure; run concluded with errors before treating it as matching the selected successful baseline."
+    }
+  },
+  "task_domain": {
+    "name": "code_fix",
+    "label": "Code Fix",
+    "reason": "The workflow appears oriented toward code changes or pull request review."
+  },
+  "behavior_fingerprint": {
+    "execution_style": "exploratory",
+    "tool_breadth": "narrow",
+    "actuation_style": "read_only",
+    "resource_profile": "heavy",
+    "dispatch_mode": "delegated",
+    "agentic_fraction": 0
+  },
+  "agentic_assessments": [
+    {
+      "kind": "resource_heavy_for_domain",
+      "severity": "high",
+      "summary": "This Code Fix run consumed a heavy execution profile for its task shape.",
+      "evidence": "turns=125 tool_types=0 duration=24m24s write_actions=0",
+      "recommendation": "Compare this run to similar successful runs and trim unnecessary turns, tools, or write actions."
+    },
+    {
+      "kind": "delegated_context_present",
+      "severity": "info",
+      "summary": "The run preserved upstream dispatch context, which helps trace multi-workflow episodes.",
+      "evidence": "workflow_call_id= event_type=issues",
+      "recommendation": "Use this context when comparing downstream runs so follow-up workflows are evaluated as part of one task chain."
+    }
+  ],
+  "metrics": {
+    "token_usage": 37030,
+    "aic": 101.077665,
+    "ambient_context": {
+      "input_tokens": 3,
+      "cached_tokens": 0
+    },
+    "working_set": {
+      "measurement_state": "measured",
+      "rebuild_factor": 100.71428571428571,
+      "cumulative_input_tokens": 705,
+      "peak_input_tokens": 7,
+      "rebuild_excess_tokens": 698,
+      "invocations": 122
+    },
+    "action_minutes": 25,
+    "turns": 125,
+    "error_count": 1,
+    "warning_count": 0
+  },
+  "key_findings": [
+    {
+      "code": "workflow_failed",
+      "category": "error",
+      "severity": "critical",
+      "title": "Workflow Failed",
+      "description": "Workflow 'Implement #253' failed with 4 error(s): ##[error]Process completed with exit code 1.",
+      "impact": "Workflow did not complete successfully and may need intervention"
+    },
+    {
+      "code": "threat_detection_job_failed",
+      "category": "security",
+      "severity": "high",
+      "title": "Threat Detection Job Failed",
+      "description": "The threat-detection job failed before producing a threat verdict",
+      "impact": "Safe outputs may have been blocked because the security control did not complete"
+    },
+    {
+      "code": "many_iterations",
+      "category": "performance",
+      "severity": "medium",
+      "title": "Many Iterations",
+      "description": "Workflow took 125 turns to complete",
+      "impact": "Many turns may indicate task complexity or unclear instructions"
+    },
+    {
+      "code": "agentic_resource_heavy_for_domain",
+      "category": "performance",
+      "severity": "high",
+      "title": "Resource Heavy For Domain",
+      "description": "This Code Fix run consumed a heavy execution profile for its task shape.",
+      "impact": "Higher cost and latency than a comparable well-behaved run"
+    },
+    {
+      "code": "agentic_delegated_context_present",
+      "category": "coordination",
+      "severity": "info",
+      "title": "Dispatch Context Preserved",
+      "description": "The run preserved upstream dispatch context, which helps trace multi-workflow episodes.",
+      "impact": "Context continuity improves downstream debugging and auditability"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "action": "Review error logs to identify root cause of failure",
+      "reason": "Understanding failure causes helps prevent recurrence",
+      "example": "Check the errors field for specific error messages, or inspect the log files in logs_path"
+    },
+    {
+      "priority": "medium",
+      "action": "Clarify workflow instructions or break into smaller tasks",
+      "reason": "Many iterations may indicate unclear objectives or overly complex tasks",
+      "example": "Split complex workflows into discrete steps with clear success criteria"
+    },
+    {
+      "priority": "high",
+      "action": "Compare this run to similar successful runs and trim unnecessary turns, tools, or write actions.",
+      "reason": "This Code Fix run consumed a heavy execution profile for its task shape."
+    }
+  ],
+  "observability_insights": [
+    {
+      "category": "execution",
+      "severity": "medium",
+      "title": "Exploratory execution path",
+      "summary": "The agent used 125 turns across 0 tool types, which indicates adaptive planning instead of a strictly linear path.",
+      "evidence": "turns=125 tool_types=0"
+    },
+    {
+      "category": "actuation",
+      "severity": "info",
+      "title": "Read-only posture observed",
+      "summary": "The workflow stayed in an analysis posture and did not emit any GitHub write actions.",
+      "evidence": "created_items=0 safe_items=0"
+    },
+    {
+      "category": "network",
+      "severity": "info",
+      "title": "Network policy aligned",
+      "summary": "The firewall observed 249 request(s) with 0 blocked, for a 0% block rate.",
+      "evidence": "blocked=0 total=249"
+    },
+    {
+      "category": "execution",
+      "severity": "info",
+      "title": "Log template patterns mined",
+      "summary": "Analysis identified 2 distinct event templates across 6 pipeline stages from 2 events.",
+      "evidence": "plan=1 finish=1"
+    },
+    {
+      "category": "execution",
+      "severity": "info",
+      "title": "Agent stage sequence",
+      "summary": "The observed pipeline stage sequence for this run.",
+      "evidence": "plan finish"
+    }
+  ],
+  "performance_metrics": {
+    "tokens_per_minute": 1517.6229508196723,
+    "network_requests": 249
+  },
+  "engine_config": {
+    "engine_id": "pi",
+    "engine_name": "Pi",
+    "model": "anthropic/claude-haiku-4-5-20251001",
+    "version": "0.87.0",
+    "cli_version": "v0.89.21",
+    "firewall_version": "v0.28.23",
+    "trigger_event": "workflow_dispatch",
+    "repository": "Viktor-Jensen-Torp/gh-aw-spike-target"
+  },
+  "prompt_analysis": {
+    "prompt_size": 20080,
+    "prompt_file": "aw-prompts/prompt.txt"
+  },
+  "session_analysis": {
+    "wall_time": "24.4m",
+    "timeout_detected": false
+  },
+  "jobs": [
+    {
+      "name": "pre_activation",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "8.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:03:39Z",
+          "completed_at": "2026-10-01T09:03:41Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:03:41Z",
+          "completed_at": "2026-10-01T09:03:43Z"
+        },
+        {
+          "name": "Check team membership for workflow",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:03:43Z",
+          "completed_at": "2026-10-01T09:03:44Z"
+        },
+        {
+          "name": "Decide whether to start",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:03:44Z",
+          "completed_at": "2026-10-01T09:03:45Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:03:45Z",
+          "completed_at": "2026-10-01T09:03:45Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:03:45Z",
+          "completed_at": "2026-10-01T09:03:45Z"
+        }
+      ]
+    },
+    {
+      "name": "activation",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "33.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:03:57Z",
+          "completed_at": "2026-10-01T09:04:02Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:04:02Z",
+          "completed_at": "2026-10-01T09:04:09Z"
+        },
+        {
+          "name": "Mask OTLP telemetry headers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:04:09Z",
+          "completed_at": "2026-10-01T09:04:09Z"
+        },
+        {
+          "name": "Generate agentic run info",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:04:09Z",
+          "completed_at": "2026-10-01T09:04:09Z"
+        },
+        {
+          "name": "Restore daily AIC scan observations",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:04:09Z",
+          "completed_at": "2026-10-01T09:04:10Z"
+        },
+        {
+          "name": "Check daily workflow token guardrail",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-01T09:04:10Z",
+          "completed_at": "2026-10-01T09:04:10Z"
+        },
+        {
+          "name": "Publish daily AIC scan observations",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-01T09:04:10Z",
+          "completed_at": "2026-10-01T09:04:11Z"
+        },
+        {
+          "name": "Validate ANTHROPIC_API_KEY secret",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:04:11Z",
+          "completed_at": "2026-10-01T09:04:11Z"
+        },
+        {
+          "name": "Check for OAuth tokens",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:04:11Z",
+          "completed_at": "2026-10-01T09:04:11Z"
+        },
+        {
+          "name": "Checkout .github and .agents folders",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-01T09:04:11Z",
+          "completed_at": "2026-10-01T09:04:14Z"
+        },
+        {
+          "name": "Save agent config folders for base branch restoration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-01T09:04:14Z",
+          "completed_at": "2026-10-01T09:04:14Z"
+        },
+        {
+          "name": "Check workflow lock file",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-01T09:04:14Z",
+          "completed_at": "2026-10-01T09:04:17Z"
+        },
+        {
+          "name": "Check compile-agentic version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-01T09:04:17Z",
+          "completed_at": "2026-10-01T09:04:18Z"
+        },
+        {
+          "name": "Log runtime features",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-10-01T09:04:18Z",
+          "completed_at": "2026-10-01T09:04:18Z"
+        },
+        {
+          "name": "Create prompt with built-in context",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-01T09:04:18Z",
+          "completed_at": "2026-10-01T09:04:18Z"
+        },
+        {
+          "name": "Interpolate variables and render templates",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-01T09:04:18Z",
+          "completed_at": "2026-10-01T09:04:19Z"
+        },
+        {
+          "name": "Substitute placeholders",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-01T09:04:19Z",
+          "completed_at": "2026-10-01T09:04:19Z"
+        },
+        {
+          "name": "Validate prompt placeholders",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-01T09:04:19Z",
+          "completed_at": "2026-10-01T09:04:19Z"
+        },
+        {
+          "name": "Print prompt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-10-01T09:04:19Z",
+          "completed_at": "2026-10-01T09:04:19Z"
+        },
+        {
+          "name": "Upload info artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-10-01T09:04:19Z",
+          "completed_at": "2026-10-01T09:04:21Z"
+        },
+        {
+          "name": "Stage prompt files for artifact upload",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-10-01T09:04:21Z",
+          "completed_at": "2026-10-01T09:04:21Z"
+        },
+        {
+          "name": "Upload activation artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-10-01T09:04:21Z",
+          "completed_at": "2026-10-01T09:04:23Z"
+        },
+        {
+          "name": "Post Checkout .github and .agents folders",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 43,
+          "started_at": "2026-10-01T09:04:23Z",
+          "completed_at": "2026-10-01T09:04:24Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 44,
+          "started_at": "2026-10-01T09:04:24Z",
+          "completed_at": "2026-10-01T09:04:24Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 45,
+          "started_at": "2026-10-01T09:04:24Z",
+          "completed_at": "2026-10-01T09:04:24Z"
+        }
+      ]
+    },
+    {
+      "name": "agent",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "21.2m",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:04:29Z",
+          "completed_at": "2026-10-01T09:04:30Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:04:30Z",
+          "completed_at": "2026-10-01T09:04:33Z"
+        },
+        {
+          "name": "Set runtime paths",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:04:33Z",
+          "completed_at": "2026-10-01T09:04:33Z"
+        },
+        {
+          "name": "Mask OTLP telemetry headers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:04:33Z",
+          "completed_at": "2026-10-01T09:04:33Z"
+        },
+        {
+          "name": "Check OTLP telemetry configuration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:04:33Z",
+          "completed_at": "2026-10-01T09:04:33Z"
+        },
+        {
+          "name": "Checkout repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-01T09:04:33Z",
+          "completed_at": "2026-10-01T09:04:34Z"
+        },
+        {
+          "name": "Fetch additional refs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-01T09:04:34Z",
+          "completed_at": "2026-10-01T09:04:34Z"
+        },
+        {
+          "name": "Initialize agent execution evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:04:34Z",
+          "completed_at": "2026-10-01T09:04:34Z"
+        },
+        {
+          "name": "Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:04:34Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Create gh-aw temp directory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Configure gh CLI for GitHub Enterprise",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Download activation artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Configure Git credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Checkout PR branch",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:35Z"
+        },
+        {
+          "name": "Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-01T09:04:35Z",
+          "completed_at": "2026-10-01T09:04:36Z"
+        },
+        {
+          "name": "Install AWF binary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-01T09:04:36Z",
+          "completed_at": "2026-10-01T09:04:36Z"
+        },
+        {
+          "name": "Install Pi CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-01T09:04:36Z",
+          "completed_at": "2026-10-01T09:04:45Z"
+        },
+        {
+          "name": "Install Playwright CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-01T09:04:45Z",
+          "completed_at": "2026-10-01T09:04:46Z"
+        },
+        {
+          "name": "Install Playwright browsers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-10-01T09:04:46Z",
+          "completed_at": "2026-10-01T09:05:11Z"
+        },
+        {
+          "name": "Install Playwright CLI skills",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-10-01T09:05:11Z",
+          "completed_at": "2026-10-01T09:05:11Z"
+        },
+        {
+          "name": "Determine automatic lockdown mode for GitHub MCP Server",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-10-01T09:05:11Z",
+          "completed_at": "2026-10-01T09:05:12Z"
+        },
+        {
+          "name": "Restore agent config folders from base branch",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-10-01T09:05:12Z",
+          "completed_at": "2026-10-01T09:05:12Z"
+        },
+        {
+          "name": "Restore inline sub-agents from activation artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-10-01T09:05:12Z",
+          "completed_at": "2026-10-01T09:05:12Z"
+        },
+        {
+          "name": "Restore inline skills from activation artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-10-01T09:05:12Z",
+          "completed_at": "2026-10-01T09:05:12Z"
+        },
+        {
+          "name": "Install dev dependencies for the pre-push checks",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-10-01T09:05:12Z",
+          "completed_at": "2026-10-01T09:05:34Z"
+        },
+        {
+          "name": "Install role postconditions extension",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26,
+          "started_at": "2026-10-01T09:05:34Z",
+          "completed_at": "2026-10-01T09:05:34Z"
+        },
+        {
+          "name": "Extract the design parts the issue claims",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-10-01T09:05:34Z",
+          "completed_at": "2026-10-01T09:05:34Z"
+        },
+        {
+          "name": "Write the issue, its requirements and the conventions to files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28,
+          "started_at": "2026-10-01T09:05:34Z",
+          "completed_at": "2026-10-01T09:05:35Z"
+        },
+        {
+          "name": "Check that playwright-cli opens a browser",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-10-01T09:05:35Z",
+          "completed_at": "2026-10-01T09:06:06Z"
+        },
+        {
+          "name": "Download container images",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-10-01T09:06:06Z",
+          "completed_at": "2026-10-01T09:06:15Z"
+        },
+        {
+          "name": "Prepare Safe Outputs Directories",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-10-01T09:06:15Z",
+          "completed_at": "2026-10-01T09:06:15Z"
+        },
+        {
+          "name": "Generate Safe Outputs Config",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32,
+          "started_at": "2026-10-01T09:06:15Z",
+          "completed_at": "2026-10-01T09:06:15Z"
+        },
+        {
+          "name": "Generate Safe Outputs Tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33,
+          "started_at": "2026-10-01T09:06:15Z",
+          "completed_at": "2026-10-01T09:06:15Z"
+        },
+        {
+          "name": "Start MCP Gateway",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34,
+          "started_at": "2026-10-01T09:06:15Z",
+          "completed_at": "2026-10-01T09:06:22Z"
+        },
+        {
+          "name": "Mount MCP servers as CLIs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-10-01T09:06:22Z",
+          "completed_at": "2026-10-01T09:06:22Z"
+        },
+        {
+          "name": "Clean credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36,
+          "started_at": "2026-10-01T09:06:22Z",
+          "completed_at": "2026-10-01T09:06:22Z"
+        },
+        {
+          "name": "Audit pre-agent workspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-10-01T09:06:22Z",
+          "completed_at": "2026-10-01T09:06:22Z"
+        },
+        {
+          "name": "Start CLI Proxy",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-10-01T09:06:22Z",
+          "completed_at": "2026-10-01T09:06:23Z"
+        },
+        {
+          "name": "Execute Pi CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 39,
+          "started_at": "2026-10-01T09:06:23Z",
+          "completed_at": "2026-10-01T09:25:31Z"
+        },
+        {
+          "name": "Stop CLI Proxy",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 40,
+          "started_at": "2026-10-01T09:25:31Z",
+          "completed_at": "2026-10-01T09:25:31Z"
+        },
+        {
+          "name": "Configure Git credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 41,
+          "started_at": "2026-10-01T09:25:31Z",
+          "completed_at": "2026-10-01T09:25:32Z"
+        },
+        {
+          "name": "Stop MCP Gateway",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 42,
+          "started_at": "2026-10-01T09:25:32Z",
+          "completed_at": "2026-10-01T09:25:33Z"
+        },
+        {
+          "name": "Redact secrets in logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 43,
+          "started_at": "2026-10-01T09:25:33Z",
+          "completed_at": "2026-10-01T09:25:33Z"
+        },
+        {
+          "name": "Append agent step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 44,
+          "started_at": "2026-10-01T09:25:33Z",
+          "completed_at": "2026-10-01T09:25:33Z"
+        },
+        {
+          "name": "Copy Safe Outputs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 45,
+          "started_at": "2026-10-01T09:25:33Z",
+          "completed_at": "2026-10-01T09:25:33Z"
+        },
+        {
+          "name": "Ingest agent output",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 46,
+          "started_at": "2026-10-01T09:25:33Z",
+          "completed_at": "2026-10-01T09:25:33Z"
+        },
+        {
+          "name": "Parse agent logs for step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 47,
+          "started_at": "2026-10-01T09:25:33Z",
+          "completed_at": "2026-10-01T09:25:34Z"
+        },
+        {
+          "name": "Parse MCP Gateway logs for step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 48,
+          "started_at": "2026-10-01T09:25:34Z",
+          "completed_at": "2026-10-01T09:25:34Z"
+        },
+        {
+          "name": "Print firewall logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 49,
+          "started_at": "2026-10-01T09:25:34Z",
+          "completed_at": "2026-10-01T09:25:34Z"
+        },
+        {
+          "name": "Parse token usage for step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 50,
+          "started_at": "2026-10-01T09:25:34Z",
+          "completed_at": "2026-10-01T09:25:35Z"
+        },
+        {
+          "name": "Print AWF reflect summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 51,
+          "started_at": "2026-10-01T09:25:35Z",
+          "completed_at": "2026-10-01T09:25:35Z"
+        },
+        {
+          "name": "Generate observability summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 52,
+          "started_at": "2026-10-01T09:25:35Z",
+          "completed_at": "2026-10-01T09:25:35Z"
+        },
+        {
+          "name": "Write agent output placeholder if missing",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 53,
+          "started_at": "2026-10-01T09:25:35Z",
+          "completed_at": "2026-10-01T09:25:35Z"
+        },
+        {
+          "name": "Upload agent output fallback artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 54,
+          "started_at": "2026-10-01T09:25:35Z",
+          "completed_at": "2026-10-01T09:25:35Z"
+        },
+        {
+          "name": "Upload agent artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 55,
+          "started_at": "2026-10-01T09:25:35Z",
+          "completed_at": "2026-10-01T09:25:36Z"
+        },
+        {
+          "name": "Post Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 107,
+          "started_at": "2026-10-01T09:25:36Z",
+          "completed_at": "2026-10-01T09:25:36Z"
+        },
+        {
+          "name": "Post Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 108,
+          "started_at": "2026-10-01T09:25:36Z",
+          "completed_at": "2026-10-01T09:25:37Z"
+        },
+        {
+          "name": "Post Checkout repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 109,
+          "started_at": "2026-10-01T09:25:37Z",
+          "completed_at": "2026-10-01T09:25:37Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 110,
+          "started_at": "2026-10-01T09:25:37Z",
+          "completed_at": "2026-10-01T09:25:37Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 111,
+          "started_at": "2026-10-01T09:25:37Z",
+          "completed_at": "2026-10-01T09:25:37Z"
+        }
+      ]
+    },
+    {
+      "name": "detection",
+      "status": "completed",
+      "conclusion": "failure",
+      "duration": "26.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:25:44Z",
+          "completed_at": "2026-10-01T09:25:46Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:25:46Z",
+          "completed_at": "2026-10-01T09:25:48Z"
+        },
+        {
+          "name": "Download activation artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:25:48Z",
+          "completed_at": "2026-10-01T09:25:49Z"
+        },
+        {
+          "name": "Download agent output artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:25:49Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Setup agent output environment variable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Checkout repository for patch context",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Initialize detection execution evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Clear inherited Copilot session state",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Clean stale firewall files from agent artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:25:51Z"
+        },
+        {
+          "name": "Download container images",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-01T09:25:51Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Check if detection needed",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Clear MCP Config for detection",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Prepare threat detection files",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Setup threat detection",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Ensure threat-detection directory and log",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 15,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:00Z"
+        },
+        {
+          "name": "Install AWF binary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-01T09:26:00Z",
+          "completed_at": "2026-10-01T09:26:01Z"
+        },
+        {
+          "name": "Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-01T09:26:01Z",
+          "completed_at": "2026-10-01T09:26:02Z"
+        },
+        {
+          "name": "Install Claude Code CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-01T09:26:02Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Install threat-detect binary",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Execute threat detection with AWF",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 20,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Render detection log",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Copy detection firewall logs",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Parse threat detection token usage for step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:05Z"
+        },
+        {
+          "name": "Upload threat detection artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-10-01T09:26:05Z",
+          "completed_at": "2026-10-01T09:26:06Z"
+        },
+        {
+          "name": "Conclude threat detection",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 25,
+          "started_at": "2026-10-01T09:26:06Z",
+          "completed_at": "2026-10-01T09:26:06Z"
+        },
+        {
+          "name": "Post Setup Node.js",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 49,
+          "started_at": "2026-10-01T09:26:06Z",
+          "completed_at": "2026-10-01T09:26:06Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 50,
+          "started_at": "2026-10-01T09:26:06Z",
+          "completed_at": "2026-10-01T09:26:06Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 51,
+          "started_at": "2026-10-01T09:26:06Z",
+          "completed_at": "2026-10-01T09:26:06Z"
+        }
+      ]
+    },
+    {
+      "name": "evals",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "54.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:26:13Z",
+          "completed_at": "2026-10-01T09:26:16Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:26:16Z",
+          "completed_at": "2026-10-01T09:26:18Z"
+        },
+        {
+          "name": "Download agent output artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:26:18Z",
+          "completed_at": "2026-10-01T09:26:20Z"
+        },
+        {
+          "name": "Setup agent output environment variable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:26:20Z",
+          "completed_at": "2026-10-01T09:26:20Z"
+        },
+        {
+          "name": "Initialize evals execution evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:26:20Z",
+          "completed_at": "2026-10-01T09:26:20Z"
+        },
+        {
+          "name": "Clean stale firewall files from agent artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-01T09:26:20Z",
+          "completed_at": "2026-10-01T09:26:20Z"
+        },
+        {
+          "name": "Download container images",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-01T09:26:20Z",
+          "completed_at": "2026-10-01T09:26:30Z"
+        },
+        {
+          "name": "Prepare evals files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:26:30Z",
+          "completed_at": "2026-10-01T09:26:30Z"
+        },
+        {
+          "name": "Setup BinEval evaluations",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:26:30Z",
+          "completed_at": "2026-10-01T09:26:30Z"
+        },
+        {
+          "name": "Ensure evals directory and log",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-01T09:26:30Z",
+          "completed_at": "2026-10-01T09:26:30Z"
+        },
+        {
+          "name": "Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-01T09:26:30Z",
+          "completed_at": "2026-10-01T09:26:31Z"
+        },
+        {
+          "name": "Install AWF binary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-01T09:26:31Z",
+          "completed_at": "2026-10-01T09:26:32Z"
+        },
+        {
+          "name": "Install Pi CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-01T09:26:32Z",
+          "completed_at": "2026-10-01T09:26:40Z"
+        },
+        {
+          "name": "Execute Pi CLI",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-01T09:26:40Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Parse MCP Gateway logs for step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Parse BinEval results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Redact secrets in evals results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Render evals results to step summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Collect evals token usage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:00Z"
+        },
+        {
+          "name": "Upload evals results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-10-01T09:27:00Z",
+          "completed_at": "2026-10-01T09:27:02Z"
+        },
+        {
+          "name": "Upload evals accounting after failure",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-10-01T09:27:02Z",
+          "completed_at": "2026-10-01T09:27:02Z"
+        },
+        {
+          "name": "Post Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 41,
+          "started_at": "2026-10-01T09:27:02Z",
+          "completed_at": "2026-10-01T09:27:02Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 42,
+          "started_at": "2026-10-01T09:27:02Z",
+          "completed_at": "2026-10-01T09:27:02Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 43,
+          "started_at": "2026-10-01T09:27:02Z",
+          "completed_at": "2026-10-01T09:27:02Z"
+        }
+      ]
+    },
+    {
+      "name": "safe_outputs",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "push_evals_state",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "21.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:27:15Z",
+          "completed_at": "2026-10-01T09:27:20Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:27:20Z",
+          "completed_at": "2026-10-01T09:27:25Z"
+        },
+        {
+          "name": "Checkout repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:27:25Z",
+          "completed_at": "2026-10-01T09:27:27Z"
+        },
+        {
+          "name": "Configure Git credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:27:27Z",
+          "completed_at": "2026-10-01T09:27:27Z"
+        },
+        {
+          "name": "Download evals artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:27:27Z",
+          "completed_at": "2026-10-01T09:27:29Z"
+        },
+        {
+          "name": "Push evals results to git",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-01T09:27:29Z",
+          "completed_at": "2026-10-01T09:27:32Z"
+        },
+        {
+          "name": "Post Checkout repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-01T09:27:32Z",
+          "completed_at": "2026-10-01T09:27:32Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-01T09:27:32Z",
+          "completed_at": "2026-10-01T09:27:32Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-01T09:27:32Z",
+          "completed_at": "2026-10-01T09:27:32Z"
+        }
+      ]
+    },
+    {
+      "name": "conclusion",
+      "status": "completed",
+      "conclusion": "success",
+      "duration": "20.0s",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-01T09:27:38Z",
+          "completed_at": "2026-10-01T09:27:41Z"
+        },
+        {
+          "name": "Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-01T09:27:41Z",
+          "completed_at": "2026-10-01T09:27:44Z"
+        },
+        {
+          "name": "Generate GitHub App token",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-01T09:27:44Z",
+          "completed_at": "2026-10-01T09:27:44Z"
+        },
+        {
+          "name": "Download agent output artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-01T09:27:44Z",
+          "completed_at": "2026-10-01T09:27:45Z"
+        },
+        {
+          "name": "Setup agent output environment variable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-01T09:27:45Z",
+          "completed_at": "2026-10-01T09:27:45Z"
+        },
+        {
+          "name": "Download detection artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-01T09:27:45Z",
+          "completed_at": "2026-10-01T09:27:46Z"
+        },
+        {
+          "name": "Download Safe Outputs Items Manifest",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-01T09:27:46Z",
+          "completed_at": "2026-10-01T09:27:46Z"
+        },
+        {
+          "name": "Download evals artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-01T09:27:46Z",
+          "completed_at": "2026-10-01T09:27:47Z"
+        },
+        {
+          "name": "Collect usage artifact files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-01T09:27:47Z",
+          "completed_at": "2026-10-01T09:27:47Z"
+        },
+        {
+          "name": "Upload usage artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-01T09:27:47Z",
+          "completed_at": "2026-10-01T09:27:48Z"
+        },
+        {
+          "name": "Wait before retrying usage artifact upload",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-10-01T09:27:48Z",
+          "completed_at": "2026-10-01T09:27:48Z"
+        },
+        {
+          "name": "Retry upload usage artifact",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-10-01T09:27:48Z",
+          "completed_at": "2026-10-01T09:27:48Z"
+        },
+        {
+          "name": "Process no-op messages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-01T09:27:48Z",
+          "completed_at": "2026-10-01T09:27:48Z"
+        },
+        {
+          "name": "Log detection run",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-01T09:27:48Z",
+          "completed_at": "2026-10-01T09:27:50Z"
+        },
+        {
+          "name": "Record missing tool",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-01T09:27:50Z",
+          "completed_at": "2026-10-01T09:27:50Z"
+        },
+        {
+          "name": "Record incomplete",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-01T09:27:50Z",
+          "completed_at": "2026-10-01T09:27:50Z"
+        },
+        {
+          "name": "Handle agent failure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-01T09:27:50Z",
+          "completed_at": "2026-10-01T09:27:53Z"
+        },
+        {
+          "name": "Report failed jobs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-01T09:27:53Z",
+          "completed_at": "2026-10-01T09:27:54Z"
+        },
+        {
+          "name": "Post Generate GitHub App token",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-10-01T09:27:54Z",
+          "completed_at": "2026-10-01T09:27:54Z"
+        },
+        {
+          "name": "Post Setup Scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36,
+          "started_at": "2026-10-01T09:27:54Z",
+          "completed_at": "2026-10-01T09:27:55Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-10-01T09:27:55Z",
+          "completed_at": "2026-10-01T09:27:55Z"
+        }
+      ]
+    }
+  ],
+  "downloaded_files": [
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/.downloaded-artifacts/all",
+      "size": 0,
+      "description": ""
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/agent-stdio.log",
+      "size": 5447200,
+      "description": "Agent standard output/error logs"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/agent_execution.json",
+      "size": 89,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/agent_output.json",
+      "size": 24,
+      "description": "Validated safe outputs"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/agent_usage.json",
+      "size": 189,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/aw-prompts/prompt-import-tree.json",
+      "size": 21038,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/aw-prompts/prompt-template.txt",
+      "size": 20654,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/aw-prompts/prompt.txt",
+      "size": 20080,
+      "description": "Input prompt for AI agent"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/aw_info.json",
+      "size": 1190,
+      "description": "Engine configuration and workflow metadata"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/awf-config.json",
+      "size": 6365,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/detection/detection_usage.json",
+      "size": 52,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/detection/detection_usage.jsonl",
+      "size": 38,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/detection/execution.json",
+      "size": 97,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/evals/evals/execution.json",
+      "size": 89,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/evals/evals.jsonl",
+      "size": 505,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/evals/evals_token_usage.jsonl",
+      "size": 1234,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/github_rate_limits.jsonl",
+      "size": 2328,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/jobs.json",
+      "size": 36623,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/gateway.md",
+      "size": 1552,
+      "description": "Markdown documentation"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/mcp-gateway.log",
+      "size": 141205,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/observed-url-domains.json",
+      "size": 2,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/proxy.log",
+      "size": 17782,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/rpc-messages.jsonl",
+      "size": 9686,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/safeoutputs/server.log",
+      "size": 15353,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/safeoutputs.log",
+      "size": 19444,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/mcp-logs/tools.json",
+      "size": 2844,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/models.json",
+      "size": 15894,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/otel.jsonl",
+      "size": 3423,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/pi-streaming.jsonl",
+      "size": 5434634,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/pre-agent-audit.txt",
+      "size": 121499,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/run_summary.json",
+      "size": 95082,
+      "description": "Cached summary of workflow run analysis"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/audit/awf-resolved-config.json",
+      "size": 12113,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/audit/docker-compose.redacted.yml",
+      "size": 28135,
+      "description": ""
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/audit/image-manifest.json",
+      "size": 712,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/audit/policy-manifest.json",
+      "size": 5174,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/audit/squid.conf",
+      "size": 15729,
+      "description": ""
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/access.log",
+      "size": 90062,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/api-proxy-logs/models.json",
+      "size": 4561,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/api-proxy-logs/otel.jsonl",
+      "size": 124249,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/api-proxy-logs/token-tracker-audit.jsonl",
+      "size": 51209,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/api-proxy-logs/token-usage.jsonl",
+      "size": 76186,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/audit.jsonl",
+      "size": 187090,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/cache.log",
+      "size": 2788,
+      "description": "Log file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/sandbox/firewall/logs/cli-proxy-logs/access.jsonl",
+      "size": 213,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/activity/summary.json",
+      "size": 580,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/agent/execution.json",
+      "size": 89,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/agent/token_usage.jsonl",
+      "size": 76186,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/agent_usage.json",
+      "size": 189,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/detection/execution.json",
+      "size": 97,
+      "description": "JSON data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/detection/token_usage.jsonl",
+      "size": 0,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/detection_usage.jsonl",
+      "size": 38,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/evals/token_usage.jsonl",
+      "size": 1234,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/evals.jsonl",
+      "size": 505,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/usage/github_rate_limits.jsonl",
+      "size": 2776,
+      "description": "JSON Lines data file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/0_conclusion.txt",
+      "size": 50232,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/1_push_evals_state.txt",
+      "size": 29363,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/2_evals.txt",
+      "size": 270375,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/4_detection.txt",
+      "size": 47151,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/5_agent.txt",
+      "size": 6263745,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/6_activation.txt",
+      "size": 109466,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/7_pre_activation.txt",
+      "size": 10166,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/10_Checkout .github and .agents folders.txt",
+      "size": 12422,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/11_Save agent config folders for base branch restoration.txt",
+      "size": 1730,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/12_Check workflow lock file.txt",
+      "size": 3450,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/13_Check compile-agentic version.txt",
+      "size": 2309,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/15_Create prompt with built-in context.txt",
+      "size": 12725,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/16_Interpolate variables and render templates.txt",
+      "size": 10172,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/17_Substitute placeholders.txt",
+      "size": 3764,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/18_Validate prompt placeholders.txt",
+      "size": 1680,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/19_Print prompt.txt",
+      "size": 29060,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/1_Set up job.txt",
+      "size": 2103,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/20_Upload info artifact.txt",
+      "size": 2513,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/21_Stage prompt files for artifact upload.txt",
+      "size": 1285,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/22_Upload activation artifact.txt",
+      "size": 3065,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/2_Setup Scripts.txt",
+      "size": 2953,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/3_Mask OTLP telemetry headers.txt",
+      "size": 1232,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/43_Post Checkout .github and .agents folders.txt",
+      "size": 1763,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/44_Post Setup Scripts.txt",
+      "size": 494,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/45_Complete job.txt",
+      "size": 804,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/4_Generate agentic run info.txt",
+      "size": 6310,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/5_Restore daily AIC scan observations.txt",
+      "size": 1949,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/6_Check daily workflow token guardrail.txt",
+      "size": 2923,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/7_Publish daily AIC scan observations.txt",
+      "size": 1723,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/8_Validate ANTHROPIC_API_KEY secret.txt",
+      "size": 1703,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/9_Check for OAuth tokens.txt",
+      "size": 1403,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/activation/system.txt",
+      "size": 807,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/107_Post Setup Node.js.txt",
+      "size": 50,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/108_Post Setup Node.js.txt",
+      "size": 50,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/109_Post Checkout repository.txt",
+      "size": 1903,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/10_Create gh-aw temp directory.txt",
+      "size": 2054,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/110_Post Setup Scripts.txt",
+      "size": 489,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/111_Complete job.txt",
+      "size": 747,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/11_Configure gh CLI for GitHub Enterprise.txt",
+      "size": 2185,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/12_Download activation artifact.txt",
+      "size": 3562,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/13_Configure Git credentials.txt",
+      "size": 2251,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/15_Setup Node.js.txt",
+      "size": 2345,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/16_Install AWF binary.txt",
+      "size": 2904,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/17_Install Pi CLI.txt",
+      "size": 2333,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/18_Install Playwright CLI.txt",
+      "size": 2052,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/19_Install Playwright browsers.txt",
+      "size": 28025,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/1_Set up job.txt",
+      "size": 2777,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/20_Install Playwright CLI skills.txt",
+      "size": 2348,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/21_Determine automatic lockdown mode for GitHub MCP Server.txt",
+      "size": 3468,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/23_Restore inline sub-agents from activation artifact.txt",
+      "size": 2281,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/24_Restore inline skills from activation artifact.txt",
+      "size": 2209,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/25_Install dev dependencies for the pre-push checks.txt",
+      "size": 15083,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/26_Install role postconditions extension.txt",
+      "size": 2958,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/27_Extract the design parts the issue claims.txt",
+      "size": 4694,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/28_Write the issue, its requirements and the conventions to files.txt",
+      "size": 6731,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/29_Check that playwright-cli opens a browser.txt",
+      "size": 2604,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/2_Setup Scripts.txt",
+      "size": 3664,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/30_Download container images.txt",
+      "size": 8348,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/31_Prepare Safe Outputs Directories.txt",
+      "size": 2074,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/32_Generate Safe Outputs Config.txt",
+      "size": 4033,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/33_Generate Safe Outputs Tools.txt",
+      "size": 5595,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/34_Start MCP Gateway.txt",
+      "size": 22296,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/35_Mount MCP servers as CLIs.txt",
+      "size": 3628,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/36_Clean credentials.txt",
+      "size": 2362,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/37_Audit pre-agent workspace.txt",
+      "size": 2063,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/38_Start CLI Proxy.txt",
+      "size": 2978,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/39_Execute Pi CLI.txt",
+      "size": 5811733,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/3_Set runtime paths.txt",
+      "size": 2613,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/40_Stop CLI Proxy.txt",
+      "size": 1985,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/41_Configure Git credentials.txt",
+      "size": 2251,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/42_Stop MCP Gateway.txt",
+      "size": 2601,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/43_Redact secrets in logs.txt",
+      "size": 3376,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/44_Append agent step summary.txt",
+      "size": 1963,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/45_Copy Safe Outputs.txt",
+      "size": 2094,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/46_Ingest agent output.txt",
+      "size": 6411,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/47_Parse agent logs for step summary.txt",
+      "size": 74889,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/48_Parse MCP Gateway logs for step summary.txt",
+      "size": 139475,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/49_Print firewall logs.txt",
+      "size": 4762,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/4_Mask OTLP telemetry headers.txt",
+      "size": 1947,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/50_Parse token usage for step summary.txt",
+      "size": 15640,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/51_Print AWF reflect summary.txt",
+      "size": 2928,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/52_Generate observability summary.txt",
+      "size": 2898,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/53_Write agent output placeholder if missing.txt",
+      "size": 2332,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/54_Upload agent output fallback artifact.txt",
+      "size": 4127,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/55_Upload agent artifacts.txt",
+      "size": 4055,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/5_Check OTLP telemetry configuration.txt",
+      "size": 2092,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/6_Checkout repository.txt",
+      "size": 13806,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/7_Fetch additional refs.txt",
+      "size": 2195,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/8_Initialize agent execution evidence.txt",
+      "size": 2254,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/9_Setup Node.js.txt",
+      "size": 2345,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/agent/system.txt",
+      "size": 737,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/10_Upload usage artifact.txt",
+      "size": 3288,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/13_Process no-op messages.txt",
+      "size": 2774,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/14_Log detection run.txt",
+      "size": 3006,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/15_Record missing tool.txt",
+      "size": 2169,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/16_Record incomplete.txt",
+      "size": 2187,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/17_Handle agent failure.txt",
+      "size": 8089,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/18_Report failed jobs.txt",
+      "size": 2725,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/1_Set up job.txt",
+      "size": 2348,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/2_Setup Scripts.txt",
+      "size": 2891,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/35_Post Generate GitHub App token.txt",
+      "size": 93,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/36_Post Setup Scripts.txt",
+      "size": 494,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/37_Complete job.txt",
+      "size": 119,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/3_Generate GitHub App token.txt",
+      "size": 1789,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/4_Download agent output artifact.txt",
+      "size": 3637,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/5_Setup agent output environment variable.txt",
+      "size": 3631,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/6_Download detection artifact.txt",
+      "size": 2814,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/7_Download Safe Outputs Items Manifest.txt",
+      "size": 1726,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/8_Download evals artifact.txt",
+      "size": 2847,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/9_Collect usage artifact files.txt",
+      "size": 3659,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/conclusion/system.txt",
+      "size": 1711,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/10_Download container images.txt",
+      "size": 4209,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/11_Check if detection needed.txt",
+      "size": 1846,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/16_Install AWF binary.txt",
+      "size": 2126,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/17_Setup Node.js.txt",
+      "size": 1567,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/18_Install Claude Code CLI.txt",
+      "size": 1789,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/1_Set up job.txt",
+      "size": 2740,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/23_Parse threat detection token usage for step summary.txt",
+      "size": 2272,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/24_Upload threat detection artifact.txt",
+      "size": 2990,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/25_Conclude threat detection.txt",
+      "size": 1709,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/2_Setup Scripts.txt",
+      "size": 2890,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/3_Download activation artifact.txt",
+      "size": 2784,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/4_Download agent output artifact.txt",
+      "size": 3637,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/50_Post Setup Scripts.txt",
+      "size": 493,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/51_Complete job.txt",
+      "size": 301,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/5_Setup agent output environment variable.txt",
+      "size": 11924,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/7_Initialize detection execution evidence.txt",
+      "size": 1536,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/8_Clear inherited Copilot session state.txt",
+      "size": 1173,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/9_Clean stale firewall files from agent artifact.txt",
+      "size": 1216,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/detection/system.txt",
+      "size": 714,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/10_Ensure evals directory and log.txt",
+      "size": 1258,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/11_Setup Node.js.txt",
+      "size": 1645,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/12_Install AWF binary.txt",
+      "size": 2204,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/13_Install Pi CLI.txt",
+      "size": 1633,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/14_Execute Pi CLI.txt",
+      "size": 88598,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/15_Parse MCP Gateway logs for step summary.txt",
+      "size": 138691,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/16_Parse BinEval results.txt",
+      "size": 2736,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/17_Redact secrets in evals results.txt",
+      "size": 2348,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/18_Render evals results to step summary.txt",
+      "size": 2089,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/19_Collect evals token usage.txt",
+      "size": 1670,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/1_Set up job.txt",
+      "size": 2572,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/20_Upload evals results.txt",
+      "size": 2940,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/2_Setup Scripts.txt",
+      "size": 2886,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/3_Download agent output artifact.txt",
+      "size": 3637,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/41_Post Setup Node.js.txt",
+      "size": 50,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/42_Post Setup Scripts.txt",
+      "size": 489,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/43_Complete job.txt",
+      "size": 165,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/4_Setup agent output environment variable.txt",
+      "size": 3631,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/5_Initialize evals execution evidence.txt",
+      "size": 1488,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/6_Clean stale firewall files from agent artifact.txt",
+      "size": 1216,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/7_Download container images.txt",
+      "size": 4209,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/8_Prepare evals files.txt",
+      "size": 1905,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/9_Setup BinEval evaluations.txt",
+      "size": 2381,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/evals/system.txt",
+      "size": 710,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/1_Set up job.txt",
+      "size": 1734,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/2_Setup Scripts.txt",
+      "size": 2530,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/3_Check team membership for workflow.txt",
+      "size": 2387,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/4_Decide whether to start.txt",
+      "size": 2581,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/8_Post Setup Scripts.txt",
+      "size": 498,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/9_Complete job.txt",
+      "size": 451,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/pre_activation/system.txt",
+      "size": 605,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/11_Post Checkout repository.txt",
+      "size": 1903,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/12_Post Setup Scripts.txt",
+      "size": 500,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/13_Complete job.txt",
+      "size": 61,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/1_Set up job.txt",
+      "size": 2027,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/2_Setup Scripts.txt",
+      "size": 2897,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/3_Checkout repository.txt",
+      "size": 12276,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/4_Configure Git credentials.txt",
+      "size": 1473,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/5_Download evals artifact.txt",
+      "size": 2858,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/6_Push evals results to git.txt",
+      "size": 5392,
+      "description": "Text file"
+    },
+    {
+      "path": "/private/tmp/claude-502/-Users-viktorjensen-torp-Code-personal-gh-aw-spike/38bccb4b-47fc-4b59-a4b3-7e77ecab4b49/scratchpad/audit/run-36840260856/workflow-logs/push_evals_state/system.txt",
+      "size": 747,
+      "description": "Text file"
+    }
+  ],
+  "firewall_token_usage": {
+    "total_input_tokens": 705,
+    "total_output_tokens": 36325,
+    "total_cache_read_tokens": 7002004,
+    "total_cache_write_tokens": 102597,
+    "total_requests": 122,
+    "total_duration_ms": 411510,
+    "total_response_bytes": 282101,
+    "cache_efficiency": 0,
+    "total_aic": 101.077665,
+    "ambient_context": {
+      "input_tokens": 3,
+      "cached_tokens": 0
+    },
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "provider": "anthropic",
+        "input_tokens": 705,
+        "output_tokens": 36325,
+        "cache_read_tokens": 7002004,
+        "cache_write_tokens": 102597,
+        "requests": 122,
+        "duration_ms": 411510,
+        "response_bytes": 282101,
+        "aic": 101.077665
+      }
+    },
+    "subagent_model_requests": [
+      {
+        "agent_name": "Error",
+        "requested_model": "null",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "ErrorResponse.safeParse",
+        "requested_model": "body",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "Health",
+        "requested_model": "200",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "In",
+        "requested_model": "false",
+        "invocation_count": 7,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "In",
+        "requested_model": "true",
+        "invocation_count": 4,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "JSON.stringify",
+        "requested_model": "validated",
+        "invocation_count": 90,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "Root",
+        "requested_model": "root",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "SignInRequest.parse",
+        "requested_model": "data",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "SignInRequest.parse",
+        "requested_model": "request.body",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "SignUpRequest.parse",
+        "requested_model": "data",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "SignUpRequest.parse",
+        "requested_model": "request.body",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "String",
+        "requested_model": "url",
+        "invocation_count": 37,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "User",
+        "requested_model": "null",
+        "invocation_count": 2,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "ading",
+        "requested_model": "false",
+        "invocation_count": 2,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "ading",
+        "requested_model": "true",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "answerHealth",
+        "requested_model": "200",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "answerHealth",
+        "requested_model": "500",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "block",
+        "requested_model": "s",
+        "invocation_count": 125,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "container",
+        "requested_model": "s",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "createBrowserRouter",
+        "requested_model": "routes",
+        "invocation_count": 20,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "button",
+        "invocation_count": 40,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "element",
+        "invocation_count": 12,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "errorMessage",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "handleClick",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "meApiCalls",
+        "invocation_count": 25,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "page",
+        "invocation_count": 78,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "signOutItem",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "expect",
+        "requested_model": "userButton",
+        "invocation_count": 56,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "fill",
+        "requested_model": "email",
+        "invocation_count": 20,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "getUrlString",
+        "requested_model": "url",
+        "invocation_count": 70,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "host",
+        "requested_model": "s",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "min",
+        "requested_model": "1",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:10192",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:14878",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:14879",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15094",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15174",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15275",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15352",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15674",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:15929",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:16179",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:9726",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "n",
+        "requested_model": "node:9930",
+        "invocation_count": 6,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "ncreatRoot",
+        "requested_model": "root",
+        "invocation_count": 10,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "ncreateRoot",
+        "requested_model": "root",
+        "invocation_count": 10,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "nudge",
+        "requested_model": "s",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "parse",
+        "requested_model": "data",
+        "invocation_count": 2,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "peer",
+        "requested_model": "s",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "reply.send",
+        "requested_model": "response",
+        "invocation_count": 10,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "reply.status",
+        "requested_model": "201",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "schema.safeParse",
+        "requested_model": "body",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "send",
+        "requested_model": "response",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setEmail",
+        "requested_model": "e.currentTarget.value",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setError",
+        "requested_model": "err.message",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setError",
+        "requested_model": "null",
+        "invocation_count": 15,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setFieldErrors",
+        "requested_model": "errors",
+        "invocation_count": 10,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setFullName",
+        "requested_model": "e.currentTarget.value",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setInternalOpen",
+        "requested_model": "newOpen",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setIsLoading",
+        "requested_model": "false",
+        "invocation_count": 216,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setIsLoading",
+        "requested_model": "true",
+        "invocation_count": 30,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setIsSignedIn",
+        "requested_model": "false",
+        "invocation_count": 352,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setIsSignedIn",
+        "requested_model": "true",
+        "invocation_count": 196,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setLastFetchedPath",
+        "requested_model": "location.pathname",
+        "invocation_count": 30,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setPassword",
+        "requested_model": "e.currentTarget.value",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setUser",
+        "requested_model": "null",
+        "invocation_count": 196,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "setUser",
+        "requested_model": "response.user",
+        "invocation_count": 216,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "stringify",
+        "requested_model": "validated",
+        "invocation_count": 1,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "super",
+        "requested_model": "message",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "symbolPattern.test",
+        "requested_model": "password",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "toContainText",
+        "requested_model": "email",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "toHaveLength",
+        "requested_model": "1",
+        "invocation_count": 25,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "toHaveURL",
+        "requested_model": "expected",
+        "invocation_count": 10,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "useContext",
+        "requested_model": "UserContext",
+        "invocation_count": 16,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "useState",
+        "requested_model": "0",
+        "invocation_count": 56,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "useState",
+        "requested_model": "false",
+        "invocation_count": 239,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "useState",
+        "requested_model": "true",
+        "invocation_count": 191,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "user.click",
+        "requested_model": "button",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "user.click",
+        "requested_model": "signOutButton",
+        "invocation_count": 5,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "user.click",
+        "requested_model": "userButton",
+        "invocation_count": 30,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      },
+      {
+        "agent_name": "within",
+        "requested_model": "canvasElement",
+        "invocation_count": 30,
+        "effective_model": "claude-haiku-4-5-20251001",
+        "reason_code": "REQUESTED_MODEL_NOT_OBSERVED"
+      }
+    ],
+    "subagent_model_actuals": [
+      {
+        "model": "claude-haiku-4-5-20251001",
+        "provider": "anthropic",
+        "requests": 122
+      }
+    ],
+    "mismatch_count": 2729,
+    "warnings": [
+      "partial or incorrect data: sub-agent model requests are inferred from agent-stdio.log; use token_usage.jsonl for reliable token consumption"
+    ]
+  },
+  "github_rate_limit_usage": {
+    "total_requests_made": 12,
+    "core_consumed": 11,
+    "core_consumed_source": "response_headers_delta",
+    "core_remaining": 4758,
+    "core_limit": 5000,
+    "resources": [
+      {
+        "resource": "core",
+        "requests_made": 12,
+        "quota_consumed": 11,
+        "final_remaining": 4758,
+        "limit": 5000
+      }
+    ]
+  },
+  "firewall_analysis": {
+    "allowed_domains": [
+      "api.anthropic.com:443"
+    ],
+    "total_requests": 249,
+    "allowed_requests": 249,
+    "blocked_requests": 0,
+    "requests_by_domain": {
+      "api.anthropic.com:443": {
+        "allowed": 249,
+        "blocked": 0
+      }
+    }
+  },
+  "policy_analysis": {
+    "policy_summary": "10 rules, SSL Bump disabled, DLP disabled",
+    "rule_hits": [],
+    "total_requests": 0,
+    "allowed_count": 0,
+    "denied_count": 0,
+    "unique_domains": 0
+  },
+  "errors": [
+    {
+      "type": "step_failure",
+      "message": "##[error]Process completed with exit code 1.",
+      "file": "detection"
+    },
+    {
+      "type": "step_failure",
+      "message": "##[error]{\"type\":\"tool_execution_update\",\"toolCallId\":\"toolu_018CLeN4vCi5kC9W5981gH52\",\"toolName\":\"bash\",\"args\":{\"command\":\"cd /home/runner/work/gh-aw-spike-target/gh-aw-spike-target \u0026\u0026 npm test -- apps/web/src/features/home/HomePage.test.tsx 2\u003e\u00261 | tail -100\"},\"partialResult\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n\u003e tempo@0.0.0 test\\n\u003e npm run typecheck \u0026\u0026 npm run test:unit \u0026\u0026 npm run test:e2e apps/web/src/features/home/HomePage.test.tsx\\n\\n\\n\u003e tempo@0.0.0 typecheck\\n\u003e npm run typecheck --workspaces --if-present\\n\\n\\n\u003e @tempo/api@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\n\\n\u003e @tempo/web@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\nsrc/features/home/HomePage.test.tsx(209,17): error TS2339: Property 'includes' does not exist on type 'string | URL | Request'.\\n  Property 'includes' does not exist on type 'URL'.\\nnpm error Lifecycle script `typecheck` failed with error:\\nnpm error code 2\\nnpm error path /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/apps/web\\nnpm error workspace @tempo/web@0.0.0\\nnpm error location /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/apps/web\\nnpm error command failed\\nnpm error command sh -c tsc -p tsconfig.json\\n\\n\\n\u003e @tempo/shared@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\n\"}],\"details\":{}}}\n##[error]{\"type\":\"tool_execution_end\",\"toolCallId\":\"toolu_018CLeN4vCi5kC9W5981gH52\",\"toolName\":\"bash\",\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n\u003e tempo@0.0.0 test\\n\u003e npm run typecheck \u0026\u0026 npm run test:unit \u0026\u0026 npm run test:e2e apps/web/src/fe...",
+      "file": "agent"
+    },
+    {
+      "type": "step_failure",
+      "message": "##[error]{\"type\":\"tool_execution_update\",\"toolCallId\":\"toolu_018CLeN4vCi5kC9W5981gH52\",\"toolName\":\"bash\",\"args\":{\"command\":\"cd /home/runner/work/gh-aw-spike-target/gh-aw-spike-target \u0026\u0026 npm test -- apps/web/src/features/home/HomePage.test.tsx 2\u003e\u00261 | tail -100\"},\"partialResult\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n\u003e tempo@0.0.0 test\\n\u003e npm run typecheck \u0026\u0026 npm run test:unit \u0026\u0026 npm run test:e2e apps/web/src/features/home/HomePage.test.tsx\\n\\n\\n\u003e tempo@0.0.0 typecheck\\n\u003e npm run typecheck --workspaces --if-present\\n\\n\\n\u003e @tempo/api@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\n\\n\u003e @tempo/web@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\nsrc/features/home/HomePage.test.tsx(209,17): error TS2339: Property 'includes' does not exist on type 'string | URL | Request'.\\n  Property 'includes' does not exist on type 'URL'.\\nnpm error Lifecycle script `typecheck` failed with error:\\nnpm error code 2\\nnpm error path /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/apps/web\\nnpm error workspace @tempo/web@0.0.0\\nnpm error location /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/apps/web\\nnpm error command failed\\nnpm error command sh -c tsc -p tsconfig.json\\n\\n\\n\u003e @tempo/shared@0.0.0 typecheck\\n\u003e tsc -p tsconfig.json\\n\\n\"}],\"details\":{}}}\n##[error]{\"type\":\"tool_execution_end\",\"toolCallId\":\"toolu_018CLeN4vCi5kC9W5981gH52\",\"toolName\":\"bash\",\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n\u003e tempo@0.0.0 test\\n\u003e npm run typecheck \u0026\u0026 npm run test:unit \u0026\u0026 npm run test:e2e apps/web/src/fe...",
+      "file": "agent/Execute Pi CLI"
+    },
+    {
+      "type": "step_failure",
+      "message": "##[error]Process completed with exit code 1.",
+      "file": "detection/Conclude threat detection"
+    }
+  ]
+}

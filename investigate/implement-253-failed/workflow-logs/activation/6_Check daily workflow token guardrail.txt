@@ -1,0 +1,38 @@
+﻿2026-10-01T09:04:10.1582490Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:10.1583414Z with:
+2026-10-01T09:04:10.1587659Z   github-token: ***
+2026-10-01T09:04:10.1589951Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'check_daily_aic_workflow_guardrail.cjs'));
+await main();
+
+2026-10-01T09:04:10.1592385Z   debug: false
+2026-10-01T09:04:10.1592896Z   user-agent: actions/github-script
+2026-10-01T09:04:10.1593491Z   result-encoding: json
+2026-10-01T09:04:10.1594000Z   retries: 0
+2026-10-01T09:04:10.1594747Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:10.1595425Z env:
+2026-10-01T09:04:10.1595890Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:10.1596492Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:10.1597973Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:10.1599529Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:10.1600149Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:10.1600819Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:10.1601391Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:10.1601976Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:10.1603432Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:10.1605341Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:10.1606715Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:10.1607972Z   GH_AW_WORKFLOW_NAME: Implement
+2026-10-01T09:04:10.1608720Z   GH_AW_WORKFLOW_ID: implement
+2026-10-01T09:04:10.1611456Z   GH_AW_RUN_URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856
+2026-10-01T09:04:10.1619098Z   GH_AW_WORKFLOW_DISPATCH_AW_CONTEXT: {"item_type":"issue","item_number":"253","event_type":"issues","repo":"Viktor-Jensen-Torp/gh-aw-spike-target","run_id":"36840225915","run_attempt":"1","workflow_id":"Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/dispatcher.yml@refs/heads/main"}
+2026-10-01T09:04:10.1621368Z   GH_AW_HAS_SLASH_COMMAND: false
+2026-10-01T09:04:10.1621971Z   GH_AW_HAS_LABEL_COMMAND: false
+2026-10-01T09:04:10.1687027Z   GH_AW_GITHUB_TOKEN: ***
+2026-10-01T09:04:10.1688460Z   GH_AW_MAX_AI_CREDITS: 100
+2026-10-01T09:04:10.1689015Z ##[endgroup]
+2026-10-01T09:04:10.4895191Z [daily-workflow-aic] Resolved daily AIC guardrail limits: {"dailyAICThreshold":500,"perRunMaxAICredits":100,"perRunFallbackAvailable":true}
+2026-10-01T09:04:10.4896974Z Skipping daily workflow AI Credits guardrail for manual or command-driven runs.

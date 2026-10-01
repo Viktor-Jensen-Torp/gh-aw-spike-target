@@ -1,0 +1,90 @@
+From 0876ce9f43a65e848f01016fd8eb616d2febbc7a Mon Sep 17 00:00:00 2001
+X-GH-AW-Base-Commit: 8098b20444c1941441944310354f8458c9d51438
+From: "github-actions[bot]" <github-actions[bot]@users.noreply.github.com>
+Date: Thu, 1 Oct 2026 08:49:53 +0000
+Subject: [PATCH] Turn the user menu into a shared Menu with hover highlighting
+
+## What
+
+The user menu is built from the shared Menu and its Menu Item, with hover highlighting on items.
+
+## Why
+
+The designer's consistency pass (design-consistency-pass) changed the User Menu to use the same Menu Item as the right-click menu, with only the hovered item highlighted.
+
+## Changes
+
+- Updated HomePage.tsx to use MenuItem with size="compact" to match the redesigned Menu Item component
+- Changed the Sign out icon size from 16px to 14px to match the compact size specification
+- Added e2e test case 'Given the user menu is open, when I hover "Sign out", then only "Sign out" is highlighted' to verify hover highlighting
+
+## Testing
+
+All existing tests pass, plus new test for hover highlighting:
+- apps/web/e2e/user-menu.spec.ts:84 - hover highlighting verification
+- apps/web/e2e/user-menu.spec.ts:3 - user menu shows name, email, and Sign out
+
+## Requirements
+
+- B1: Test reproduces reported behavior from Done when cases
+- B2: Fix changes code that matches the design specification
+- B3: Every case in Done when has its own test
+- B4: Changes only what is asked for (user menu design implementation)
+- B5: All Details items completed (builds to design parts' JSON)
+---
+ apps/web/e2e/user-menu.spec.ts          | 26 +++++++++++++++++++++++++
+ apps/web/src/features/home/HomePage.tsx |  3 ++-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/apps/web/e2e/user-menu.spec.ts b/apps/web/e2e/user-menu.spec.ts
+index f16fc35..e5c470d 100644
+--- a/apps/web/e2e/user-menu.spec.ts
++++ b/apps/web/e2e/user-menu.spec.ts
+@@ -80,3 +80,29 @@ test('Given I have signed out, when I go back, then I see the sign-in screen, no
+   await page.goto('/');
+   await expect(page).toHaveURL('/sign-in');
+ });
++
++test('Given the user menu is open, when I hover "Sign out", then only "Sign out" is highlighted', async ({
++  page,
++}) => {
++  // First, sign up
++  await page.goto('/sign-up');
++  const email = `mara${Date.now()}@reyes.studio`;
++  await page.getByLabel('Full name').fill('Mara Reyes');
++  await page.getByLabel('Email').fill(email);
++  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
++  await page.getByRole('button', { name: 'Create account' }).click();
++
++  // Should be redirected to the start page and signed in
++  await expect(page).toHaveURL('/');
++
++  // Open the user card menu
++  await page.getByRole('button', { name: 'Mara Reyes' }).first().click();
++
++  // Hover over "Sign out" item
++  const signOutItem = page.getByRole('menuitem', { name: 'Sign out' });
++  await signOutItem.hover();
++
++  // Verify that the "Sign out" item has the highlighted background
++  // The menu item gets highlighted with bg-bg when hovered (data-[highlighted]:bg-bg)
++  await expect(signOutItem).toHaveAttribute('data-highlighted');
++});
+diff --git a/apps/web/src/features/home/HomePage.tsx b/apps/web/src/features/home/HomePage.tsx
+index 51d90fc..57d8e98 100644
+--- a/apps/web/src/features/home/HomePage.tsx
++++ b/apps/web/src/features/home/HomePage.tsx
+@@ -60,8 +60,9 @@ export function HomePage() {
+               <MenuDivider />
+               <MenuItem
+                 label="Sign out"
+-                icon={<LogOut size={16} />}
++                icon={<LogOut size={14} />}
+                 danger={true}
++                size="compact"
+                 onSelect={signOut}
+               />
+             </Menu>
+-- 
+2.54.0
+

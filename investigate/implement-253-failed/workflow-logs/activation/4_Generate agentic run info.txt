@@ -1,0 +1,101 @@
+﻿2026-10-01T09:04:09.0728451Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:09.0729499Z with:
+2026-10-01T09:04:09.0731833Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'generate_aw_info.cjs'));
+await main(core, context);
+
+2026-10-01T09:04:09.0773373Z   github-token: ***
+2026-10-01T09:04:09.0773999Z   debug: false
+2026-10-01T09:04:09.0774757Z   user-agent: actions/github-script
+2026-10-01T09:04:09.0775388Z   result-encoding: json
+2026-10-01T09:04:09.0776203Z   retries: 0
+2026-10-01T09:04:09.0776751Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:09.0777416Z env:
+2026-10-01T09:04:09.0777894Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:09.0783880Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:09.0785674Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:09.0795203Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:09.0799888Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:09.0800672Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:09.0802710Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:09.0805681Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:09.0807415Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:09.0810459Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:09.0811289Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:09.0812621Z   GH_AW_INFO_ENGINE_ID: pi
+2026-10-01T09:04:09.0814363Z   GH_AW_INFO_ENGINE_NAME: Pi
+2026-10-01T09:04:09.0815653Z   GH_AW_INFO_MODEL: anthropic/claude-haiku-4-5-20251001
+2026-10-01T09:04:09.0816854Z   GH_AW_INFO_VERSION: 0.87.0
+2026-10-01T09:04:09.0817459Z   GH_AW_INFO_AGENT_VERSION: 0.87.0
+2026-10-01T09:04:09.0818083Z   GH_AW_INFO_CLI_VERSION: v0.89.21
+2026-10-01T09:04:09.0849252Z   GH_AW_INFO_WORKFLOW_NAME: Implement
+2026-10-01T09:04:09.0850177Z   GH_AW_INFO_EXPERIMENTAL: false
+2026-10-01T09:04:09.0850815Z   GH_AW_INFO_SUPPORTS_TOOLS_ALLOWLIST: true
+2026-10-01T09:04:09.0851460Z   GH_AW_INFO_STAGED: false
+2026-10-01T09:04:09.0852055Z   GH_AW_INFO_ALLOWED_DOMAINS: ["defaults"]
+2026-10-01T09:04:09.0852726Z   GH_AW_INFO_FIREWALL_ENABLED: true
+2026-10-01T09:04:09.0853351Z   GH_AW_INFO_AWF_VERSION: v0.28.23
+2026-10-01T09:04:09.0854049Z   GH_AW_INFO_AWMG_VERSION: 
+2026-10-01T09:04:09.0854811Z   GH_AW_INFO_FIREWALL_TYPE: squid
+2026-10-01T09:04:09.0855412Z   GH_AW_INFO_AGENT_RUNTIME: 
+2026-10-01T09:04:09.0855984Z   GH_AW_INFO_FRONTMATTER_EMOJI: 🛠️
+2026-10-01T09:04:09.0856576Z   GH_AW_COMPILED_STRICT: true
+2026-10-01T09:04:09.0857171Z ##[endgroup]
+2026-10-01T09:04:09.5526403Z Starting context variable validation...
+2026-10-01T09:04:09.5533394Z ✓ github.event.organization.id is valid: 325550183
+2026-10-01T09:04:09.5561558Z ✓ github.event.repository.id is valid: 1377284481
+2026-10-01T09:04:09.5570023Z ✓ github.event.sender.id is valid: 41898282
+2026-10-01T09:04:09.5571897Z Validated 3 context variables
+2026-10-01T09:04:09.5573680Z ✅ All context variables validated successfully
+2026-10-01T09:04:09.5577254Z Lockdown mode not explicitly enabled, skipping validation
+2026-10-01T09:04:09.5579060Z Repository visibility: unknown
+2026-10-01T09:04:09.5580620Z Compiled with strict mode: true
+2026-10-01T09:04:09.6251243Z Generated merged models.json at: /tmp/gh-aw/models.json
+2026-10-01T09:04:09.6358624Z Generated aw_info.json at: /tmp/gh-aw/aw_info.json
+2026-10-01T09:04:09.6360518Z {
+2026-10-01T09:04:09.6361535Z   "engine_id": "pi",
+2026-10-01T09:04:09.6362564Z   "engine_name": "Pi",
+2026-10-01T09:04:09.6372101Z   "model": "anthropic/claude-haiku-4-5-20251001",
+2026-10-01T09:04:09.6373771Z   "version": "0.87.0",
+2026-10-01T09:04:09.6375366Z   "agent_version": "0.87.0",
+2026-10-01T09:04:09.6414544Z   "workflow_name": "Implement",
+2026-10-01T09:04:09.6487339Z   "experimental": false,
+2026-10-01T09:04:09.6490920Z   "supports_tools_allowlist": true,
+2026-10-01T09:04:09.6491622Z   "cache_memory": false,
+2026-10-01T09:04:09.6492177Z   "run_id": 36840260856,
+2026-10-01T09:04:09.6492700Z   "run_number": 96,
+2026-10-01T09:04:09.6493200Z   "run_attempt": "1",
+2026-10-01T09:04:09.6494613Z   "repository": "Viktor-Jensen-Torp/gh-aw-spike-target",
+2026-10-01T09:04:09.6495357Z   "ref": "refs/heads/main",
+2026-10-01T09:04:09.6495968Z   "sha": "de198674479de83afc84c5cd7c89ae627285d96c",
+2026-10-01T09:04:09.6496651Z   "actor": "github-actions[bot]",
+2026-10-01T09:04:09.6497254Z   "event_name": "workflow_dispatch",
+2026-10-01T09:04:09.6497894Z   "target_repo": "",
+2026-10-01T09:04:09.6498390Z   "staged": false,
+2026-10-01T09:04:09.6498878Z   "allowed_domains": [
+2026-10-01T09:04:09.6499406Z     "defaults"
+2026-10-01T09:04:09.6500929Z   ],
+2026-10-01T09:04:09.6501462Z   "firewall_enabled": true,
+2026-10-01T09:04:09.6502072Z   "awf_version": "v0.28.23",
+2026-10-01T09:04:09.6502626Z   "awmg_version": "",
+2026-10-01T09:04:09.6503139Z   "agent_runtime": "",
+2026-10-01T09:04:09.6503633Z   "steps": {
+2026-10-01T09:04:09.6504104Z     "firewall": "squid"
+2026-10-01T09:04:09.6504875Z   },
+2026-10-01T09:04:09.6505363Z   "created_at": "2026-10-01T09:04:09.558Z",
+2026-10-01T09:04:09.6506746Z   "frontmatter_emoji": "🛠️",
+2026-10-01T09:04:09.6507400Z   "cli_version": "v0.89.21",
+2026-10-01T09:04:09.6507956Z   "context": {
+2026-10-01T09:04:09.6508450Z     "item_type": "issue",
+2026-10-01T09:04:09.6508992Z     "item_number": "253",
+2026-10-01T09:04:09.6509537Z     "event_type": "issues",
+2026-10-01T09:04:09.6510179Z     "repo": "Viktor-Jensen-Torp/gh-aw-spike-target",
+2026-10-01T09:04:09.6510857Z     "run_id": "36840225915",
+2026-10-01T09:04:09.6511400Z     "run_attempt": "1",
+2026-10-01T09:04:09.6512705Z     "workflow_id": "Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/dispatcher.yml@refs/heads/main"
+2026-10-01T09:04:09.6513723Z   }
+2026-10-01T09:04:09.6514148Z }
+2026-10-01T09:04:09.6846956Z Generated workflow overview in step summary

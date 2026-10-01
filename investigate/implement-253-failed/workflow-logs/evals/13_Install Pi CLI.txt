@@ -1,0 +1,22 @@
+﻿2026-10-01T09:26:32.1675965Z ##[group]Run npm install --ignore-scripts -g @earendil-works/pi-coding-agent@0.87.0
+2026-10-01T09:26:32.1676960Z [36;1mnpm install --ignore-scripts -g @earendil-works/pi-coding-agent@0.87.0[0m
+2026-10-01T09:26:32.1739391Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:26:32.1739667Z env:
+2026-10-01T09:26:32.1739885Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:26:32.1740173Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:26:32.1740976Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:26:32.1741774Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:26:32.1742086Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:26:32.1742414Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:26:32.1742671Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:26:32.1742973Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:26:32.1743340Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a2376259fc9e750c
+2026-10-01T09:26:32.1743748Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846778209
+2026-10-01T09:26:32.1744081Z   GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:26:32.1744377Z ##[endgroup]
+2026-10-01T09:26:35.3261968Z npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+2026-10-01T09:26:40.1367671Z 
+2026-10-01T09:26:40.1383476Z added 144 packages in 8s
+2026-10-01T09:26:40.1383858Z 
+2026-10-01T09:26:40.1391581Z 9 packages are looking for funding
+2026-10-01T09:26:40.1392195Z   run `npm fund` for details

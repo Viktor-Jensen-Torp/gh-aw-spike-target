@@ -1,0 +1,46 @@
+﻿2026-10-01T09:04:21.2648335Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-10-01T09:04:21.2652707Z with:
+2026-10-01T09:04:21.2654941Z   name: activation
+2026-10-01T09:04:21.2657667Z   include-hidden-files: true
+2026-10-01T09:04:21.2673894Z   path: /tmp/gh-aw/aw_info.json
+/tmp/gh-aw/models.json
+/tmp/gh-aw/aw-prompts/prompt.txt
+/tmp/gh-aw/aw-prompts/prompt-template.txt
+/tmp/gh-aw/aw-prompts/prompt-import-tree.json
+/tmp/gh-aw/github_rate_limits.jsonl
+/tmp/gh-aw/base
+/tmp/gh-aw/.pi/agents
+/tmp/gh-aw/.pi/skills
+
+2026-10-01T09:04:21.2679339Z   if-no-files-found: ignore
+2026-10-01T09:04:21.2723658Z   retention-days: 1
+2026-10-01T09:04:21.2728586Z   compression-level: 6
+2026-10-01T09:04:21.2734325Z   overwrite: false
+2026-10-01T09:04:21.2735257Z   archive: true
+2026-10-01T09:04:21.2737106Z env:
+2026-10-01T09:04:21.2738515Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:21.2739577Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:21.2742337Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:21.2751475Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:21.2752581Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:21.2753755Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:21.2755312Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:21.2756334Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:21.2757462Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:21.2758794Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:21.2759996Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:21.2761069Z ##[endgroup]
+2026-10-01T09:04:22.2022428Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-01T09:04:22.2034411Z The least common ancestor is /tmp/gh-aw. This will be the root directory of the artifact
+2026-10-01T09:04:22.2037590Z With the provided path, there will be 105 files uploaded
+2026-10-01T09:04:22.2039680Z Artifact name is valid!
+2026-10-01T09:04:22.2042455Z Root directory input is valid!
+2026-10-01T09:04:22.4277149Z Uploading artifact: activation.zip
+2026-10-01T09:04:22.4438297Z Beginning upload of artifact content to blob storage
+2026-10-01T09:04:22.9682092Z Uploaded bytes 454413
+2026-10-01T09:04:22.9989761Z Finished uploading artifact content to blob storage!
+2026-10-01T09:04:23.0001675Z SHA256 digest of uploaded artifact is d592ce096230e1dd8c09e74ffcf078c7e149048b63d13bdda1e86065a791a276
+2026-10-01T09:04:23.0006686Z Finalizing artifact upload
+2026-10-01T09:04:23.2557159Z Artifact activation successfully finalized. Artifact ID 11150672212
+2026-10-01T09:04:23.2562042Z Artifact activation has been successfully uploaded! Final size is 454413 bytes. Artifact ID is 11150672212
+2026-10-01T09:04:23.2594588Z Artifact download URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/actions/runs/36840260856/artifacts/11150672212

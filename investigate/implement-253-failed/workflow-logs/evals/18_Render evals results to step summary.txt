@@ -1,0 +1,32 @@
+﻿2026-10-01T09:27:00.5863496Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:27:00.5864172Z with:
+2026-10-01T09:27:00.5865703Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'render_evals_summary.cjs'));
+await main();
+
+2026-10-01T09:27:00.5869744Z   github-token: ***
+2026-10-01T09:27:00.5870130Z   debug: false
+2026-10-01T09:27:00.5870516Z   user-agent: actions/github-script
+2026-10-01T09:27:00.5870942Z   result-encoding: json
+2026-10-01T09:27:00.5871334Z   retries: 0
+2026-10-01T09:27:00.5871727Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:27:00.5872110Z env:
+2026-10-01T09:27:00.5872511Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:00.5872917Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:00.5873833Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:00.5874799Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:00.5875273Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:00.5875750Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:00.5876142Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:00.5876831Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:00.5877355Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a2376259fc9e750c
+2026-10-01T09:27:00.5877823Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846778209
+2026-10-01T09:27:00.5878261Z   GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
+2026-10-01T09:27:00.5878749Z   GH_AW_AIC: 0.5877
+2026-10-01T09:27:00.5879061Z   GH_AW_AMBIENT_CONTEXT: 2227
+2026-10-01T09:27:00.5879443Z ##[endgroup]
+2026-10-01T09:27:00.6900609Z Rendering evals summary: 2 result(s)
+2026-10-01T09:27:00.6938038Z BinEval results section written to step summary

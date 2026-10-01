@@ -1,0 +1,24 @@
+﻿2026-10-01T09:04:10.5492219Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-10-01T09:04:10.5493193Z with:
+2026-10-01T09:04:10.5493678Z   name: aic-usage-scan-v2
+2026-10-01T09:04:10.5494859Z   path: /tmp/gh-aw/agentic-workflow-usage-scan-v2.jsonl
+2026-10-01T09:04:10.5495589Z   overwrite: true
+2026-10-01T09:04:10.5496102Z   if-no-files-found: ignore
+2026-10-01T09:04:10.5496648Z   retention-days: 3
+2026-10-01T09:04:10.5497162Z   compression-level: 6
+2026-10-01T09:04:10.5497701Z   include-hidden-files: false
+2026-10-01T09:04:10.5498255Z   archive: true
+2026-10-01T09:04:10.5498802Z env:
+2026-10-01T09:04:10.5499290Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:10.5499889Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:10.5501358Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:10.5502861Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:10.5503519Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:10.5504461Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:10.5505065Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:10.5506093Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:10.5506821Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:10.5507621Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:10.5508320Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:10.5508922Z ##[endgroup]
+2026-10-01T09:04:11.1865192Z No files were found with the provided path: /tmp/gh-aw/agentic-workflow-usage-scan-v2.jsonl. No artifacts will be uploaded.

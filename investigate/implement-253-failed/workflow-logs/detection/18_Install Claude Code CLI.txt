@@ -1,0 +1,21 @@
+﻿2026-10-01T09:26:02.3789024Z ##[group]Run npm install -g @anthropic-ai/claude-code@2.1.273
+2026-10-01T09:26:02.3789512Z [36;1mnpm install -g @anthropic-ai/claude-code@2.1.273[0m
+2026-10-01T09:26:02.3830802Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:26:02.3831103Z env:
+2026-10-01T09:26:02.3831326Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:26:02.3831642Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:26:02.3832396Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:26:02.3833152Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:26:02.3833452Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:26:02.3833764Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:26:02.3834034Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:26:02.3834337Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:26:02.3834713Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 767fb979fc5431fc
+2026-10-01T09:26:02.3835369Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846748591
+2026-10-01T09:26:02.3835674Z ##[endgroup]
+2026-10-01T09:26:05.2998290Z 
+2026-10-01T09:26:05.3002788Z added 2 packages in 3s
+2026-10-01T09:26:05.3006760Z npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+2026-10-01T09:26:05.3007567Z npm warn install-scripts   @anthropic-ai/claude-code@2.1.273 (postinstall: node install.cjs)
+2026-10-01T09:26:05.3008073Z npm warn install-scripts
+2026-10-01T09:26:05.3009162Z npm warn install-scripts Run `npm install -g --allow-scripts=@anthropic-ai/claude-code` to allow these scripts once, or `npm config set allow-scripts=@anthropic-ai/claude-code --location=user` to allow them for all global installs.

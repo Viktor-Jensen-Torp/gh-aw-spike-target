@@ -1,0 +1,30 @@
+﻿2026-10-01T09:04:09.7339471Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:04:09.7340415Z with:
+2026-10-01T09:04:09.7346550Z   github-token: ***
+2026-10-01T09:04:09.7348851Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'restore_aic_scan_cache.cjs'));
+await main();
+
+2026-10-01T09:04:09.7352084Z   debug: false
+2026-10-01T09:04:09.7352653Z   user-agent: actions/github-script
+2026-10-01T09:04:09.7353355Z   result-encoding: json
+2026-10-01T09:04:09.7355472Z   retries: 0
+2026-10-01T09:04:09.7356197Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:04:09.7359992Z env:
+2026-10-01T09:04:09.7360518Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:09.7361128Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:09.7362794Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:09.7367177Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:09.7368184Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:09.7368869Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:09.7369931Z   GH_AW_MAX_DAILY_AI_CREDITS: 500
+2026-10-01T09:04:09.7370902Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:09.7372868Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:09.7374370Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a30ed0ea3774ad34
+2026-10-01T09:04:09.7375106Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845448994
+2026-10-01T09:04:09.7376185Z   GH_AW_HAS_SLASH_COMMAND: false
+2026-10-01T09:04:09.7377011Z   GH_AW_HAS_LABEL_COMMAND: false
+2026-10-01T09:04:09.7378410Z ##[endgroup]

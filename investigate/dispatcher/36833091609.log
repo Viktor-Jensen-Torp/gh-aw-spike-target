@@ -1,0 +1,222 @@
+dispatch	UNKNOWN STEP	﻿2026-10-01T07:54:42.1117870Z Current runner version: '2.337.0'
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1148570Z ##[group]Runner Image Provisioner
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1150061Z Hosted Compute Agent
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1151443Z Version: 20260828.587
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1152747Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1153936Z Build Date: 2026-08-28T16:44:25Z
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1155297Z Worker ID: {af67b973-9428-435c-ab0f-c3496403fb01}
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1156588Z Azure Region: northcentralus
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1157699Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1159859Z ##[group]Operating System
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1161365Z Ubuntu
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1162368Z 24.04.5
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1163370Z LTS
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1164449Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1165498Z ##[group]Runner Image
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1166598Z Image: ubuntu-24.04
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1167670Z Version: 20260920.314.1
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1169651Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1172209Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1173820Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1175773Z ##[group]GITHUB_TOKEN Permissions
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1178852Z Actions: write
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1180024Z Contents: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1181255Z Metadata: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1182372Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1185266Z Secret source: Actions
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1187282Z Cache mode: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1188756Z Prepare workflow directory
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1543189Z Prepare all required actions
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.1592436Z Getting action download info
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.4407325Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.5354297Z Download action repository 'actions/create-github-app-token@v3' (SHA:bcd2ba49218906704ab6c1aa796996da409d3eb1)
+dispatch	UNKNOWN STEP	2026-10-01T07:54:42.9617700Z Complete job name: dispatch
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0421583Z ##[group]Run actions/checkout@v5
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0422713Z with:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0423384Z   sparse-checkout: .github/scripts
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0424176Z   persist-credentials: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0424971Z   repository: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0429155Z   token: ***
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0429812Z   ssh-strict: true
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0430468Z   ssh-user: git
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0431416Z   clean: true
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0432172Z   sparse-checkout-cone-mode: true
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0432933Z   fetch-depth: 1
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0433571Z   fetch-tags: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0434234Z   show-progress: true
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0434911Z   lfs: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0435535Z   submodules: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0436194Z   set-safe-directory: true
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0436917Z   allow-unsafe-pr-checkout: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.0437974Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1657527Z Syncing repository: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1660946Z ##[group]Getting Git version info
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1662639Z Working directory is '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1664164Z [command]/usr/bin/git version
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1727691Z git version 2.55.0
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1750506Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1768561Z Temporarily overriding HOME='/home/runner/work/_temp/566bfb27-9859-4562-9fb9-f1ebd85d0679' before making global git config changes
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1771942Z Adding repository directory to the temporary git global config as a safe directory
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1777316Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1851690Z Deleting the contents of '/home/runner/work/gh-aw-spike-target/gh-aw-spike-target'
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1863625Z ##[group]Initializing the repository
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1872741Z [command]/usr/bin/git init /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1977758Z hint: Using 'master' as the name for the initial branch. This default branch name
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1980407Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1982784Z hint: to use in all of your new repositories, which will suppress this warning,
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1984593Z hint: call:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1985731Z hint:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1986984Z hint: 	git config --global init.defaultBranch <name>
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1988538Z hint:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1989964Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1992758Z hint: 'development'. The just-created branch can be renamed via this command:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1994379Z hint:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1995332Z hint: 	git branch -m <name>
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1996381Z hint:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1997732Z hint: Disable this message with "git config set advice.defaultBranchName false"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.1999980Z Initialized empty Git repository in /home/runner/work/gh-aw-spike-target/gh-aw-spike-target/.git/
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2003346Z [command]/usr/bin/git remote add origin https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2049148Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2050813Z ##[group]Disabling automatic garbage collection
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2053991Z [command]/usr/bin/git config --local gc.auto 0
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2096252Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2097864Z ##[group]Setting up auth
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2099396Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2140972Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2546858Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2590536Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2859922Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.2900907Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.3169648Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.3213145Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.3214304Z ##[group]Fetching the repository
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.3223009Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +abac3bfa89cebc98e4d87e07c3138a327c159aa8:refs/remotes/origin/main
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5842294Z From https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5844302Z  * [new ref]         abac3bfa89cebc98e4d87e07c3138a327c159aa8 -> origin/main
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5847766Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5849399Z ##[group]Determining the checkout info
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5851331Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5852712Z ##[group]Setting up sparse checkout
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5855450Z [command]/usr/bin/git sparse-checkout set .github/scripts
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5905723Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5907451Z ##[group]Checking out the ref
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.5909719Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9089391Z Switched to a new branch 'main'
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9092490Z branch 'main' set up to track 'origin/main'.
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9099221Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9154386Z [command]/usr/bin/git log -1 --format=%H
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9186420Z abac3bfa89cebc98e4d87e07c3138a327c159aa8
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9197043Z ##[group]Removing auth
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9200350Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9237467Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9487065Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9518564Z http.https://github.com/.extraheader
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9528022Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9569131Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9818438Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:43.9858124Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0110369Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0734368Z ##[group]Run actions/create-github-app-token@v3
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0735994Z with:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0737194Z   client-id: Iv23lidwbDbnN0P1RJsx
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0763838Z   private-key: ***
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0765223Z   permission-organization-projects: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0766765Z   permission-issues: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0768124Z   permission-pull-requests: read
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0769536Z   skip-token-revoke: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0770944Z   github-api-url: https://api.github.com
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.0772575Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.1607225Z Inputs 'owner' and 'repositories' are not set. Creating token for this repository (Viktor-Jensen-Torp/gh-aw-spike-target).
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6276306Z ##[group]Run set -euo pipefail
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6277250Z ^[[36;1mset -euo pipefail^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6278097Z ^[[36;1msay() { echo "$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6278988Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6279881Z ^[[36;1m# The reviewer App can read the organisation's projects; GITHUB_TOKEN cannot.^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6280984Z ^[[36;1mCUR=$(bash .github/scripts/current-sprint.sh "${REPO%/*}" "$PROJECT")^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6282324Z ^[[36;1mSPRINT=$(jq -r .title <<<"$CUR"); IN_SPRINT=$(jq -c .issues <<<"$CUR")^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6283514Z ^[[36;1m[ -n "$SPRINT" ] || { say "No current sprint (no Sprint iteration covers today); nothing to start."; exit 0; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6284532Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6285307Z ^[[36;1m# A run whose gate stopped it (agent job skipped) is not work; a run^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6286311Z ^[[36;1m# still deciding counts as real, which errs towards starting less.^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6287495Z ^[[36;1mruns() { GH_TOKEN="$ACTIONS_TOKEN" gh run list --repo "$REPO" --workflow implement.lock.yml --limit 100 \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6288635Z ^[[36;1m           --json databaseId,status,conclusion,displayTitle "$@"; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6289652Z ^[[36;1mreal() { GH_TOKEN="$ACTIONS_TOKEN" gh run view "$1" --repo "$REPO" --json jobs \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6290754Z ^[[36;1m           --jq '[.jobs[] | select(.name == "agent")] | (length == 0 or (.[0].conclusion != "skipped"))'; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6292052Z ^[[36;1mcount_real() { local n=0; for R in $(jq -r '.[] | select(.conclusion != "skipped") | .databaseId'); do^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6293092Z ^[[36;1m                 [ "$(real "$R")" = "true" ] && n=$((n + 1)); done; echo "$n"; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6293872Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6294606Z ^[[36;1m# Work in flight: open agent pull requests, plus real implement runs not^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6295560Z ^[[36;1m# finished yet (they have not opened their pull request).^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6296582Z ^[[36;1mOPEN_PRS=$(gh pr list --repo "$REPO" --state open --label agent --json number --jq 'length')^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6297638Z ^[[36;1mRUNNING=$(runs --jq '[.[] | select(.status != "completed")]' | count_real)^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6298720Z ^[[36;1mSLOTS=$(( MAX_OPEN - OPEN_PRS - RUNNING ))^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6299562Z ^[[36;1mTODAY=$(runs --created ">=$(date -u +%Y-%m-%d)" | count_real)^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6300372Z ^[[36;1mLEFT_TODAY=$(( MAX_PER_DAY - TODAY ))^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6301406Z ^[[36;1m[ "$LEFT_TODAY" -lt "$SLOTS" ] && SLOTS="$LEFT_TODAY"^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6302487Z ^[[36;1msay "Sprint \`$SPRINT\`: $OPEN_PRS open agent PR(s), $RUNNING run(s) in flight, $TODAY started today; $SLOTS slot(s)."^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6303494Z ^[[36;1m[ "$SLOTS" -gt 0 ] || exit 0^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6304147Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6304868Z ^[[36;1m# Issues an open pull request says it fixes, and issues an implement run^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6305818Z ^[[36;1m# is still working on (its run name is "Implement #N").^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6306825Z ^[[36;1mFIXING=$( { gh pr list --repo "$REPO" --state open --limit 200 --json body --jq '.[].body // ""' \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6307860Z ^[[36;1m              | { grep -oiE '(fixes|closes|resolves) #[0-9]+' || true; }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6308825Z ^[[36;1m            runs --jq '.[] | select(.status != "completed") | .displayTitle' \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6309718Z ^[[36;1m              | { grep -oE '^Implement #[0-9]+' || true; }; } \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6310594Z ^[[36;1m  | { grep -oE '[0-9]+' || true; } | jq -R 'tonumber' | jq -sc 'unique')^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6311495Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6312322Z ^[[36;1mCANDIDATES=$(gh api graphql --paginate -F owner="${REPO%/*}" -F name="${REPO#*/}" -f query='^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6313511Z ^[[36;1m  query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6314817Z ^[[36;1m    issues(states: OPEN, labels: ["ready"], first: 100, after: $endCursor) {^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6315706Z ^[[36;1m      pageInfo { hasNextPage endCursor }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6316456Z ^[[36;1m      nodes { number title createdAt^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6317184Z ^[[36;1m        issueType { name }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6317885Z ^[[36;1m        labels(first: 30) { nodes { name } }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6318815Z ^[[36;1m        issueFieldValues(first: 10) { nodes { ... on IssueFieldSingleSelectValue {^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6319788Z ^[[36;1m          name field { ... on IssueFieldSingleSelect { name } } } } }^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6320801Z ^[[36;1m        blockedBy(first: 50) { nodes { number state labels(first: 30) { nodes { name } } } } } } } }' \^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6322114Z ^[[36;1m  --jq '.data.repository.issues.nodes[]' | jq -s -c --argjson sprint "$IN_SPRINT" --argjson fixing "$FIXING" '^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6323107Z ^[[36;1m    map({number, title, createdAt,^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6323844Z ^[[36;1m         type: (.issueType.name // ""),^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6324570Z ^[[36;1m         labels: [.labels.nodes[].name],^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6325524Z ^[[36;1m         priority: ([.issueFieldValues.nodes[] | select(.field.name? == "Priority") | .name][0] // ""),^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6326782Z ^[[36;1m         waiting: [.blockedBy.nodes[] | select(.state == "OPEN" and ([.labels.nodes[].name] | index("merged") | not)) | .number]})^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6327863Z ^[[36;1m    | map(select((.number as $n | $sprint | index($n))^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6328680Z ^[[36;1m                 and (.type != "Epic" and .type != "Spike")^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6329695Z ^[[36;1m                 and ([.labels[] | select(. == "needs-human" or . == "merged" or . == "human" or . == "paused")] | length == 0)^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6330714Z ^[[36;1m                 and (.number as $n | $fixing | index($n) | not)^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6331700Z ^[[36;1m                 and (.waiting | length == 0)))^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6332588Z ^[[36;1m    | sort_by([({"High": 0, "Medium": 1, "Low": 2}[.priority] // 3), .createdAt])')^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6333863Z ^[[36;1msay "Startable: $(jq -r 'map("#\(.number)" + (if .priority != "" then " (\(.priority))" else "" end)) | join(", ") | if . == "" then "none" else . end' <<<"$CANDIDATES")"^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6335107Z ^[[36;1m^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6335844Z ^[[36;1mfor N in $(jq -r --argjson k "$SLOTS" '.[:$k][].number' <<<"$CANDIDATES"); do^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6336779Z ^[[36;1m  if [ "$DRY_RUN" = "true" ]; then say "would start #$N"; continue; fi^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6337827Z ^[[36;1m  GH_TOKEN="$ACTIONS_TOKEN" bash .github/scripts/dispatch.sh implement.lock.yml issue "$N" >/dev/null^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6338753Z ^[[36;1m  say "started #$N"^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6339386Z ^[[36;1mdone^[[0m
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6598373Z shell: /usr/bin/bash -e {0}
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6599030Z env:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6602792Z   GH_TOKEN: ***
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6605777Z   ACTIONS_TOKEN: ***
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6606439Z   REPO: Viktor-Jensen-Torp/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6607120Z   PROJECT: 2
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6607675Z   MAX_OPEN: 2
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6608219Z   MAX_PER_DAY: 30
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6608766Z   DRY_RUN: false
+dispatch	UNKNOWN STEP	2026-10-01T07:54:44.6609328Z ##[endgroup]
+dispatch	UNKNOWN STEP	2026-10-01T07:54:51.0638742Z Sprint `Sprint 1`: 0 open agent PR(s), 0 run(s) in flight, 0 started today; 2 slot(s).
+dispatch	UNKNOWN STEP	2026-10-01T07:54:53.9591599Z Startable: none
+dispatch	UNKNOWN STEP	2026-10-01T07:54:53.9882362Z Post job cleanup.
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.2904392Z Token revoked
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.3379375Z Post job cleanup.
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4274562Z [command]/usr/bin/git version
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4317154Z git version 2.55.0
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4354218Z Temporarily overriding HOME='/home/runner/work/_temp/1e94de01-842b-4006-bda1-53cf6dbfd366' before making global git config changes
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4356012Z Adding repository directory to the temporary git global config as a safe directory
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4359726Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gh-aw-spike-target/gh-aw-spike-target
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4400380Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4436917Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4705790Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.4744213Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.5013443Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.5052630Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+dispatch	UNKNOWN STEP	2026-10-01T07:54:54.5467250Z Cleaning up orphan processes

@@ -1,0 +1,18 @@
+﻿2026-10-01T09:26:20.1970569Z ##[group]Run mkdir -p "/tmp/gh-aw/evals"
+2026-10-01T09:26:20.1970967Z [36;1mmkdir -p "/tmp/gh-aw/evals"[0m
+2026-10-01T09:26:20.1971339Z [36;1mevidence_tmp="/tmp/gh-aw/evals/execution.json.tmp"[0m
+2026-10-01T09:26:20.1972053Z [36;1mprintf '{"version":1,"component":"evals","run_id":%s,"run_attempt":%s,"state":"not_started"}\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" > "$evidence_tmp"[0m
+2026-10-01T09:26:20.1972749Z [36;1mmv "$evidence_tmp" "/tmp/gh-aw/evals/execution.json"[0m
+2026-10-01T09:26:20.2034215Z shell: /usr/bin/bash -e {0}
+2026-10-01T09:26:20.2034485Z env:
+2026-10-01T09:26:20.2034717Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:26:20.2034992Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:26:20.2035769Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:26:20.2037279Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:26:20.2037609Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:26:20.2037991Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:26:20.2038252Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:26:20.2038560Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:26:20.2038931Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: a2376259fc9e750c
+2026-10-01T09:26:20.2039252Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846778209
+2026-10-01T09:26:20.2039531Z ##[endgroup]

@@ -1,0 +1,50 @@
+﻿2026-10-01T09:05:11.8438276Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:05:11.8438724Z with:
+2026-10-01T09:05:11.8439716Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const determineAutomaticLockdown = require(path.join(actionsDir, 'determine_automatic_lockdown.cjs'));
+await determineAutomaticLockdown(github, context, core);
+
+2026-10-01T09:05:11.8443150Z   github-token: ***
+2026-10-01T09:05:11.8443387Z   debug: false
+2026-10-01T09:05:11.8443620Z   user-agent: actions/github-script
+2026-10-01T09:05:11.8443909Z   result-encoding: json
+2026-10-01T09:05:11.8444140Z   retries: 0
+2026-10-01T09:05:11.8444383Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:05:11.8444688Z env:
+2026-10-01T09:05:11.8444901Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:05:11.8445174Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:05:11.8446231Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:05:11.8447074Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:05:11.8447370Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:05:11.8447681Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:05:11.8447932Z   DEFAULT_BRANCH: main
+2026-10-01T09:05:11.8448164Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:05:11.8448420Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:05:11.8448652Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:05:11.8448945Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:05:11.8449269Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:05:11.8449523Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:05:11.8449783Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:05:11.8450052Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:05:11.8450300Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:05:11.8450549Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:05:11.8450776Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:05:11.8451040Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:05:11.8451338Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:05:11.8451661Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:05:11.8452030Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:05:11.8452353Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:05:11.8452634Z   GH_AW_GITHUB_TOKEN: 
+2026-10-01T09:05:11.8452872Z   GH_AW_GITHUB_MCP_SERVER_TOKEN: 
+2026-10-01T09:05:11.8453129Z ##[endgroup]
+2026-10-01T09:05:11.9448725Z Determining automatic guard policy for GitHub MCP server
+2026-10-01T09:05:11.9450560Z Checking repository: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:05:12.2274438Z Repository visibility: public
+2026-10-01T09:05:12.2275461Z Repository is private: false
+2026-10-01T09:05:12.2281676Z Configured min-integrity: (not set)
+2026-10-01T09:05:12.2282757Z Configured repos: (not set)
+2026-10-01T09:05:12.2284315Z min-integrity not configured — automatically setting to 'approved' for public repository
+2026-10-01T09:05:12.2286347Z repos not configured — automatically setting to 'public' for public repository
+2026-10-01T09:05:12.2287582Z Automatic guard policy determination complete for public repository
+2026-10-01T09:05:12.2289074Z GitHub MCP guard policy automatically applied for public repository. min-integrity='approved' and repos='public'.

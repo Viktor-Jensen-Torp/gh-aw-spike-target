@@ -1,0 +1,43 @@
+{
+  "engine_id": "pi",
+  "engine_name": "Pi",
+  "model": "anthropic/claude-haiku-4-5-20251001",
+  "version": "0.87.0",
+  "agent_version": "0.87.0",
+  "workflow_name": "Implement",
+  "experimental": false,
+  "supports_tools_allowlist": true,
+  "cache_memory": false,
+  "run_id": 36840260856,
+  "run_number": 96,
+  "run_attempt": "1",
+  "repository": "Viktor-Jensen-Torp/gh-aw-spike-target",
+  "ref": "refs/heads/main",
+  "sha": "de198674479de83afc84c5cd7c89ae627285d96c",
+  "actor": "github-actions[bot]",
+  "event_name": "workflow_dispatch",
+  "target_repo": "",
+  "staged": false,
+  "allowed_domains": [
+    "defaults"
+  ],
+  "firewall_enabled": true,
+  "awf_version": "v0.28.23",
+  "awmg_version": "",
+  "agent_runtime": "",
+  "steps": {
+    "firewall": "squid"
+  },
+  "created_at": "2026-10-01T09:04:09.558Z",
+  "frontmatter_emoji": "🛠️",
+  "cli_version": "v0.89.21",
+  "context": {
+    "item_type": "issue",
+    "item_number": "253",
+    "event_type": "issues",
+    "repo": "Viktor-Jensen-Torp/gh-aw-spike-target",
+    "run_id": "36840225915",
+    "run_attempt": "1",
+    "workflow_id": "Viktor-Jensen-Torp/gh-aw-spike-target/.github/workflows/dispatcher.yml@refs/heads/main"
+  }
+}

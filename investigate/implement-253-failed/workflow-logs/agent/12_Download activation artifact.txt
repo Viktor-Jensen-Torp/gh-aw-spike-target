@@ -1,0 +1,45 @@
+﻿2026-10-01T09:04:35.2036296Z ##[group]Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+2026-10-01T09:04:35.2036786Z with:
+2026-10-01T09:04:35.2036988Z   name: activation
+2026-10-01T09:04:35.2037222Z   path: /tmp/gh-aw
+2026-10-01T09:04:35.2037455Z   merge-multiple: false
+2026-10-01T09:04:35.2037751Z   repository: Viktor-Jensen-Torp/gh-aw-spike-target
+2026-10-01T09:04:35.2038080Z   run-id: 36840260856
+2026-10-01T09:04:35.2038322Z   skip-decompress: false
+2026-10-01T09:04:35.2038565Z   digest-mismatch: error
+2026-10-01T09:04:35.2038789Z env:
+2026-10-01T09:04:35.2039002Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:04:35.2039276Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:04:35.2040094Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:04:35.2040947Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:04:35.2041247Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:04:35.2041637Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:04:35.2041897Z   DEFAULT_BRANCH: main
+2026-10-01T09:04:35.2042133Z   GH_AW_ASSETS_ALLOWED_EXTS: 
+2026-10-01T09:04:35.2042384Z   GH_AW_ASSETS_BRANCH: 
+2026-10-01T09:04:35.2042629Z   GH_AW_ASSETS_MAX_SIZE_KB: 0
+2026-10-01T09:04:35.2042916Z   GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
+2026-10-01T09:04:35.2043241Z   GH_AW_PR_HEAD_BASE_BRANCH: 
+2026-10-01T09:04:35.2043495Z   GH_AW_PR_HEAD_BASE_PR_NUMBER: 
+2026-10-01T09:04:35.2043752Z   GH_AW_PR_HEAD_BASE_REF: 
+2026-10-01T09:04:35.2043994Z   GH_AW_PR_HEAD_BASE_REPO: 
+2026-10-01T09:04:35.2044240Z   GH_AW_PR_HEAD_BASE_SHA: 
+2026-10-01T09:04:35.2044468Z   GH_AW_PR_HEAD_REPO: 
+2026-10-01T09:04:35.2044688Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:04:35.2044938Z   GH_AW_WORKFLOW_ID_SANITIZED: implement
+2026-10-01T09:04:35.2045237Z   PLAYWRIGHT_MCP_SANDBOX: false
+2026-10-01T09:04:35.2045556Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:04:35.2046157Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 2351877d8af0efc9
+2026-10-01T09:04:35.2046629Z   GITHUB_AW_OTEL_JOB_START_MS: 1790845473006
+2026-10-01T09:04:35.2046913Z ##[endgroup]
+2026-10-01T09:04:35.3563548Z Downloading single artifact
+2026-10-01T09:04:35.4491433Z Preparing to download the following artifacts:
+2026-10-01T09:04:35.4507487Z - activation (ID: 11150672212, Size: 454413, Expected Digest: sha256:d592ce096230e1dd8c09e74ffcf078c7e149048b63d13bdda1e86065a791a276)
+2026-10-01T09:04:35.6264604Z Redirecting to blob download url: https://productionresultssa1.blob.core.windows.net/actions-results/dac52cfa-b81b-428a-a7b4-32d947c3d2f1/workflow-job-run-c8acb1e7-e2f8-56eb-933b-112e94bdc27b/artifacts/b15526c9c0e75acea3d1f8055de216c85f0330baf8604e13d8c6ce90fb90d6d7.zip
+2026-10-01T09:04:35.6267560Z Starting download of artifact to: /tmp/gh-aw
+2026-10-01T09:04:35.6771416Z (node:3876) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-01T09:04:35.6773922Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T09:04:35.7663570Z SHA256 digest of downloaded artifact is d592ce096230e1dd8c09e74ffcf078c7e149048b63d13bdda1e86065a791a276
+2026-10-01T09:04:35.7665170Z Artifact download completed successfully.
+2026-10-01T09:04:35.7666302Z Total of 1 artifact(s) downloaded
+2026-10-01T09:04:35.7669132Z Download artifact has finished successfully

@@ -1,0 +1,32 @@
+﻿2026-10-01T09:27:50.3973910Z ##[group]Run actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+2026-10-01T09:27:50.3975008Z with:
+2026-10-01T09:27:50.3979354Z   github-token: ***
+2026-10-01T09:27:50.3981894Z   script: const path = require('path');
+const actionsDir = path.join(process.env.RUNNER_TEMP, 'gh-aw', 'actions');
+const { setupGlobals } = require(path.join(actionsDir, 'setup_globals.cjs'));
+setupGlobals(core, github, context, exec, io, getOctokit);
+const { main } = require(path.join(actionsDir, 'report_incomplete_handler.cjs'));
+await main();
+
+2026-10-01T09:27:50.3984564Z   debug: false
+2026-10-01T09:27:50.3985272Z   user-agent: actions/github-script
+2026-10-01T09:27:50.3986339Z   result-encoding: json
+2026-10-01T09:27:50.3987066Z   retries: 0
+2026-10-01T09:27:50.3987797Z   retry-exempt-status-codes: 400,401,403,404,422
+2026-10-01T09:27:50.3997139Z env:
+2026-10-01T09:27:50.3997846Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:50.4003834Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:50.4005592Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:50.4009239Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:50.4010116Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:50.4011009Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:50.4011774Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:50.4012623Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:50.4013611Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 5d139c37ca1b9167
+2026-10-01T09:27:50.4014507Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846863923
+2026-10-01T09:27:50.4015407Z   GH_AW_AGENT_OUTPUT: /tmp/gh-aw/agent_output.json
+2026-10-01T09:27:50.4016629Z   GH_AW_REPORT_INCOMPLETE_CREATE_ISSUE: true
+2026-10-01T09:27:50.4017486Z   GH_AW_WORKFLOW_NAME: Implement
+2026-10-01T09:27:50.4018807Z   GH_AW_WORKFLOW_SOURCE_URL: https://github.com/Viktor-Jensen-Torp/gh-aw-spike-target/blob/main/.github/workflows/implement.md
+2026-10-01T09:27:50.4020131Z ##[endgroup]
+2026-10-01T09:27:50.5287699Z Max count: unlimited

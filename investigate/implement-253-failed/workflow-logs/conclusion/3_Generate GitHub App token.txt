@@ -1,0 +1,25 @@
+﻿2026-10-01T09:27:44.0328037Z ##[group]Run actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+2026-10-01T09:27:44.0329122Z with:
+2026-10-01T09:27:44.0329739Z   client-id: Iv23liAsDhGOsnuJhNBa
+2026-10-01T09:27:44.0342222Z   private-key: ***
+2026-10-01T09:27:44.0342884Z   owner: Viktor-Jensen-Torp
+2026-10-01T09:27:44.0343599Z   repositories: gh-aw-spike-target
+2026-10-01T09:27:44.0344371Z   github-api-url: https://api.github.com
+2026-10-01T09:27:44.0345144Z   permission-contents: write
+2026-10-01T09:27:44.0346036Z   permission-issues: write
+2026-10-01T09:27:44.0346741Z   permission-pull-requests: write
+2026-10-01T09:27:44.0347468Z   skip-token-revoke: false
+2026-10-01T09:27:44.0348125Z env:
+2026-10-01T09:27:44.0348742Z   OTEL_EXPORTER_OTLP_ENDPOINT: 
+2026-10-01T09:27:44.0349458Z   OTEL_SERVICE_NAME: gh-aw.implement
+2026-10-01T09:27:44.0351031Z   OTEL_RESOURCE_ATTRIBUTES: gh-aw.workflow.name=Implement,gh-aw.repository=Viktor-Jensen-Torp/gh-aw-spike-target,gh-aw.run.id=36840260856,github.run_id=36840260856,gh-aw.engine.id=pi
+2026-10-01T09:27:44.0352664Z   OTEL_EXPORTER_OTLP_HEADERS: 
+2026-10-01T09:27:44.0353455Z   GH_AW_OTLP_ENDPOINTS: [{"url":"","headers":""}]
+2026-10-01T09:27:44.0354257Z   GH_AW_OTLP_IF_MISSING: ignore
+2026-10-01T09:27:44.0354942Z   GH_AW_RUNTIME_FEATURES: 
+2026-10-01T09:27:44.0355700Z   GITHUB_AW_OTEL_TRACE_ID: 78bd5c44fe8cb81f476f21df20fa0d20
+2026-10-01T09:27:44.0356783Z   GITHUB_AW_OTEL_PARENT_SPAN_ID: 5d139c37ca1b9167
+2026-10-01T09:27:44.0357853Z   GITHUB_AW_OTEL_JOB_START_MS: 1790846863923
+2026-10-01T09:27:44.0358631Z ##[endgroup]
+2026-10-01T09:27:44.6402593Z Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
+2026-10-01T09:27:44.6404921Z - Viktor-Jensen-Torp/gh-aw-spike-target

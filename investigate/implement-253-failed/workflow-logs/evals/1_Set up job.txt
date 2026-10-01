@@ -1,0 +1,35 @@
+﻿2026-10-01T09:26:13.9582010Z Current runner version: '2.337.0'
+2026-10-01T09:26:13.9606690Z ##[group]Runner Image Provisioner
+2026-10-01T09:26:13.9607717Z Hosted Compute Agent
+2026-10-01T09:26:13.9608339Z Version: 20260828.587
+2026-10-01T09:26:13.9609161Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-01T09:26:13.9610016Z Build Date: 2026-08-28T16:44:25Z
+2026-10-01T09:26:13.9610839Z Worker ID: {4f9b82ec-b437-4763-b635-9753ddfdfb7c}
+2026-10-01T09:26:13.9611739Z Azure Region: westus
+2026-10-01T09:26:13.9612371Z ##[endgroup]
+2026-10-01T09:26:13.9613991Z ##[group]Operating System
+2026-10-01T09:26:13.9614678Z Ubuntu
+2026-10-01T09:26:13.9615237Z 24.04.5
+2026-10-01T09:26:13.9615822Z LTS
+2026-10-01T09:26:13.9616398Z ##[endgroup]
+2026-10-01T09:26:13.9617322Z ##[group]Runner Image
+2026-10-01T09:26:13.9617962Z Image: ubuntu-24.04
+2026-10-01T09:26:13.9618561Z Version: 20260920.314.1
+2026-10-01T09:26:13.9619673Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-01T09:26:13.9621493Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+2026-10-01T09:26:13.9622486Z ##[endgroup]
+2026-10-01T09:26:13.9623671Z ##[group]GITHUB_TOKEN Permissions
+2026-10-01T09:26:13.9625535Z Contents: read
+2026-10-01T09:26:13.9626236Z Metadata: read
+2026-10-01T09:26:13.9627220Z ##[endgroup]
+2026-10-01T09:26:13.9629218Z Secret source: Actions
+2026-10-01T09:26:13.9630369Z Cache mode: write
+2026-10-01T09:26:13.9631100Z Prepare workflow directory
+2026-10-01T09:26:14.0245574Z Prepare all required actions
+2026-10-01T09:26:14.0294327Z Getting action download info
+2026-10-01T09:26:14.4172748Z Download action repository 'github/gh-aw-actions@924af5fdc64061cfbf66fb584c8b07e2ac230c60' (SHA:924af5fdc64061cfbf66fb584c8b07e2ac230c60)
+2026-10-01T09:26:15.0092334Z Download action repository 'actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c' (SHA:3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c)
+2026-10-01T09:26:15.3892003Z Download action repository 'actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3' (SHA:3a2844b7e9c422d3c10d287c895573f7108da1b3)
+2026-10-01T09:26:15.7417157Z Download action repository 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020' (SHA:820762786026740c76f36085b0efc47a31fe5020)
+2026-10-01T09:26:15.8199316Z Download action repository 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' (SHA:043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+2026-10-01T09:26:16.0405944Z Complete job name: evals
