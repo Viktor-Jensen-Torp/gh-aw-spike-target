@@ -80,3 +80,29 @@ test('Given I have signed out, when I go back, then I see the sign-in screen, no
   await page.goto('/');
   await expect(page).toHaveURL('/sign-in');
 });
+
+test('Given the user menu is open, when I hover "Sign out", then only "Sign out" is highlighted', async ({
+  page,
+}) => {
+  // First, sign up
+  await page.goto('/sign-up');
+  const email = `mara${Date.now()}@reyes.studio`;
+  await page.getByLabel('Full name').fill('Mara Reyes');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  // Should be redirected to the start page and signed in
+  await expect(page).toHaveURL('/');
+
+  // Open the user card menu
+  await page.getByRole('button', { name: 'Mara Reyes' }).first().click();
+
+  // Hover over "Sign out" item
+  const signOutItem = page.getByRole('menuitem', { name: 'Sign out' });
+  await signOutItem.hover();
+
+  // Verify that the "Sign out" item has the highlighted background
+  // The menu item gets highlighted with bg-bg when hovered (data-[highlighted]:bg-bg)
+  await expect(signOutItem).toHaveAttribute('data-highlighted');
+});

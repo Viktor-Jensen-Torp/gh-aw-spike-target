@@ -60,8 +60,9 @@ export function HomePage() {
               <MenuDivider />
               <MenuItem
                 label="Sign out"
-                icon={<LogOut size={16} />}
+                icon={<LogOut size={14} />}
                 danger={true}
+                size="compact"
                 onSelect={signOut}
               />
             </Menu>
