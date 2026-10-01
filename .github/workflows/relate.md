@@ -83,13 +83,15 @@ pre-agent-steps:
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
-      MAX_ISSUES: "60"
+      MAX_ISSUES: "120"
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/agent
       # Filter first, then cap: capping the listing first let merged and [aw]
       # issues use up the 60, so older open issues (#111, #55) were never
-      # considered (run 36732579456, #252). Newest first, as before.
+      # considered (run 36732579456, #252). Newest first, as before. 120, because
+      # 60 left out the 7 oldest of 67 open issues (2026-10-01); at 1,200
+      # characters an issue that is about 36K tokens.
       gh issue list --repo "$REPO" --state open --limit 1000 \
         --json number,title,body,labels,createdAt \
         --jq "[ .[]
