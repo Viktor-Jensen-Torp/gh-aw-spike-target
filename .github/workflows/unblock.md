@@ -88,8 +88,12 @@ pre-agent-steps:
       # --unshallow as a belt to the frontmatter's braces: it errors on a repo
       # that is already complete, so fall back to a plain fetch.
       git fetch -q --unshallow origin 2>/dev/null || true
-      git fetch -q origin "$BASE" "refs/pull/$PR/head:pr-head"
-      git checkout -q pr-head
+      # The branch under its own name, tracking origin. gh-aw's push takes the
+      # current branch as the PR's, and origin/<branch> as the pre-agent head the
+      # patch starts from; under a local name (`pr-head`) it found neither and
+      # refused every push (runs 36837858853, 36840226744; generate_git_patch.cjs).
+      git fetch -q origin "$BASE" "+refs/heads/$HEAD:refs/remotes/origin/$HEAD"
+      git checkout -q -B "$HEAD" "origin/$HEAD"
 
       if git merge --no-edit "origin/$BASE" > /tmp/gh-aw/agent/merge.log 2>&1; then
         echo "clean" > /tmp/gh-aw/agent/merge-state.txt
@@ -218,9 +222,13 @@ what the conflicting lines should say.
 You are on the pull request's branch with the merge in progress. `git status`,
 `git diff` and reading the files all work normally.
 
+Every `push_to_pull_request_branch` call takes all three of `repo`
+`${{ github.repository }}`, `pull_request_number` ${{ inputs.pr }} and a one-line
+`message`; without them it refuses. Never rebase, reset or rewrite the branch:
+the push sends only what you add on top of it.
+
 **If the state is `clean`**, the branch merged with no conflicts. Call
-`push_to_pull_request_branch` with `pull_request_number` ${{ inputs.pr }}, and
-stop. Nothing needs deciding; the pipeline sends the review.
+`push_to_pull_request_branch`, and stop. Nothing needs deciding; the pipeline sends the review.
 
 ## Step 2: Resolve, keeping both sides' intent
 
@@ -293,8 +301,7 @@ push: that is Step 4.
 it answers **"BLOCKED by the pipeline"**, nothing was pushed: fix what it names,
 commit, and push again. If it tells you to stop, go to Step 4.
 
-Then call `push_to_pull_request_branch` with `pull_request_number`
-${{ inputs.pr }}. The pipeline sends the review of the resolved branch after
+Then call `push_to_pull_request_branch`. The pipeline sends the review of the resolved branch after
 your run.
 
 ## Step 4: When you cannot

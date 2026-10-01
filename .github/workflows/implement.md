@@ -3,6 +3,10 @@ emoji: 🛠️
 description: Implements a dispatched issue as a pull request with tests.
 intent: Turn an accepted issue into a reviewable pull request that passes the repository's checks, without a person writing the code.
 
+# Above shared/budget.md's 100: successful implement runs reach 70 AIC (10-70
+# over the last 20 runs, 2026-10-01), so 100 left little room for a real large
+# task; a loop is still cut off at $1.50.
+max-ai-credits: 150
 
 inlined-imports: true
 
@@ -68,6 +72,21 @@ jobs:
   pre-activation:
     outputs:
       proceed: ${{ steps.gate.outputs.proceed }}
+  # A finished run may free a slot, so it wakes the dispatcher itself. The
+  # dispatcher starts this run with GITHUB_TOKEN, and GitHub fires no
+  # `workflow_run` for such a run, so its completion woke nothing: 0 of 22
+  # bot-started Implement and Refine runs were followed by a dispatcher run, 27
+  # of 27 others were (investigate/2026-10-01, REPORT.md). A dispatch from
+  # GITHUB_TOKEN is the exception GitHub allows.
+  conclusion:
+    permissions:
+      actions: write
+    pre-steps:
+      - name: Wake the dispatcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh workflow run dispatcher.yml --repo "$REPO" --ref main || echo "::warning::could not wake the dispatcher"
 
 if: needs.pre_activation.outputs.proceed == 'true'
 
