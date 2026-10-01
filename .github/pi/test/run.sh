@@ -54,6 +54,8 @@ case_() {
   [ $ok = 1 ] || fails=$((fails + 1))
 }
 fixture() { case_ "$1" "$2" "$(cat "$FIX/$3")"; }
+# #247: these cases change apps/web/; mark the app as looked at, as a snapshot would.
+looked() { mkdir -p "$ROOT/state"; echo "playwright-cli snapshot" > "$ROOT/state/looked"; }
 
 echo "== real commands, in the order the agents ran them"
 new_root
@@ -206,14 +208,31 @@ git clone -q "$SCOPE/origin.git" "$SCOPE/ws" 2>/dev/null
 in_ws() { (cd "$SCOPE/ws" && "$@") >/dev/null 2>&1; }
 new_root; fake_verify
 in_ws sh -c 'echo b >> apps/web/a.ts && git add -A && git commit -qm fix'
-GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "only apps/ changed: goes through"            pass  "$PUSH"
+looked; GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "only apps/ changed: goes through"            pass  "$PUSH"
 in_ws sh -c 'mkdir -p .github x/y && echo c > .github/ci.yml && echo d > "x/y/chrome" && git add -A && git commit -qm sweep'
 new_root; fake_verify
 GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ ".github/ and a stray folder: refused"      block "$PUSH"
 grep -q "  .github/ci.yml" "$ROOT/last_err" && grep -q "git reset " "$ROOT/last_err" && echo "PASS  the agent is told which files, and how to undo" || { echo "FAIL  refusal lacks files or reset"; fails=$((fails+1)); }
 [ ! -f "$ROOT/verify.runs" ] && echo "PASS  refused before verify ran" || { echo "FAIL  verify ran for an out-of-scope commit"; fails=$((fails+1)); }
-new_root; fake_verify
+new_root; fake_verify; looked
 GITHUB_WORKSPACE="$SCOPE/ws" ROLE=review  case_ "review role: not checked"                  pass  "$PUSH"
+
+echo "== a change with a screen is looked at first (#247; #237, #214)"
+in_ws sh -c 'git reset -q --hard origin/main && echo e >> apps/web/a.ts && git add apps/web/a.ts && git commit -qm web'
+new_root; fake_verify
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "apps/web/ changed, never looked: refused"   block "$PUSH"
+grep -q "have not looked at it in a browser" "$ROOT/last_err" && echo "PASS  the agent is told to look" || { echo "FAIL  no look instruction"; fails=$((fails+1)); }
+new_root; fake_verify
+PI_ROLE=rework PI_POSTCONDITIONS_STATE_DIR="$ROOT/state" node -e '
+  const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
+  h.tool_result({ toolName: "bash", input: { command: "playwright-cli snapshot" }, isError: false, content: [] });' "$EXT" 2>/dev/null
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "after a snapshot: goes through"             pass  "$PUSH"
+new_root; fake_verify
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "\"Could not look at the app:\" says why: goes through" pass \
+  'echo "{\"body\":\"Could not look at the app: Storybook did not start (see log)\"}" | safeoutputs push_to_pull_request_branch .'
+in_ws sh -c 'git reset -q --hard origin/main && mkdir -p apps/api && echo f > apps/api/b.ts && git add apps/api/b.ts && git commit -qm api'
+new_root; fake_verify
+GITHUB_WORKSPACE="$SCOPE/ws" ROLE=rework case_ "only apps/api/ changed: no look needed"      pass  "$PUSH"
 
 echo "== review rows are refused in the form the routing would refuse them"
 REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
@@ -231,7 +250,7 @@ WS="$BASE/ws"; mkdir -p "$WS"
 for P in $(jq -r '.requirements[].evidence' <<<"$FIXED" | grep -oE '[A-Za-z0-9_.@-]+(/[A-Za-z0-9_.@-]+)+' | sed -E 's/[.:]+$//' | sort -u); do
   case "$P" in */) mkdir -p "$WS/$P" ;; *) mkdir -p "$WS/$(dirname "$P")"; seq 400 > "$WS/$P" ;; esac
 done
-new_root; GITHUB_WORKSPACE="$WS" case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
+new_root; looked; GITHUB_WORKSPACE="$WS" case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
 # Replay of #213 (review 36707098843): a story cited at line 260 of a 215-line file.
 SHORT=$(jq -c '.requirements |= map(if .id == "U1" then .evidence = "apps/web/src/components/Button/Button.stories.tsx:260" else . end)' <<<"$FIXED")
 head -215 "$WS/apps/web/src/components/Button/Button.stories.tsx" > "$WS/s" && mv "$WS/s" "$WS/apps/web/src/components/Button/Button.stories.tsx"
@@ -247,7 +266,7 @@ new_root; case_ "a row left out is refused"                  block "$(submit REQ
 new_root; case_ "data as a bare list, not {requirements}"  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements' <<<"$FIXED")")"
 grep -q "data must be an object" "$ROOT/last_err" && echo "PASS  it names the shape data needs" || { echo "FAIL  bare list reported as: $(head -1 "$ROOT/last_err")"; fails=$((fails + 1)); }
 new_root; case_ "n/a on a row that does not allow it"        block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(if .id == "U1" then .status = "n/a" else . end)' <<<"$FIXED")")"
-new_root; REQS="$ROOT/none.md" case_ "no requirements file (a person's PR): not checked" pass 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
+new_root; looked; REQS="$ROOT/none.md" case_ "no requirements file (a person's PR): not checked" pass 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
 unset ROWS_SCRIPT REQS META
 
 echo "== agent_end nudge"
