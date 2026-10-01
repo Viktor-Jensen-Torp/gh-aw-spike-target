@@ -225,7 +225,18 @@ new_root; case_ "replay #136: U1-U3 without a full path refused" block "$(submit
 grep -q "U1: met-without-a-changed-file" "$ROOT/last_err" && echo "PASS  the agent is told which rows" || { echo "FAIL  the agent is not told which rows"; fails=$((fails+1)); }
 FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3") then .evidence = "apps/web/src/components/Button/Button.stories.tsx:16" else . end)
   + [{"id": "U7", "status": "met", "evidence": "apps/web/src/components/Button/Button.stories.tsx:16"}]' <<<"$REPLAY")
-new_root; case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
+# The guard looks cited lines up in the checkout (#244): give it one in which
+# every cited file exists and is long enough.
+WS="$BASE/ws"; mkdir -p "$WS"
+for P in $(jq -r '.requirements[].evidence' <<<"$FIXED" | grep -oE '[A-Za-z0-9_.@-]+(/[A-Za-z0-9_.@-]+)+' | sed -E 's/[.:]+$//' | sort -u); do
+  case "$P" in */) mkdir -p "$WS/$P" ;; *) mkdir -p "$WS/$(dirname "$P")"; seq 400 > "$WS/$P" ;; esac
+done
+new_root; GITHUB_WORKSPACE="$WS" case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
+# Replay of #213 (review 36707098843): a story cited at line 260 of a 215-line file.
+SHORT=$(jq -c '.requirements |= map(if .id == "U1" then .evidence = "apps/web/src/components/Button/Button.stories.tsx:260" else . end)' <<<"$FIXED")
+head -215 "$WS/apps/web/src/components/Button/Button.stories.tsx" > "$WS/s" && mv "$WS/s" "$WS/apps/web/src/components/Button/Button.stories.tsx"
+new_root; GITHUB_WORKSPACE="$WS" case_ "a cited line past the end of the file is refused" block "$(submit REQUEST_CHANGES "$SHORT")"
+grep -q "U1: met-cites-a-missing-line" "$ROOT/last_err" && echo "PASS  the agent is told which row cites a missing line" || { echo "FAIL  missing-line row not named"; fails=$((fails + 1)); }
 new_root; case_ "no data at all is refused"                  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
 grep -q "trailing dot" "$ROOT/last_err" && echo "PASS  it shows how to pipe the review" || { echo "FAIL  no piping hint"; fails=$((fails + 1)); }
 new_root; case_ "requirements at the top level are refused"  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\",\"requirements\":[]}" | safeoutputs submit_pull_request_review .'

@@ -231,6 +231,21 @@ check "design-part: other instances of the component are untouched" '"Default"' 
   "$(part screen | jq -c '.children[2].children[1].content')"
 part missing >/dev/null 2>&1; check "design-part: an absent id is an error" "nonzero" "$([ $? -ne 0 ] && echo nonzero || echo zero)"
 
+# --- review-rows.sh with cited lines (#244) -----------------------------------------
+printf 'apps/web/src/components/Menu/Menu.stories.tsx\t215\napps/web/src/features/auth/routes.ts\tabsent\napps/web/src/components/Menu\tdir\n' > "$WORK/cited.tsv"
+printf 'apps/web/src/components/Menu/Menu.stories.tsx\n' > "$WORK/menu-files.txt"
+cited() { rows "$(review "$(row C1 met "none found")" "$(row U1 met "$1")")" "$REQ_COMPONENT" "$WORK/menu-files.txt" "$WORK/cited.tsv" | grep '^U1:'; }
+check "replay #213: a line past the end of the file is refused" "U1: met-cites-a-missing-line" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:260")"
+check "a range inside the file passes"                          "U1: met" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:25-55")"
+check "replay #232: a path that does not exist is refused"      "U1: met-cites-a-missing-line" "$(cited "apps/web/src/components/Menu/Menu.stories.tsx:16, apps/web/src/features/auth/routes.ts:50-57")"
+check "a folder holding a changed file passes"                  "U1: met" "$(cited "apps/web/src/components/Menu/")"
+check "without the table nothing is looked up"                  "U1: met" \
+  "$(rows "$(review "$(row C1 met x)" "$(row U1 met "apps/web/src/components/Menu/Menu.stories.tsx:999")")" "$REQ_COMPONENT" "$WORK/menu-files.txt" | grep '^U1:')"
+mkdir -p "$WORK/ws/apps/a"; seq 10 > "$WORK/ws/apps/a/f.ts"
+printf '{"requirements":[{"id":"U1","status":"met","evidence":"apps/a/f.ts:3, apps/a/, apps/b/g.ts"}]}' > "$WORK/cite.json"
+check "cited-lines.sh: lines, folders and absent paths" "$(printf 'apps/a\tdir\napps/a/f.ts\t10\napps/b/g.ts\tabsent')" \
+  "$(ROOT="$WORK/ws" bash "$SCRIPTS/cited-lines.sh" "$WORK/cite.json")"
+
 # --- check-issue.sh: "Out of scope" names its neighbours (#227) --------------------
 body() { # <out-of-scope text, or "-" for no heading> -> a work-item body
   printf '## What\nx\n\n## Why\ny\n\n## Details\nz\n\n## Done when\n\n| Given | Expect |\n|---|---|\n| a | b |\n'

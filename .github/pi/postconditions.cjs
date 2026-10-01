@@ -433,17 +433,20 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
         echo "BLOCKED by the pipeline: data must be an object, {\\"requirements\\": [{\\"id\\": ..., \\"status\\": ..., \\"evidence\\": ...}, ...]}, not a bare list. Nothing was submitted." >&2
         return 2
       fi
-      __rd="${STATE_DIR}/rows-data.json"; __rf="${STATE_DIR}/rows-files.txt"
+      __rd="${STATE_DIR}/rows-data.json"; __rf="${STATE_DIR}/rows-files.txt"; __rc="${STATE_DIR}/rows-cited.tsv"
       printf '%s' "$__data" > "$__rd"; jq -r '.files[].path' "${PR_META}" > "$__rf" 2>/dev/null
-      if ! __rows=$(bash "${REVIEW_ROWS}" "$__rd" "${REQUIREMENTS}" "$__rf" 2>&1); then
+      # The cited paths and lines, looked up in this checkout (the pull request's head).
+      ROOT="\${GITHUB_WORKSPACE:-$(pwd)}" bash "$(dirname "${REVIEW_ROWS}")/cited-lines.sh" "$__rd" > "$__rc" 2>/dev/null || : > "$__rc"
+      if ! __rows=$(bash "${REVIEW_ROWS}" "$__rd" "${REQUIREMENTS}" "$__rf" "$__rc" 2>&1); then
         echo "[spike/postconditions] WARNING: review-rows.sh failed; submitting unchecked (routing still checks): $__rows" >&2
         __rows=""
       fi
-      __bad=$(printf '%s\n' "$__rows" | grep -E ': (met-without-a-changed-file|n/a-not-allowed|missing)$' || true)
+      __bad=$(printf '%s\n' "$__rows" | grep -E ': (met-without-a-changed-file|met-cites-a-missing-line|n/a-not-allowed|missing)$' || true)
       if [ -n "$__bad" ]; then
         echo "BLOCKED by the pipeline: these rows would be refused as written. Nothing was submitted; fix them and call $1 again:" >&2
         printf '%s\n' "$__bad" | sed 's/^/  /' >&2
         echo "  met-without-a-changed-file: the evidence must name a changed file (or its folder) by its full path, e.g. apps/web/src/components/Button/Button.stories.tsx:16. The changed files are in /tmp/gh-aw/agent/pr-meta.json." >&2
+        echo "  met-cites-a-missing-line: a path or line the evidence cites does not exist in this checkout. Read the file and cite the line that shows the proof; never copy line numbers from the pull request body." >&2
         echo "  n/a-not-allowed: only rows marked yes under 'n/a allowed' may be n/a. missing: every row of requirements.md, and C1, needs an entry." >&2
         return 2
       fi

@@ -283,7 +283,11 @@ jobs:
             gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$T/files.txt"
             # Every row must be `met` with a changed path as proof, or an allowed
             # `n/a` (.github/scripts/review-rows.sh).
-            ROWS=$(bash .github/scripts/review-rows.sh "$T/data.json" "$T/req.md" "$T/files.txt")
+            # Every cited path and line must exist at the head (#244): looked up
+            # through the API, since this job checks out no pull request files.
+            CITED_FROM=api REPO="$REPO" SHA="$SHA" bash .github/scripts/cited-lines.sh "$T/data.json" > "$T/cited.tsv" \
+              || { echo "::warning::could not look up the cited lines; not checked"; : > "$T/cited.tsv"; }
+            ROWS=$(bash .github/scripts/review-rows.sh "$T/data.json" "$T/req.md" "$T/files.txt" "$T/cited.tsv")
             sed 's/^/  /' <<<"$ROWS"
             ROWS_FAILED=$(awk '$2 != "met" && $2 != "n/a" { printf "%s%s ", $1, $2 }' <<<"$ROWS")
             [ -z "$ROWS_FAILED" ] || echo "requirements not met: $ROWS_FAILED"
