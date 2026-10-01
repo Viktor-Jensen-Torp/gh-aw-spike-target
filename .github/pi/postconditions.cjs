@@ -245,6 +245,9 @@ const SWEEPING_ADD = /(^|[;&|(`\n]|\$\()\s*git\s+(add\s+(-A|--all|\.)(\s|$|;|&)|
 const SWEEPING_ADD_REASON =
   "BLOCKED by the pipeline: add only the files you changed, by path (git add apps/web/src/... ). A sweeping add also commits what gh-aw left in the checkout (a browser install, restored .github/ files), and on rework run 36601234520 that made the push fail. Nothing was run.";
 
+/** A command that runs verify.sh: at the start, after ; & | ( or after bash/sh. */
+const RUNS_VERIFY = /(^|[;&|(]\s*|\b(?:bash|sh)\s+)(?:\S*\/)?verify\.sh\b/m;
+
 /**
  * Item 9: advice for one moment, appended to that tool's result.
  * @param {string} command
@@ -252,7 +255,9 @@ const SWEEPING_ADD_REASON =
  * @returns {string} advice, or "" when there is none
  */
 function adviceFor(command, output) {
-  if (/verify\.sh/.test(command)) {
+  // Only a command that runs verify.sh, not one that mentions it (a grep, or
+  // the guard's own text): on #217 a review's failed grep got this advice.
+  if (RUNS_VERIFY.test(command)) {
     return "\n[pipeline] verify.sh failed. Fix what it names, run it again until it passes, then commit only the files you changed (by path) before you push.";
   }
   if (/\bsafeoutputs\b/.test(command) && /unknown parameters|Invalid arguments|is required|must be/i.test(output)) {
@@ -413,11 +418,15 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   // request may link no issue, and then there are no rows to check.
   const rowsCheck = checkRows
     ? `
-  if [ "$1" = submit_pull_request_review ] || [ "$1" = submit-pull-request-review ]; then
+  if { [ "$1" = submit_pull_request_review ] || [ "$1" = submit-pull-request-review ]; } && [ "$2" != "--help" ]; then
     if [ -f "${REVIEW_ROWS}" ] && [ -f "${REQUIREMENTS}" ] && [ -f "${PR_META}" ]; then
       __data=$(printf '%s' "$__payload" | jq -c '.data // empty' 2>/dev/null); [ -z "$__data" ] && __data=$(__pc_flag data "$@")
       if [ -z "$__data" ]; then
-        echo "BLOCKED by the pipeline: the review has no data. Submit it with {\\"requirements\\": [...]}, one entry per row, C1 included (Step 5). Nothing was submitted." >&2
+        if printf '%s' "$__payload" | jq -e '.requirements' >/dev/null 2>&1; then
+          echo "BLOCKED by the pipeline: \\"requirements\\" must sit inside \\"data\\": {\\"event\\": ..., \\"body\\": ..., \\"data\\": {\\"requirements\\": [...]}}. Nothing was submitted." >&2
+        else
+          echo "BLOCKED by the pipeline: the review has no data. Pipe the whole review as JSON with a trailing dot, e.g. jq -n ... '{event: \\"COMMENT\\", body: \\$b, data: {requirements: [...]}}' | safeoutputs $1 . ; one entry per row, C1 included (Step 5). Nothing was submitted." >&2
+        fi
         return 2
       fi
       if ! printf '%s' "$__data" | jq -e 'type == "object" and (.requirements | type) == "array"' >/dev/null 2>&1; then
@@ -463,6 +472,8 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
+  # Asking for a tool's fields is never refused or recorded (#246).
+  if [ "$2" = "--help" ]; then command safeoutputs "$@"; return; fi
   __payload=""; __rec=""; __val=""
   if [ "$2" = "." ]; then
     __payload=$(cat)
@@ -575,7 +586,10 @@ function postconditions(pi) {
   let finished = false;
   pi.on("tool_result", async (/** @type {any} */ event) => {
     if (event.toolName !== "bash") return;
-    const command = String(event.input?.command || "");
+    // The agent's own command: tool_call prepends the guard, whose text names
+    // verify.sh, so without this every failed safeoutputs call got verify advice.
+    let command = String(event.input?.command || "");
+    if (guard && command.startsWith(`${guard}\n`)) command = command.slice(guard.length + 1);
     if (!event.isError) {
       // Item 12: say so once, right after the last required output goes through.
       if (finished || !/** @type {any} */ (spec).finishWhenDone || !/\bsafeoutputs\b/.test(command)) return;
@@ -586,7 +600,8 @@ function postconditions(pi) {
       return { content: [...(event.content || []), { type: "text", text: FINISHED }] };
     }
     const output = (event.content || []).map((/** @type {any} */ c) => c.text || "").join("\n");
-    const advice = adviceFor(command, output);
+    // A role that never verifies (review) gets no verify advice.
+    const advice = !verify && RUNS_VERIFY.test(command) ? "" : adviceFor(command, output);
     if (!advice) return;
     log(`advice appended after: ${command.slice(0, 80)}`);
     return { content: [...(event.content || []), { type: "text", text: advice }] };

@@ -227,6 +227,10 @@ FIXED=$(jq -c '.requirements |= map(if (.id == "U1" or .id == "U2" or .id == "U3
   + [{"id": "U7", "status": "met", "evidence": "apps/web/src/components/Button/Button.stories.tsx:16"}]' <<<"$REPLAY")
 new_root; case_ "same review with full paths goes through"   pass  "$(submit REQUEST_CHANGES "$FIXED")"
 new_root; case_ "no data at all is refused"                  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\"}" | safeoutputs submit_pull_request_review .'
+grep -q "trailing dot" "$ROOT/last_err" && echo "PASS  it shows how to pipe the review" || { echo "FAIL  no piping hint"; fails=$((fails + 1)); }
+new_root; case_ "requirements at the top level are refused"  block 'echo "{\"event\":\"COMMENT\",\"body\":\"b\",\"requirements\":[]}" | safeoutputs submit_pull_request_review .'
+grep -q "must sit inside" "$ROOT/last_err" && echo "PASS  it says requirements go inside data" || { echo "FAIL  no inside-data hint"; fails=$((fails + 1)); }
+new_root; case_ "--help is never refused"                    pass  'safeoutputs submit_pull_request_review --help'
 new_root; case_ "a row left out is refused"                  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements |= map(select(.id != "U2"))' <<<"$FIXED")")"
 # Replay: review run 36675018713, call 56: data sent as a bare list.
 new_root; case_ "data as a bare list, not {requirements}"  block "$(submit REQUEST_CHANGES "$(jq -c '.requirements' <<<"$FIXED")")"
@@ -319,6 +323,17 @@ grep -q "safeoutputs <tool> --help" <<<"$(advised refine 'cat <<EOF | safeoutput
   && echo "PASS  replay refine 36561914371: advice after refused fields" || { echo "FAIL  no advice after refused fields"; fails=$((fails + 1)); }
 [ "$(advised rework "bash .github/scripts/verify.sh" "✓ all passed" 0)" = unchanged ] && echo "PASS  a passing verify.sh gets no advice" || { echo "FAIL  advice on success"; fails=$((fails + 1)); }
 [ "$(advised rework "ls /nope" "No such file" 1)" = unchanged ] && echo "PASS  other failures get no advice" || { echo "FAIL  advice on unrelated failure"; fails=$((fails + 1)); }
+# #246: a command that mentions verify.sh without running it gets no advice (review 36701439061).
+[ "$(advised review "grep -n verify.sh .github/workflows/review.md" "" 1)" = unchanged ] && echo "PASS  a grep that mentions verify.sh gets no advice" || { echo "FAIL  advice on a grep"; fails=$((fails + 1)); }
+[ "$(advised review "bash .github/scripts/verify.sh" "✗ test" 1)" = unchanged ] && echo "PASS  review (no verify) gets no verify advice" || { echo "FAIL  verify advice for review"; fails=$((fails + 1)); }
+# The guard's own text (prepended by tool_call) names verify.sh; a failed guarded call must not get verify advice.
+guarded() { PI_ROLE="$1" PI_POSTCONDITIONS_STATE_DIR="$BASE/k" CMD="$2" node -e '
+  const h = {}; require(process.argv[1])({ on: (e, f) => (h[e] = f), sendUserMessage() {} });
+  const input = { command: process.env.CMD };
+  Promise.resolve(h.tool_call({ toolName: "bash", input })).then(() =>
+    h.tool_result({ toolName: "bash", input, isError: true, content: [{ type: "text", text: "BLOCKED by the pipeline: x" }] }))
+   .then(r => console.log(r ? r.content.map(c => c.text).join("|") : "unchanged"));' "$EXT" 2>/dev/null; }
+! grep -q "verify.sh failed" <<<"$(guarded rework 'echo "{}" | safeoutputs create_pull_request .')" && echo "PASS  a refused guarded call gets no verify advice" || { echo "FAIL  verify advice on a guarded call"; fails=$((fails + 1)); }
 
 # Item 12: once every required output is in, the result says to finish; not before.
 rm -rf "$BASE/k"; mkdir -p "$BASE/k"
