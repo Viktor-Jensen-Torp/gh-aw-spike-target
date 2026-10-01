@@ -20,6 +20,10 @@ on:
   # time contributes to load spikes, and scheduled runs are dropped — not
   # merely delayed — when GitHub is busy, which is worst on the hour.
   schedule: daily
+  # back-to-refinement.yml dispatches refine after a design change (#259) with
+  # GITHUB_TOKEN, which runs as github-actions[bot] and has no role; without
+  # this, gh-aw's role check stopped all four dispatches (run 36833176973).
+  bots: [github-actions]
   # "Run workflow": refine one issue (or an epic's pieces) now, without waiting
   # for tonight; or the whole backlog with a different settling period.
   workflow_dispatch:
