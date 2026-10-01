@@ -8,7 +8,7 @@
   --color-surface: #ffffff;
   --color-border: #e4e3df;
   --color-text: #191917;
-  --color-muted: #6f6e69;
+  --color-muted: #5a5954;
   --color-faint: #6e6e68;
   --color-accent: #2f5d3a;
   --color-accent-soft: #e8f0e9;
@@ -16,7 +16,7 @@
   --color-on-accent: #ffffff;
   --color-avatar-bg: #d8dfd9;
   --color-avatar-neutral: #eae9e4;
-  --color-border-strong: #c9c8c2;
+  --color-border-strong: #86857f;
   --color-border-disabled: #dcdbd5;
   --color-surface-hover: #f1f1ee;
   --color-surface-focus: #f7f9f7;
@@ -39,6 +39,7 @@
   --color-info-soft: #e9f1f4;
   --color-success: #3e7a4c;
   --color-accent-disabled: #c3cfc6;
+  --color-on-accent-disabled: #5a7060;
   --color-inverse-surface: #3a3a36;
   --color-inverse-border: #4a4a46;
   --color-inverse-muted: #d6d5cf;
