@@ -414,6 +414,16 @@ Review only lines that appear in the diff. Look for:
 - Unclear names, magic numbers, comments that no longer match the code
 - Dead or commented-out code, duplicated logic, needless complexity
 
+## Step 2b: Look at it, if it has a screen
+
+When the pull request changes `apps/web/`, open each screen or story it changes
+in the browser (`.github/pi/seeing-the-app.md`) and compare what you see with
+the issue's "Done when" and its design parts. Listing the stories is not
+looking at them: on #214 a story that could not render passed this way. The
+pipeline refuses the review until you have taken a `playwright-cli snapshot`;
+if it truly cannot be done, say why in the body on a line starting "Could not
+look at the app:".
+
 ## Step 3: Give a verdict on every requirement
 
 For each row of `requirements.md`, and for this row that applies to every pull

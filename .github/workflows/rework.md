@@ -283,7 +283,14 @@ finding: add the test.
 Whatever the task: **never make a check pass by weakening or deleting a test.**
 If a test is genuinely wrong, say so in your comment and explain why.
 
-## Step 3: Verify before you push
+## Step 3: Look at it, if it has a screen
+
+For a change under `apps/web/`, open each screen or story you changed in the
+browser and check it (`.github/pi/seeing-the-app.md`). The pipeline refuses the
+push until you have taken a `playwright-cli snapshot`; if it truly cannot be
+done, say why on a line starting "Could not look at the app:".
+
+## Step 4: Verify before you push
 
 Run `bash .github/scripts/verify.sh` and fix everything it names until it
 passes. It runs exactly the checks that gate the pull request, so a failure left

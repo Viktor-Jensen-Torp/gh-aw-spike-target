@@ -44,7 +44,7 @@ pre-agent-steps:
       fi
       # The paths the change touches, for the conventions: a pull request's
       # changed files, or for a new change the paths its issue names.
-      conventions() { # <issue body>
+      conventions() { # <issue body> [issue type]
         TMP=$(mktemp -d)
         if [ -n "${PR:-}" ]; then
           gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' > "$TMP/paths.txt"
@@ -52,7 +52,10 @@ pre-agent-steps:
           printf '%s' "$1" | grep -oE '`(apps|packages|docs)/[^` ]+`' | tr -d '`' | sort -u > "$TMP/paths.txt" || true
         fi
         printf '%s' "$1" > "$TMP/issue-body.md"
-        bash .github/scripts/agent-context.sh "$TMP/paths.txt" "$TMP/issue-body.md" "$DIR/conventions.md"
+        # A new change also passes the issue's type, so its conventions follow
+        # where the change will land, not only the paths the body names (#249).
+        NEW_CHANGE_TYPE=""; [ -n "${PR:-}" ] || NEW_CHANGE_TYPE="${2:-none}"
+        bash .github/scripts/agent-context.sh "$TMP/paths.txt" "$TMP/issue-body.md" "$DIR/conventions.md" $NEW_CHANGE_TYPE
         rm -rf "$TMP"
       }
       if [ -z "$N" ]; then
@@ -76,5 +79,5 @@ pre-agent-steps:
       cp "$REQ" "$DIR/requirements.md"
       jq -r '"#\(.number) (\(.type)): \(.title) — \(.body | length) characters"' "$DIR/issue.json"
       echo "requirements: $REQ ($(grep -cE '^\| *[A-Z][0-9]+ *\|' "$REQ") rows)"
-      conventions "$(jq -r .body "$DIR/issue.json")"
+      conventions "$(jq -r .body "$DIR/issue.json")" "$(jq -r '.type // ""' "$DIR/issue.json")"
 ---

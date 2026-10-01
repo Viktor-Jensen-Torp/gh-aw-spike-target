@@ -10,16 +10,23 @@
 # design parts" in that row). A new row in index.md is picked up without a
 # change here.
 #
-# Usage: agent-context.sh <paths.txt> <issue-body.md> <out.md>
+# Usage: agent-context.sh <paths.txt> <issue-body.md> <out.md> [issue type]
 #   paths.txt      paths the change touches, one per line: a pull request's
 #                  changed files, or for a new change the paths its issue names
 #   issue-body.md  the issue's body ("" if none)
+#   issue type     for a new change only: where it will land when the body
+#                  names no path. A Component is a shared component, and
+#                  claimed design parts mean a screen; so web.md, components.md
+#                  and chain/design.md are picked although no path names them.
+#                  #177's implementer got api.md only, while its reviewer,
+#                  picking by the changed files, judged it by web.md too (#249).
 # Run from the repository root. Exit 2 if index.md cannot be read.
 set -euo pipefail
 
 PATHS="${1:?usage: agent-context.sh paths.txt issue-body.md out.md}"
 BODY="${2:?missing issue-body.md}"
 OUT="${3:?missing out.md}"
+TYPE="${4:-}"
 IDX=.github/conventions/index.md
 [ -f "$IDX" ] || { echo "agent-context.sh: no $IDX" >&2; exit 2; }
 DIR=$(dirname "$IDX")
@@ -29,6 +36,14 @@ links() { grep -oE '\]\([^)]+\.md\)' | sed -E 's/^\]\((.*)\)$/\1/'; }
 
 CLAIMS=no
 grep -qE '`[^` ]+\.pen#[A-Za-z0-9_-]+`' "$BODY" 2>/dev/null && CLAIMS=yes
+
+# A new change (a type was given): add where it will land to the paths.
+if [ -n "$TYPE" ]; then
+  EXTRA=$(mktemp); cat "$PATHS" > "$EXTRA"
+  [ "$TYPE" = Component ] && echo "apps/web/src/components/_" >> "$EXTRA"
+  [ "$CLAIMS" = yes ] && echo "apps/web/src/_" >> "$EXTRA"
+  PATHS="$EXTRA"
+fi
 
 PICKED=()   # "path<TAB>why"
 add() { local p; p="$(cd "$DIR/$(dirname "$1")" && pwd)/$(basename "$1")"; p="${p#"$PWD"/}"
