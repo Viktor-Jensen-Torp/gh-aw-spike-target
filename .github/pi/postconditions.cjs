@@ -123,6 +123,7 @@ const CHECK_ISSUE = process.env.PI_CHECK_ISSUE_SCRIPT || "/tmp/gh-aw/pi-agent-di
 const REVIEW_ROWS = process.env.PI_REVIEW_ROWS_SCRIPT || "/tmp/gh-aw/pi-agent-dir/verify/review-rows.sh";
 const REQUIREMENTS = process.env.PI_REQUIREMENTS || "/tmp/gh-aw/agent/requirements.md";
 const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
+const LOOKED = `${STATE_DIR}/looked`;
 
 /**
  * required: each inner array is "any of these".
@@ -134,6 +135,8 @@ const PR_META = process.env.PI_PR_META || "/tmp/gh-aw/agent/pr-meta.json";
  * linkIssue: create_pull_request's body must say "Fixes #$PI_ISSUE".
  * checkRows: submit_pull_request_review's `data` must pass review-rows.sh's form rules.
  * allowedPaths: a regex every committed, unpushed path must match (commit scope).
+ * mustLook: a change touching apps/web/ is submitted only after a playwright-cli
+ *           snapshot, or with a "Could not look at the app:" line saying why (#247).
  */
 const ROLES = {
   review: {
@@ -144,6 +147,7 @@ const ROLES = {
     },
     checkRows: true,
     finishWhenDone: true,
+    mustLook: true,
   },
   implement: {
     required: [["create_pull_request", "noop", "report_incomplete", "missing_tool", "missing_data"]],
@@ -153,12 +157,14 @@ const ROLES = {
     finishWhenDone: true,
     // Implement's allowed-files (implement.md): the app code and the map.
     allowedPaths: "^(apps|packages)/|^docs/architecture\\.md$",
+    mustLook: true,
   },
   rework: {
     required: [["push_to_pull_request_branch", "noop", "report_incomplete", "missing_tool", "missing_data"]],
     checks: {},
     verify: true,
     allowedPaths: "^(apps|packages)/|^docs/architecture\\.md$",
+    mustLook: true,
   },
   // A quiet night is a correct outcome for the refiner, so `noop` counts — but
   // finishing with no output at all does not, because that is indistinguishable
@@ -296,8 +302,9 @@ function log(msg) {
  * @param {boolean} [linkIssue] create_pull_request must name $PI_ISSUE with a closing keyword
  * @param {boolean} [checkRows] submit_pull_request_review's rows must pass review-rows.sh's form rules
  * @param {string} [allowedPaths] regex every committed, unpushed path must match
+ * @param {boolean} [mustLook] a change touching apps/web/ needs a browser snapshot first
  */
-function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false, checkRows = false, allowedPaths = "") {
+function buildGuard(checks, verify = false, giveUp = "call report_incomplete with a short summary of what still fails", checkIssue = false, candidates = "", linkIssue = false, checkRows = false, allowedPaths = "", mustLook = false) {
   const cases = Object.entries(checks)
     .map(([tool, rule]) => {
       const norm = rule.upper ? ` | tr '[:lower:]' '[:upper:]'` : "";
@@ -472,6 +479,30 @@ function buildGuard(checks, verify = false, giveUp = "call report_incomplete wit
   esac`
     : "";
 
+  // A change with a screen is looked at before it is submitted (#247). On #237
+  // the implementer claimed Storybook verified a story it never opened, and on
+  // #214 the reviewer listed the stories without opening one, so a story that
+  // could not render shipped. The extension records a successful
+  // playwright-cli snapshot in ${LOOKED}.
+  const lookCheck = mustLook
+    ? `
+  case "$1" in create_pull_request|create-pull-request|push_to_pull_request_branch|push-to-pull-request-branch|submit_pull_request_review|submit-pull-request-review)
+    if [ ! -f "${LOOKED}" ]; then
+      case "$1" in
+        submit*) __web=$(jq -r '.files[].path' "${PR_META}" 2>/dev/null | grep '^apps/web/' | head -3 || true) ;;
+        *) __web=$(cd "\${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" && git log --name-only --format= HEAD --not --remotes 2>/dev/null | sort -u | grep '^apps/web/' | head -3 || true) ;;
+      esac
+      if [ -n "$__web" ]; then
+        __b=$(printf '%s' "$__payload" | jq -r '.body // empty' 2>/dev/null); [ -z "$__b" ] && __b=$(__pc_flag body "$@")
+        if ! printf '%s' "$__b" | grep -q 'Could not look at the app:'; then
+          echo "BLOCKED by the pipeline: this change touches apps/web/ ($(printf '%s' "$__web" | tr '\\n' ' ')) and you have not looked at it in a browser. Follow .github/pi/seeing-the-app.md: start the app (Storybook for src/components/), open each changed screen or story with playwright-cli, take a snapshot, and check it against the issue's Done when. If it truly cannot be done, put a line starting 'Could not look at the app:' with the reason in the body. Nothing was submitted; call $1 again." >&2
+          return 2
+        fi
+      fi
+    fi ;;
+  esac`
+    : "";
+
   return `mkdir -p ${STATE_DIR}
 __pc_flag() { __f="$1"; shift; while [ $# -gt 0 ]; do case "$1" in --"$__f") printf '%s' "$2"; return;; --"$__f"=*) printf '%s' "\${1#*=}"; return;; esac; shift; done; }
 safeoutputs() {
@@ -484,7 +515,7 @@ safeoutputs() {
       echo "BLOCKED by the pipeline: the payload for $1 is not valid JSON (jq: \${__jerr:-empty input}). Usually an unescaped quote or line break inside a string. Build it with jq so it is always valid, e.g. jq -n --arg s 'your text' '{conclusion: \\"failure\\", summary: \\$s}' | safeoutputs $1 . Nothing was submitted." >&2
       return 2
     fi
-  fi${issueCheck}${linkCheck}${rowsCheck}${scopeCheck}
+  fi${issueCheck}${linkCheck}${rowsCheck}${scopeCheck}${lookCheck}
   case "$1" in
 ${cases}${verifyCase}
   esac${consistency}
@@ -575,8 +606,9 @@ function postconditions(pi) {
   const linkIssue = /** @type {any} */ (spec).linkIssue === true;
   const checkRows = /** @type {any} */ (spec).checkRows === true;
   const allowedPaths = /** @type {any} */ (spec).allowedPaths || "";
-  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue || checkRows || allowedPaths
-    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue, checkRows, allowedPaths)
+  const mustLook = /** @type {any} */ (spec).mustLook === true;
+  const guard = Object.keys(spec.checks).length > 0 || verify || checkIssue || linkIssue || checkRows || allowedPaths || mustLook
+    ? buildGuard(spec.checks, verify, spec.giveUp, checkIssue, spec.decideEach?.candidates || "", linkIssue, checkRows, allowedPaths, mustLook)
     : "";
   let nudges = 0;
   log(`role=${role} guards=[${Object.keys(spec.checks).join(",")}] verify=${verify ? VERIFY : "off"} required=${JSON.stringify(spec.required)}`);
@@ -594,6 +626,10 @@ function postconditions(pi) {
     let command = String(event.input?.command || "");
     if (guard && command.startsWith(`${guard}\n`)) command = command.slice(guard.length + 1);
     if (!event.isError) {
+      // #247: a successful playwright-cli snapshot counts as having looked.
+      if (/\bplaywright-cli\b[^\n]*\bsnapshot\b/.test(command)) {
+        try { fs.mkdirSync(STATE_DIR, { recursive: true }); fs.writeFileSync(LOOKED, command.slice(0, 200)); } catch { /* best effort */ }
+      }
       // Item 12: say so once, right after the last required output goes through.
       if (finished || !/** @type {any} */ (spec).finishWhenDone || !/\bsafeoutputs\b/.test(command)) return;
       const called = calledTools();

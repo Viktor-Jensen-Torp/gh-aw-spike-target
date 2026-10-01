@@ -194,14 +194,20 @@ Work in this order:
    `apps/`, `packages/` and `docs/architecture.md`.
 3. Write a test for every case under the issue's "Done when", named after it
    (`.github/conventions/chain/testing.md`).
-4. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
+4. **Look at it, if it has a screen.** For a change under `apps/web/`, open
+   each screen or story it changes in the browser and check it against the
+   issue's "Done when" (`.github/pi/seeing-the-app.md`). The pipeline refuses
+   the pull request until you have taken a `playwright-cli snapshot`; if it
+   truly cannot be done, say why on a line starting "Could not look at the
+   app:". Never write that you checked something you did not open.
+5. Run `bash .github/scripts/verify.sh` and **fix everything it names, then run
    it again until it passes**. It runs exactly the checks that gate the pull
    request (typecheck, tests, browser tests, lint, conventions), so a failure
    you leave here comes back as a
    rejected review, a rework round and a second review. Fixing it now costs
    nothing; fixing it later costs three runs.
-5. Commit your changes.
-6. Open one pull request with `create_pull_request`. The body states what the
+6. Commit your changes.
+7. Open one pull request with `create_pull_request`. The body states what the
    issue asked for, what you changed, and that `verify.sh` passes, and ends
    with the line `Fixes #${{ github.event.inputs.issue }}`: the review, the
    rework and the release find the issue through it.
@@ -212,7 +218,7 @@ Work in this order:
    answers **"BLOCKED by the pipeline"**, nothing was submitted: fix what it
    names, commit, and call `create_pull_request` again. If it tells you to
    stop, call `report_incomplete` with what still fails — do not keep trying.
-7. **Then stop.** Do not inspect the result — no `git log`, no `git status`, no
+8. **Then stop.** Do not inspect the result — no `git log`, no `git status`, no
    `ls` to confirm the commit, no reading the pull request back. gh-aw pushes
    the branch and opens the pull request after your run ends, so the working
    directory you would be looking at cannot show you the outcome either way:

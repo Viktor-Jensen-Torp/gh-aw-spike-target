@@ -30,7 +30,8 @@ pre-agent-steps:
 ## Seeing the app
 
 When the change touches `apps/web/`, look at the screens it changes (a shared
-component: its stories in Storybook) before you finish. How to start them,
+component: its stories in Storybook) before you finish: it is a numbered step
+of your task, and the pipeline refuses the change until you have. How to start them,
 read them and stop them: `.github/pi/seeing-the-app.md`. Skip this for changes
 with no screen. If the app does not start, say so in your output with the last
 lines of its log; never skip it silently.
