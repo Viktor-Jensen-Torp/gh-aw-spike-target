@@ -256,8 +256,9 @@ const RUNS_VERIFY = /(^|[;&|(]\s*|\b(?:bash|sh)\s+)(?:\S*\/)?verify\.sh\b/m;
  */
 function adviceFor(command, output) {
   // Only a command that runs verify.sh, not one that mentions it (a grep, or
-  // the guard's own text): on #217 a review's failed grep got this advice.
-  if (RUNS_VERIFY.test(command)) {
+  // the guard's own text): on #217 a review's failed grep got this advice. Nor a
+  // safeoutputs call whose body names it (implement run 36840260856).
+  if (!/\bsafeoutputs\b/.test(command) && RUNS_VERIFY.test(command)) {
     return "\n[pipeline] verify.sh failed. Fix what it names, run it again until it passes, then commit only the files you changed (by path) before you push.";
   }
   if (/\bsafeoutputs\b/.test(command) && /unknown parameters|Invalid arguments|is required|must be/i.test(output)) {

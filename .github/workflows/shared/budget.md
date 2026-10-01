@@ -5,7 +5,8 @@ description: >
   built-in default), so a role with unusual needs can still set its own.
 
 # Per run. gh-aw's default is 1000 AIC — $10 a run, effectively unbounded for
-# work this size. Measured over 94 runs: median ~5, highest ever 43.1.
+# work this size. Healthy runs stay well under it; runs that hit it were stuck in a loop
+# (implement run 36840260856: 101 AIC, a port held by its own leftover servers).
 max-ai-credits: 100
 
 # Per workflow per rolling 24 hours. gh-aw's built-in default is 5000, which is

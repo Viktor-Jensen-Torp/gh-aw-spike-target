@@ -62,8 +62,25 @@ ensure_deps() {
 }
 
 # Typecheck, unit and component tests, and browser tests: package.json's `test`.
+# The browser tests start the app on 5173 (web) and 3001 (API) and, under CI,
+# refuse a port already taken. A run cut short (an agent's `timeout … verify.sh`)
+# leaves its servers behind, and every later run then failed on the port
+# (implement run 36840260856: 7 runs, 90 AIC). Under CI only, so a person's own
+# dev server is never stopped.
+free_ports() {
+  [ -n "${CI:-}" ] || return 0
+  local p pids
+  for p in 5173 3001; do
+    pids=$({ lsof -ti "tcp:$p" || fuser "$p/tcp"; } 2>/dev/null | tr -s ' \n' ' ')
+    [ -n "${pids// /}" ] || continue
+    echo "verify.sh: stopping a leftover server on port $p (pid $pids)"
+    kill $pids 2>/dev/null; sleep 1; kill -9 $pids 2>/dev/null || true
+  done
+}
+
 test_step() {
   ensure_deps || return 1
+  free_ports
   npm test
 }
 
